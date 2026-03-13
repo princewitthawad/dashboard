@@ -2128,6 +2128,19 @@ function exportPDF(){
         pdf.addImage(c.toDataURL('image/jpeg',.9),'JPEG',margin,margin,imgW,rendH);
       }
 
+      // หน้า 1: scale ให้พอดี A4 เสมอ
+      function addCanvasFit(c){
+        const pxPerMm=c.width/imgW;
+        const naturalH=c.height/pxPerMm;
+        // ถ้าสูงเกิน pagesH ให้ย่อ scale ลงพอดี
+        const fitH=Math.min(naturalH,pagesH);
+        const fitW=imgW*(fitH/naturalH)*( naturalH<=pagesH ? 1 : (pagesH/naturalH) );
+        const finalW=naturalH<=pagesH ? imgW : imgW*(pagesH/naturalH);
+        const finalH=naturalH<=pagesH ? naturalH : pagesH;
+        const offX=margin+(imgW-finalW)/2;
+        pdf.addImage(c.toDataURL('image/jpeg',.9),'JPEG',offX,margin,finalW,finalH);
+      }
+
       // trim canvas2: ตัดพื้นที่ว่างด้านบน/ล่างออก
       function trimCanvas(c){
         const ctx=c.getContext('2d');
@@ -2151,7 +2164,7 @@ function exportPDF(){
         return out;
       }
 
-      addCanvas(canvas1,true);
+      addCanvasFit(canvas1);
       addCanvas(trimCanvas(canvas2),false);
 
       pdf.save('construction-progress-'+todayStr()+'.pdf');
