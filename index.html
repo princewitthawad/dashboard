@@ -2629,7 +2629,7 @@ function exportPDF(){
         .edit-only,.view-badge,.live,.IG,.DCI,.PI,.DC-inp,
         .save-bar,#toast,#lock-modal,#jupiter-overlay,
         #analysis-overlay,#rt-guide-overlay,#fb-guide,
-        button,.TABS,.DP{display:none!important;}
+        button{display:none!important;}
         /* ── แสดง s2-desktop ── */
         .s2-desktop{display:block!important;}
         .s2-mobile{display:none!important;}
@@ -2673,6 +2673,13 @@ function exportPDF(){
         });
       }
 
+      /* ── แสดง .DP ทั้งหมดใน .DS ชั่วคราวก่อน capture ── */
+      const dpEls=document.querySelectorAll('.DS .DP');
+      const tabsEl=document.querySelector('.DS .TABS');
+      dpEls.forEach(dp=>{dp.style.setProperty('display','block','important');});
+      if(tabsEl) tabsEl.style.setProperty('display','none','important');
+      await new Promise(r=>setTimeout(r,200));
+
       /* ── capture main sections ── */
       const imgs=[];
       const mainEls=[
@@ -2680,15 +2687,29 @@ function exportPDF(){
         document.querySelector('.kg'),
         document.querySelector('.pie-section'),
         document.querySelector('.DS'),
-        ...Array.from(document.querySelectorAll('.W>.card')),
+        document.querySelector('.G2'),           // S1 + S4
+        document.querySelector('.W>.card:nth-of-type(1)'), // S2
+        ...Array.from(document.querySelectorAll('.W>.card')).filter(el=>{
+          // กรองเฉพาะ card ที่อยู่ใน .W โดยตรง ไม่ใช่ใน .G2 หรือ .C2
+          return el.parentElement && el.parentElement.classList.contains('W');
+        }),
+        document.querySelector('.C2'),           // S5 + S6
         document.querySelector('.SB'),
       ].filter(el=>el&&el.offsetHeight>2);
 
-      for(const el of mainEls){
+      // deduplicate
+      const seen=new Set();
+      const uniqueEls=mainEls.filter(el=>{if(seen.has(el))return false;seen.add(el);return true;});
+
+      for(const el of uniqueEls){
         const cv=await cap(el);
         if(cv&&cv.width>10) imgs.push(cv);
         await new Promise(r=>setTimeout(r,40));
       }
+
+      /* ── คืน .DP กลับ ── */
+      dpEls.forEach(dp=>{dp.style.removeProperty('display');});
+      if(tabsEl) tabsEl.style.removeProperty('display');
 
       /* ── คืน DOM ── */
       if(!s3was&&s3wrap){s3wrap.style.maxHeight='0';s3wrap.style.opacity='0';}
