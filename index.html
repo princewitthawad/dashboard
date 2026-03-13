@@ -2056,206 +2056,48 @@ function renderSafety(){
 }
 
 // ═══════════════════════════════
-// EXPORT PDF — มาตรฐานเดียวกันทุก device
+// EXPORT PDF
 // ═══════════════════════════════
 function exportPDF(){
-  showToast('กำลังสร้าง PDF...','info',4000);
-  const vals=getVals();
-  const vs=[vals.s1,vals.f25,vals.out,vals.s4,vals.s5,vals.s6,vals.s7];
-  const today=new Date().toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'});
-  const ts=new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
-
-  function bar(pct,col){
-    return`<div style="height:7px;background:#e8eaf0;border-radius:99px;overflow:hidden;margin:4px 0"><div style="height:100%;width:${Math.min(100,Math.max(0,pct))}%;background:${col};border-radius:99px"></div></div>`;
-  }
-  function badge(v,t){
-    return v>=t
-      ?`<span style="font-size:7.5pt;padding:1px 8px;border-radius:20px;background:#d1fae5;color:#065f46;font-weight:700">✅ ตามเป้า</span>`
-      :`<span style="font-size:7.5pt;padding:1px 8px;border-radius:20px;background:#fef3c7;color:#92400e;font-weight:700">⏳ ดำเนินการ</span>`;
-  }
-  function col(v,t){const r=v/t;return r>=1?'#059669':r>=.5?'#2563eb':r>=.3?'#d97706':'#dc2626';}
-
-  // Summary 7 cards
-  const sumCards=SUMDEF.map((d,i)=>`
-    <div style="background:#f8fafc;border:1px solid #e2e8f0;border-top:3px solid ${d.col};border-radius:8px;padding:8px 10px;text-align:center">
-      <div style="font-size:7.5pt;color:#6b7280;margin-bottom:3px;font-weight:600">${d.lbl}</div>
-      <div style="font-size:16pt;font-weight:800;color:${col(vs[i],d.tgt)};line-height:1;font-family:monospace">${vs[i].toFixed(1)}%</div>
-      <div style="font-size:7pt;color:#9ca3af;margin:2px 0">เป้า ${d.tgt}%</div>
-      ${bar(vs[i]/d.tgt*100,d.col)}
-      ${badge(vs[i],d.tgt)}
-    </div>`).join('');
-
-  // S2 table rows
-  const s2rows=FD.map(f=>{
-    const done=Math.round(f.rooms*f.pct/100);
-    const c=col(f.pct,100);
-    return`<tr><td>${f.label}</td><td style="text-align:center">${f.rooms}</td><td style="text-align:center;font-weight:700;color:${c}">${done}/${f.rooms}</td><td style="min-width:80px">${bar(f.pct,c)}</td><td style="text-align:right;font-weight:800;color:${c}">${f.pct}%</td></tr>`;
-  }).join('');
-
-  // S3 table rows
-  const s3rows=OD.map(o=>{
-    const{ta,da,fp}=calcOut(o);const c=col(fp,50);
-    return`<tr><td>${o.label}</td><td style="text-align:center">${o.fd}/${o.fa}</td><td style="text-align:center">${o.bd}/${o.ba}</td><td style="text-align:center">${o.sld}/${o.sl}</td><td style="text-align:center">${o.srd}/${o.sr}</td><td style="text-align:center;font-weight:600">${da.toFixed(0)}</td><td style="min-width:70px">${bar(fp,c)}</td><td style="text-align:right;font-weight:800;color:${c}">${fp.toFixed(1)}%</td></tr>`;
-  }).join('');
-
-  // S4 table rows
-  const s4rows=S4R.map(r=>{
-    const v=gv(r.id);const c=col(v,100);
-    return`<tr><td>${r.lbl}</td><td style="text-align:center">${r.wt}%</td><td style="min-width:80px">${bar(v,c)}</td><td style="text-align:right;font-weight:800;color:${c}">${v.toFixed(1)}%</td></tr>`;
-  }).join('');
-
-  // Daily log
-  const logs=getDailyLog().slice(-5).reverse();
-  const logRows=logs.length===0
-    ?`<tr><td colspan="8" style="text-align:center;color:#9ca3af;padding:8px">ยังไม่มีบันทึก</td></tr>`
-    :logs.map(l=>`<tr><td style="font-weight:600;white-space:nowrap">${l.date}</td>${SUMDEF.map((_,i)=>`<td style="text-align:right">${(l.vals?.[i]||0).toFixed(1)}%</td>`).join('')}</tr>`).join('');
-
-  // Plaster rooms
-  const doneRooms=Math.round(vs[6]/4.545);
-  const plastRooms=Array.from({length:22},(_,i)=>{
-    const d=i<doneRooms;
-    return`<div style="width:26px;height:26px;border-radius:5px;background:${d?'#f57c00':'#f1f5f9'};border:1px solid ${d?'#e65100':'#e2e8f0'};display:flex;align-items:center;justify-content:center;font-size:7pt;font-weight:700;color:${d?'#fff':'#9ca3af'}">${d?'✓':i+1}</div>`;
-  }).join('');
-
-  const CSS=`
-    *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:'Sarabun',sans-serif;background:#fff;color:#1e293b;font-size:9.5pt;line-height:1.5}
-    .page{max-width:277mm;margin:0 auto;padding:10mm}
-    h2{font-size:10pt;font-weight:700;color:#312e81;margin-bottom:7px;display:flex;align-items:center;gap:6px}
-    .num{width:20px;height:20px;border-radius:5px;background:#4f46e5;color:#fff;font-size:8pt;font-weight:800;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
-    .sec{background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:12px 14px;margin-bottom:8px;break-inside:avoid}
-    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-    table{width:100%;border-collapse:collapse;font-size:8.5pt}
-    thead tr{background:#f1f5f9}
-    th{padding:4px 7px;text-align:left;font-size:7.5pt;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.3px}
-    td{padding:3px 7px;border-bottom:1px solid #f1f5f9;color:#374151}
-    tbody tr:nth-child(even){background:#f8fafc}
-    @media print{
-      @page{size:A4 landscape;margin:8mm}
-      body{font-size:8.5pt}
-      .page{padding:0;max-width:100%}
-      .sec{margin-bottom:5px}
-      .no-print{display:none!important}
-    }`;
-
-  const html=`<!DOCTYPE html><html lang="th"><head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Construction Report — ${today}</title>
-  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <style>${CSS}</style>
-  </head><body><div class="page">
-
-  <!-- ── Header ── -->
-  <div style="background:linear-gradient(135deg,#eef2ff,#f8faff);border:1px solid #c7d2fe;border-top:4px solid #4f46e5;border-radius:8px;padding:12px 16px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between">
-    <div>
-      <div style="font-size:14pt;font-weight:800;color:#1e1b4b">🏗️ Construction Progress Report</div>
-      <div style="font-size:8.5pt;color:#6b7280;margin-top:2px;font-family:monospace">วันที่: ${today} · ${ts} น. · รายงานความคืบหน้างานก่อสร้าง</div>
-    </div>
-    <button class="no-print" onclick="window.print()" style="padding:8px 20px;background:#4f46e5;color:#fff;border:none;border-radius:8px;font-size:10pt;font-weight:700;cursor:pointer;font-family:inherit">🖨️ พิมพ์ / บันทึก PDF</button>
-  </div>
-
-  <!-- ── Summary 7 cards ── -->
-  <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:8px">${sumCards}</div>
-
-  <!-- ── 2-column layout ── -->
-  <div class="grid2">
-
-    <!-- LEFT -->
-    <div>
-      <!-- S1 -->
-      <div class="sec">
-        <h2><span class="num">1</span> งานหลังคา</h2>
-        <div style="display:flex;align-items:center;gap:10px">
-          <div style="flex:1">${bar(vs[0],'#059669')}</div>
-          <div style="font-size:20pt;font-weight:800;color:${col(vs[0],100)};font-family:monospace">${vs[0].toFixed(1)}%</div>
-        </div>
-        <div style="font-size:8pt;color:#6b7280;margin-top:4px">เป้าหมาย 100% &nbsp;${badge(vs[0],100)}</div>
-      </div>
-
-      <!-- S2 -->
-      <div class="sec">
-        <h2><span class="num">2</span> งานก่ออิฐภายใน (ชั้น 2–5)</h2>
-        <table><thead><tr><th>ชั้น</th><th>ห้อง</th><th>ทำแล้ว</th><th>ความคืบหน้า</th><th style="text-align:right">%</th></tr></thead>
-        <tbody>${s2rows}</tbody></table>
-        <div style="margin-top:6px;display:flex;align-items:center;gap:8px">
-          <span style="font-size:8.5pt;color:#6b7280">รวมเฉลี่ย:</span>
-          <strong style="font-size:11pt;color:#2563eb;font-family:monospace">${vs[1].toFixed(1)}%</strong> ${badge(vs[1],100)}
-        </div>
-      </div>
-
-      <!-- S4 -->
-      <div class="sec">
-        <h2><span class="num" style="background:#ff9500">4</span> งานก่ออิฐภายใน ชั้น 1</h2>
-        <table><thead><tr><th>ห้อง</th><th>น้ำหนัก</th><th>ความคืบหน้า</th><th style="text-align:right">%</th></tr></thead>
-        <tbody>${s4rows}</tbody></table>
-        <div style="margin-top:6px;display:flex;align-items:center;gap:8px">
-          <span style="font-size:8.5pt;color:#6b7280">รวม weighted avg:</span>
-          <strong style="font-size:11pt;color:#ff9500;font-family:monospace">${vals.s4.toFixed(1)}%</strong> ${badge(vals.s4,100)}
-        </div>
-      </div>
-
-      <!-- S5 S6 -->
-      <div class="grid2" style="gap:7px">
-        <div class="sec" style="margin-bottom:0">
-          <h2><span class="num" style="background:#9c27b0">5</span> งานไฟฟ้า</h2>
-          <div style="font-size:18pt;font-weight:800;color:#9c27b0;font-family:monospace">${vs[4].toFixed(1)}%</div>
-          ${bar(vs[4]/80*100,'#9c27b0')}
-          <div style="font-size:7.5pt;color:#6b7280;margin-top:3px">เป้า 80% ${badge(vs[4],80)}</div>
-        </div>
-        <div class="sec" style="margin-bottom:0">
-          <h2><span class="num" style="background:#00838f">6</span> ท่อน้ำดี</h2>
-          <div style="font-size:18pt;font-weight:800;color:#00838f;font-family:monospace">${vs[5].toFixed(1)}%</div>
-          ${bar(vs[5]/50*100,'#00838f')}
-          <div style="font-size:7.5pt;color:#6b7280;margin-top:3px">เป้า 50% ${badge(vs[5],50)}</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- RIGHT -->
-    <div>
-      <!-- S3 -->
-      <div class="sec">
-        <h2><span class="num" style="background:#00bcd4">3</span> งานก่ออิฐภายนอก</h2>
-        <table><thead><tr><th>ชั้น</th><th>หน้า</th><th>หลัง</th><th>ซ้าย</th><th>ขวา</th><th>ม²</th><th>คืบหน้า</th><th style="text-align:right">%</th></tr></thead>
-        <tbody>${s3rows}</tbody></table>
-        <div style="margin-top:6px;display:flex;align-items:center;gap:8px">
-          <span style="font-size:8.5pt;color:#6b7280">รวม weighted:</span>
-          <strong style="font-size:11pt;color:#00bcd4;font-family:monospace">${vs[2].toFixed(1)}%</strong> ${badge(vs[2],50)}
-        </div>
-      </div>
-
-      <!-- S7 -->
-      <div class="sec">
-        <h2><span class="num" style="background:#f57c00">7</span> งานฉาบผนังภายใน</h2>
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
-          <div style="flex:1">${bar(vs[6]/40*100,'#f57c00')}</div>
-          <div style="font-size:18pt;font-weight:800;color:#f57c00;font-family:monospace">${vs[6].toFixed(1)}%</div>
-        </div>
-        <div style="font-size:7.5pt;color:#6b7280;margin-bottom:8px">เป้า 40% · น้ำหนักห้องละ 4.55% &nbsp;${badge(vs[6],40)}</div>
-        <div style="display:flex;flex-wrap:wrap;gap:3px">${plastRooms}</div>
-      </div>
-
-      <!-- Daily log -->
-      <div class="sec">
-        <h2>📝 บันทึกรายวัน (5 วันล่าสุด)</h2>
-        <table><thead><tr><th>วันที่</th>${SUMDEF.map(d=>`<th style="text-align:right">${d.lbl}</th>`).join('')}</tr></thead>
-        <tbody>${logRows}</tbody></table>
-      </div>
-    </div>
-  </div>
-
-  <div style="margin-top:10px;padding-top:8px;border-top:1px solid #e2e8f0;font-size:7.5pt;color:#9ca3af;display:flex;justify-content:space-between">
-    <span>Construction Progress Dashboard · สร้างอัตโนมัติ ${today} ${ts} น.</span>
-    <span>ข้อมูล ณ วันที่พิมพ์เท่านั้น</span>
-  </div>
-
-  </div></body></html>`;
-
-  const win=window.open('','_blank','width=1200,height=900');
-  if(!win){showToast('กรุณาอนุญาต popup แล้วลองใหม่','info');return;}
-  win.document.write(html);
-  win.document.close();
-  showToast('เปิดหน้า PDF แล้ว — กด 🖨️ เพื่อบันทึก','ok',5000);
+  showToast('กำลังสร้าง PDF...','info',8000);
+  const style=document.createElement('style');
+  style.id='_pdf_style';
+  style.textContent=`button,.IG,.DCI,.PI,.edit-only,.view-badge,.overlay,#toast,#lock-modal,#pwc-modal,.TABS,.DP{display:none!important} .DP#tab-all{display:block!important} .W{max-width:1200px!important} .s2-mobile{display:none!important} .s2-desktop{display:block!important}`;
+  document.head.appendChild(style);
+  const W=document.querySelector('.W');
+  const origW=W.style.width;W.style.width='1200px';
+  const script=document.createElement('script');
+  script.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+  script.onload=async()=>{
+    const canvas=await html2canvas(W,{scale:1.5,useCORS:true,backgroundColor:'#080d14',logging:false});
+    const jsPDFScript=document.createElement('script');
+    jsPDFScript.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+    jsPDFScript.onload=()=>{
+      const{jsPDF}=window.jspdf;
+      const pdf=new jsPDF('p','mm','a4');
+      const pgW=210,pgH=297,margin=8;
+      const imgW=pgW-margin*2;
+      const totalH=canvas.height*(imgW/(canvas.width));
+      const pagesH=pgH-margin*2;
+      let y=0;
+      while(y<totalH){
+        if(y>0)pdf.addPage();
+        const srcY=Math.round(y*canvas.width/imgW);
+        const srcH=Math.round(pagesH*canvas.width/imgW);
+        const pc=document.createElement('canvas');
+        pc.width=canvas.width;pc.height=Math.min(srcH,canvas.height-srcY);
+        pc.getContext('2d').drawImage(canvas,0,srcY,canvas.width,pc.height,0,0,canvas.width,pc.height);
+        pdf.addImage(pc.toDataURL('image/jpeg',.9),'JPEG',margin,margin,imgW,pc.height*(imgW/canvas.width));
+        y+=pagesH;
+      }
+      pdf.save('construction-progress-'+todayStr()+'.pdf');
+      document.getElementById('_pdf_style')?.remove();
+      W.style.width=origW;
+      showToast('สร้าง PDF สำเร็จ 📄','ok');
+    };
+    document.head.appendChild(jsPDFScript);
+  };
+  document.head.appendChild(script);
 }
 
 // ═══════════════════════════════
