@@ -2146,7 +2146,15 @@ function exportPDF(){
         pdf.addImage(c.toDataURL('image/jpeg',.92),'JPEG',offX,margin,finalW,finalH);
       }
 
-      addCanvasPage(trimCanvas(canvas1),true);
+      function addCanvasPageFill(c){
+        // เต็มความกว้าง A4 เสมอ รักษา proportion
+        const ratio=c.height/c.width;
+        const finalW=imgW;
+        const finalH=finalW*ratio;
+        pdf.addImage(c.toDataURL('image/jpeg',.92),'JPEG',margin,margin,finalW,Math.min(finalH,pagesH));
+      }
+
+      addCanvasPageFill(trimCanvas(canvas1));
       addCanvasPage(trimCanvas(canvas2),false);
 
       pdf.save('construction-progress-'+todayStr()+'.pdf');
