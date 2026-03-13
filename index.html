@@ -2062,7 +2062,7 @@ function exportPDF(){
   showToast('กำลังสร้าง PDF...','info',8000);
   const style=document.createElement('style');
   style.id='_pdf_style';
-  style.textContent=`button,.IG,.DCI,.PI,.edit-only,.view-badge,.overlay,#toast,#lock-modal,#pwc-modal,.TABS,.DP{display:none!important} .DP#tab-all{display:block!important} .W{max-width:1200px!important} .s2-mobile{display:none!important} .s2-desktop{display:block!important}`;
+  style.textContent=`button,.IG,.DCI,.PI,.edit-only,.view-badge,.overlay,#toast,#lock-modal,#pwc-modal,.TABS,.DP,.save-bar{display:none!important} .DP#tab-all{display:block!important} .W{max-width:1200px!important} .s2-mobile{display:none!important} .s2-desktop{display:block!important}`;
   document.head.appendChild(style);
   const W=document.querySelector('.W');
   const origW=W.style.width;W.style.width='1200px';
