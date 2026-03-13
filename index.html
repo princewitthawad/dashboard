@@ -2066,9 +2066,25 @@ function exportPDF(){
   document.head.appendChild(style);
   const W=document.querySelector('.W');
   const origW=W.style.width;W.style.width='1200px';
+
+  // หา offsetTop ของ card S7 (card ที่มี SN สีส้ม "7") เทียบกับ W
+  function getS7Top(){
+    const cards=W.querySelectorAll('.card');
+    for(const c of cards){
+      const sn=c.querySelector('.SN');
+      if(sn&&sn.textContent.trim()==='7'){
+        let el=c,top=0;
+        while(el&&el!==W){top+=el.offsetTop;el=el.offsetParent;}
+        return top;
+      }
+    }
+    return null;
+  }
+
   const script=document.createElement('script');
   script.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
   script.onload=async()=>{
+    const s7Top=getS7Top();
     const canvas=await html2canvas(W,{scale:1.5,useCORS:true,backgroundColor:'#080d14',logging:false});
     const jsPDFScript=document.createElement('script');
     jsPDFScript.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
@@ -2077,19 +2093,32 @@ function exportPDF(){
       const pdf=new jsPDF('p','mm','a4');
       const pgW=210,pgH=297,margin=8;
       const imgW=pgW-margin*2;
-      const totalH=canvas.height*(imgW/(canvas.width));
+      const scale=canvas.width/1200;         // canvas px ต่อ CSS px
       const pagesH=pgH-margin*2;
-      let y=0;
-      while(y<totalH){
-        if(y>0)pdf.addPage();
-        const srcY=Math.round(y*canvas.width/imgW);
-        const srcH=Math.round(pagesH*canvas.width/imgW);
+      const pxPerMm=canvas.width/imgW;
+
+      // คำนวณจุดตัด: ถ้าหา S7 ได้ ใช้ top ของ S7 เป็นจุดเริ่มหน้า 2
+      // ถ้าไม่ได้ ตัดครึ่งตามปกติ
+      const totalCanvasH=canvas.height;
+      const cutPx=s7Top!=null
+        ? Math.round(s7Top*scale*1.5)        // 1.5 = html2canvas scale
+        : Math.round(totalCanvasH/2);
+
+      const slices=[
+        {start:0,          end:cutPx},
+        {start:cutPx,      end:totalCanvasH},
+      ];
+
+      slices.forEach((sl,i)=>{
+        if(i>0) pdf.addPage();
+        const srcH=sl.end-sl.start;
         const pc=document.createElement('canvas');
-        pc.width=canvas.width;pc.height=Math.min(srcH,canvas.height-srcY);
-        pc.getContext('2d').drawImage(canvas,0,srcY,canvas.width,pc.height,0,0,canvas.width,pc.height);
-        pdf.addImage(pc.toDataURL('image/jpeg',.9),'JPEG',margin,margin,imgW,pc.height*(imgW/canvas.width));
-        y+=pagesH;
-      }
+        pc.width=canvas.width;pc.height=srcH;
+        pc.getContext('2d').drawImage(canvas,0,sl.start,canvas.width,srcH,0,0,canvas.width,srcH);
+        const rendH=srcH/pxPerMm;
+        pdf.addImage(pc.toDataURL('image/jpeg',.9),'JPEG',margin,margin,imgW,Math.min(rendH,pagesH));
+      });
+
       pdf.save('construction-progress-'+todayStr()+'.pdf');
       document.getElementById('_pdf_style')?.remove();
       W.style.width=origW;
