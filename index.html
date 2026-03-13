@@ -2589,13 +2589,13 @@ function refreshAdvice(){
 // ไม่มี print dialog, โทนขาวหรู, จัดหน้าแน่นไม่มีช่องว่าง
 // ═══════════════════════════════════════════════════════════
 function exportPDF(){
-  showToast('Creating PDF...','info',30000);
+  showToast('Creating PDF...','info',40000);
 
   function loadSc(src,chk){
     return new Promise((res,rej)=>{
       if(chk&&window[chk]){res();return;}
       const s=document.createElement('script');
-      s.src=src; s.onload=()=>setTimeout(res,200); s.onerror=rej;
+      s.src=src; s.onload=()=>setTimeout(res,250); s.onerror=rej;
       document.head.appendChild(s);
     });
   }
@@ -2605,124 +2605,204 @@ function exportPDF(){
   .then(async()=>{
     try{
 
-      /* ════ 1. INJECT DARK THEME (เหมือนหน้าจอ) ════ */
-      const DARK_CSS=`
-        html,body{background:#080d14!important;}
-        *{
-          animation:none!important;transition:none!important;
-          backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
-          box-shadow:none!important;
-        }
-        body::before,.orb{display:none!important;}
-        /* ซ่อน UI ที่ไม่ต้องการ */
-        .edit-only,.view-badge,.live,.IG,.DCI,.PI,.DC-inp,
-        .save-bar,#toast,#lock-modal,#jupiter-overlay,
-        #analysis-overlay,#rt-guide-overlay,#fb-guide,
-        .TABS,button{display:none!important;}
-        /* แสดง desktop layout */
-        .s2-desktop{display:block!important;}
-        .s2-mobile{display:none!important;}
-      `;
-      const styleTag=document.createElement('style');
-      styleTag.id='pdf-inject';
-      styleTag.textContent=DARK_CSS;
-      document.head.appendChild(styleTag);
-
-      /* ════ 2. เตรียม DOM ════ */
-      // ซ่อน overlay
-      const HIDE=['lock-modal','jupiter-overlay','rt-guide-overlay','fb-guide','toast','analysis-overlay'];
+      /* ═══ 1. PREPARE DOM ═══ */
+      const HIDE_IDS=['lock-modal','jupiter-overlay','rt-guide-overlay','fb-guide','toast','analysis-overlay'];
       const prevD={};
-      HIDE.forEach(id=>{const el=document.getElementById(id);if(el){prevD[id]=el.style.display;el.style.setProperty('display','none','important');}});
+      HIDE_IDS.forEach(id=>{
+        const el=document.getElementById(id);
+        if(el){prevD[id]=el.style.cssText;el.style.setProperty('display','none','important');}
+      });
+      document.querySelectorAll('.save-bar').forEach(el=>el.style.setProperty('display','none','important'));
+      document.querySelectorAll('button').forEach(el=>el.style.setProperty('display','none','important'));
+      document.querySelectorAll('.edit-only,.view-badge,.live,.IG,.DCI,.PI,.DC-inp')
+        .forEach(el=>el.style.setProperty('display','none','important'));
 
       // เปิด s3 detail
       const s3wrap=document.getElementById('s3-detail-wrap');
       const s3was=_s3Open;
-      if(!s3was&&s3wrap){s3wrap.style.maxHeight='3000px';s3wrap.style.opacity='1';}
-
-      // แสดง .DP ทั้งหมดใน Circular Dashboard (ซ่อน tabs)
-      const dpAll=document.querySelectorAll('.DS .DP');
-      const tabsEl=document.querySelector('.DS .TABS');
-      dpAll.forEach(dp=>dp.style.setProperty('display','block','important'));
-      if(tabsEl) tabsEl.style.setProperty('display','none','important');
-
-      window.scrollTo(0,0);
-      await new Promise(r=>setTimeout(r,600));
-
-      /* ════ 3. CAPTURE ทั้ง .W ครั้งเดียว ════ */
-      const W=document.querySelector('.W');
-      if(!W) throw new Error('.W not found');
-
-      const fullCanvas = await html2canvas(W,{
-        scale:2.0,
-        useCORS:true,
-        allowTaint:true,
-        backgroundColor:'#080d14',
-        logging:false,
-        foreignObjectRendering:false,
-        windowWidth:1440,
-        width:W.scrollWidth,
-        height:W.scrollHeight,
-      });
-
-      /* ════ 4. คืน DOM ════ */
-      dpAll.forEach(dp=>dp.style.removeProperty('display'));
-      if(tabsEl) tabsEl.style.removeProperty('display');
-      if(!s3was&&s3wrap){s3wrap.style.maxHeight='0';s3wrap.style.opacity='0';}
-      HIDE.forEach(id=>{const el=document.getElementById(id);if(el)el.style.display=prevD[id]||'';});
-      styleTag.remove();
-
-      /* ════ 5. แบ่งหน้า ════ */
-      const {jsPDF}=window.jspdf;
-      const PW=210, PH=297, MX=5, MY=5, FH=8;
-      const CW=PW-MX*2;
-      const AVAIL=PH-MY*2-FH;          // พื้นที่ content ต่อหน้า mm
-      const pxPerMm=fullCanvas.width/CW; // pixel per mm
-      const sliceH=Math.floor(AVAIL*pxPerMm); // px ต่อหน้า
-
-      const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
-      let pg=0;
-      let srcY=0;
-      const totalH=fullCanvas.height;
-
-      while(srcY<totalH){
-        if(pg>0) pdf.addPage();
-        pg++;
-
-        const sh=Math.min(sliceH, totalH-srcY);
-        const sl=document.createElement('canvas');
-        sl.width=fullCanvas.width;
-        sl.height=sh;
-        const ctx=sl.getContext('2d');
-        ctx.fillStyle='#080d14';
-        ctx.fillRect(0,0,sl.width,sh);
-        ctx.drawImage(fullCanvas,0,srcY,fullCanvas.width,sh,0,0,sl.width,sh);
-
-        const imgH=sh/pxPerMm;
-        pdf.addImage(sl.toDataURL('image/jpeg',0.92),'JPEG',MX,MY,CW,imgH,undefined,'FAST');
-
-        srcY+=sh;
+      if(!s3was&&s3wrap){
+        s3wrap.style.cssText='max-height:6000px!important;opacity:1!important;transition:none!important;overflow:visible!important;';
       }
 
-      /* ════ 6. Footer ════ */
+      // แสดง Circular tab-all — ต้อง override .DP{display:none} และ @media print
+      // วิธีเดียวที่ชนะ !important คือ inject <style> ที่มี specificity สูงกว่า
+      const forceShowCSS=`
+        /* FORCE SHOW for PDF capture */
+        #tab-all, #tab-all.DP, .DS #tab-all,
+        html body .DS #tab-all,
+        html body .W .DS #tab-all { display:block!important; }
+        /* ซ่อน tab อื่นๆ */
+        #tab-s1,#tab-s2,#tab-s3,#tab-s4,
+        #tab-s5,#tab-s6,#tab-s7 { display:none!important; }
+        /* ซ่อน TABS bar */
+        .DS .TABS { display:none!important; }
+        /* ซ่อน UI */
+        body::before,.orb{display:none!important;}
+        *{animation:none!important;transition:none!important;
+          backdrop-filter:none!important;-webkit-backdrop-filter:none!important;}
+        .s2-desktop{display:block!important;}
+        .s2-mobile{display:none!important;}
+      `;
+      const stForce=document.createElement('style');
+      stForce.id='pdf-force-show';
+      stForce.textContent=forceShowCSS;
+      document.head.appendChild(stForce);
+
+      window.scrollTo(0,0);
+      await new Promise(r=>setTimeout(r,700));
+
+      /* ═══ 2. CAPTURE ทีละ element ═══
+         — capture แต่ละ section แยก แล้วเรียงใน PDF
+         — ทำแบบนี้เพราะ @media print ซ่อน elements บางตัวใน full-page capture
+      ═══════════════════════════════════════════════ */
+      async function cap(el){
+        if(!el) return null;
+        // force แสดง element
+        const origVis=el.style.visibility;
+        const origOp=el.style.opacity;
+        el.style.visibility='visible';
+        el.style.opacity='1';
+        // scroll to element
+        el.scrollIntoView({block:'start'});
+        await new Promise(r=>setTimeout(r,80));
+        let cv=null;
+        try{
+          cv=await html2canvas(el,{
+            scale:2.5,
+            useCORS:true,
+            allowTaint:true,
+            backgroundColor:'#080d14',
+            logging:false,
+            foreignObjectRendering:false,
+            ignoreElements:(node)=>{
+              const id=node.id||'';
+              const cls=(node.className||'').toString();
+              if(['lock-modal','jupiter-overlay','rt-guide-overlay',
+                  'fb-guide','toast','analysis-overlay'].includes(id)) return true;
+              if(cls.includes('save-bar')) return true;
+              return false;
+            },
+          });
+        }catch(e){console.warn('cap error',e);}
+        el.style.visibility=origVis;
+        el.style.opacity=origOp;
+        return cv;
+      }
+
+      // รายการ elements ที่จะ capture ตามลำดับ
+      const captureItems=[
+        {el: document.querySelector('header'),        label:'header'},
+        {el: document.querySelector('.kg'),           label:'KPI'},
+        {el: document.querySelector('.pie-section'),  label:'Pie'},
+        {el: document.querySelector('.DS'),           label:'Circular DS'},
+        {el: document.querySelector('.G2'),           label:'S1+S4'},
+        {el: document.getElementById('s2body')?.closest('.card'), label:'S2'},
+        {el: document.getElementById('s3body')?.closest('.card'), label:'S3'},
+        // S5+S6: หาจาก .C2 ที่เป็น direct child ของ .W
+        {el: (()=>{
+          for(const el of document.querySelectorAll('.C2')){
+            if(el.parentElement===document.querySelector('.W')) return el;
+          }
+          return null;
+        })(), label:'S5+S6'},
+        {el: document.getElementById('prooms')?.closest('.card'), label:'S7'},
+        {el: document.querySelector('.SB'),           label:'Summary'},
+      ];
+
+      const imgs=[];
+      for(const item of captureItems){
+        if(!item.el){console.warn('not found:',item.label);continue;}
+        if(item.el.offsetHeight<1 && item.el.offsetWidth<1){
+          console.warn('zero size:',item.label);continue;
+        }
+        console.log('capturing:',item.label, item.el.offsetHeight+'px');
+        const cv=await cap(item.el);
+        if(cv&&cv.width>10&&cv.height>10){
+          imgs.push({cv,label:item.label});
+          console.log('captured:',item.label,cv.width+'x'+cv.height);
+        } else {
+          console.warn('capture failed:',item.label);
+        }
+        await new Promise(r=>setTimeout(r,60));
+      }
+
+      /* ═══ 3. RESTORE DOM ═══ */
+      stForce.remove();
+      if(!s3was&&s3wrap){
+        s3wrap.style.cssText='max-height:0;opacity:0;transition:max-height .5s cubic-bezier(.4,0,.2,1),opacity .4s ease;overflow:hidden;';
+      }
+      HIDE_IDS.forEach(id=>{
+        const el=document.getElementById(id);
+        if(el) el.style.cssText=prevD[id]||'';
+      });
+      document.querySelectorAll('.save-bar').forEach(el=>el.style.removeProperty('display'));
+      document.querySelectorAll('button').forEach(el=>el.style.removeProperty('display'));
+      document.querySelectorAll('.edit-only,.view-badge,.live,.IG,.DCI,.PI,.DC-inp')
+        .forEach(el=>el.style.removeProperty('display'));
+      window.scrollTo(0,0);
+
+      if(imgs.length===0) throw new Error('Nothing captured');
+
+      /* ═══ 4. BUILD PDF ═══ */
+      const {jsPDF}=window.jspdf;
+      const PW=210,PH=297,MX=7,MY=7,GAP=3,FH=8;
+      const CW=PW-MX*2;
+      const AVAIL=PH-MY*2-FH;
+
+      const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+      let curY=MY;
+
+      for(const {cv,label} of imgs){
+        const ratio=CW/cv.width;   // mm per px
+        const ih=cv.height*ratio;  // image height in mm
+
+        if(ih<=AVAIL){
+          // ภาพพอดีในหน้าเดียว
+          if(curY+ih>PH-MY-FH && curY>MY){
+            pdf.addPage(); curY=MY;
+          }
+          pdf.addImage(cv.toDataURL('image/jpeg',0.92),'JPEG',MX,curY,CW,ih,undefined,'FAST');
+          curY+=ih+GAP;
+        } else {
+          // ภาพยาวกว่า 1 หน้า → ตัด slice
+          const pxPerPage=Math.floor(AVAIL/ratio);
+          let sy=0;
+          while(sy<cv.height){
+            if(curY>MY){ pdf.addPage(); curY=MY; }
+            const sh=Math.min(pxPerPage, cv.height-sy);
+            const sl=document.createElement('canvas');
+            sl.width=cv.width; sl.height=sh;
+            const ctx=sl.getContext('2d');
+            ctx.fillStyle='#080d14';
+            ctx.fillRect(0,0,sl.width,sh);
+            ctx.drawImage(cv,0,sy,cv.width,sh,0,0,sl.width,sh);
+            const imgH=sh*ratio;
+            pdf.addImage(sl.toDataURL('image/jpeg',0.92),'JPEG',MX,curY,CW,imgH,undefined,'FAST');
+            curY+=imgH+GAP;
+            sy+=sh;
+          }
+        }
+      }
+
+      /* ═══ 5. FOOTER ═══ */
       const tot=pdf.internal.getNumberOfPages();
       const now=new Date();
       const ds=now.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
       for(let i=1;i<=tot;i++){
         pdf.setPage(i);
-        pdf.setDrawColor(56,100,150); pdf.setLineWidth(0.2);
-        pdf.line(MX,PH-FH-0.5,PW-MX,PH-FH-0.5);
-        pdf.setFontSize(7); pdf.setTextColor(100,130,160);
-        pdf.text('Construction Progress Dashboard  -  '+ds, MX, PH-FH+2.5);
-        pdf.text('Page '+i+' / '+tot, PW-MX, PH-FH+2.5,{align:'right'});
+        pdf.setDrawColor(56,100,160); pdf.setLineWidth(0.2);
+        pdf.line(MX,PH-FH,PW-MX,PH-FH);
+        pdf.setFontSize(7); pdf.setTextColor(120,140,170);
+        pdf.text('Construction Progress Dashboard  ·  '+ds,MX,PH-FH+3.5);
+        pdf.text('Page '+i+' / '+tot,PW-MX,PH-FH+3.5,{align:'right'});
       }
 
       pdf.save('Construction_Report_'+now.toISOString().slice(0,10)+'.pdf');
       showToast('PDF saved — '+tot+' pages','ok');
 
     }catch(err){
-      const st=document.getElementById('pdf-inject');
-      if(st) st.remove();
-      console.error('PDF:',err);
+      console.error('PDF error:',err);
+      document.getElementById('pdf-force-show')?.remove();
       showToast('PDF failed: '+err.message,'err',8000);
     }
   }).catch(()=>showToast('Failed to load library','err',6000));
