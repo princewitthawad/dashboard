@@ -2589,13 +2589,13 @@ function refreshAdvice(){
 // EXPORT PDF
 // ═══════════════════════════════════════════════════════════
 function exportPDF(){
-  showToast('Creating PDF...','info',45000);
+  showToast('กำลังสร้าง PDF...','info',90000);
 
   function loadSc(src,chk){
     return new Promise((res,rej)=>{
       if(chk&&window[chk]){res();return;}
       const s=document.createElement('script');
-      s.src=src; s.onload=()=>setTimeout(res,300); s.onerror=rej;
+      s.src=src; s.onload=()=>setTimeout(res,400); s.onerror=rej;
       document.head.appendChild(s);
     });
   }
@@ -2605,10 +2605,9 @@ function exportPDF(){
   .then(async()=>{
     try{
 
-      /* ═══════════════════════════════════════════════
-         STEP 1 : เตรียม DOM
-      ═══════════════════════════════════════════════ */
-      // inject CSS — ซ่อน UI + บังคับแสดง tab-all
+      /* ══════════════════════════════════════
+         STEP 1 : PREPARE
+      ══════════════════════════════════════ */
       const st=document.createElement('style');
       st.id='_pdf';
       st.textContent=`
@@ -2620,210 +2619,220 @@ function exportPDF(){
         #analysis-overlay,#rt-guide-overlay,#fb-guide{display:none!important;}
         .s2-desktop{display:block!important;}
         .s2-mobile{display:none!important;}
-        /* บังคับ Circular tab-all แสดง — specificity สูงสุด */
         html body .W .DS .DP{display:none!important;}
         html body .W .DS #tab-all{display:block!important;}
         html body .W .DS .TABS{display:none!important;}
       `;
       document.head.appendChild(st);
 
-      // ซ่อน overlay
       const HIDE=['lock-modal','jupiter-overlay','rt-guide-overlay',
                   'fb-guide','toast','analysis-overlay'];
       const prevSt={};
       HIDE.forEach(id=>{
         const e=document.getElementById(id);
-        if(e){prevSt[id]=e.style.cssText;e.style.setProperty('display','none','important');}
+        if(e){prevSt[id]=e.style.cssText;
+              e.style.setProperty('display','none','important');}
       });
 
-      // เปิด S3 detail
+      // เปิด S3
       const s3w=document.getElementById('s3-detail-wrap');
       const s3was=_s3Open;
-      if(!s3was&&s3w){
-        s3w.style.cssText='max-height:9999px!important;opacity:1!important;'+
-          'overflow:visible!important;transition:none!important;';
-      }
+      if(!s3was&&s3w) s3w.style.cssText=
+        'max-height:9999px!important;opacity:1!important;overflow:visible!important;';
 
-      // ตั้ง .W ให้กว้าง 1100px — พอดีกับ A4 ที่ scale 2 (1100*2=2200px canvas)
+      // กำหนด W กว้าง fixed
       const W=document.querySelector('.W');
       const prevW=W.style.cssText;
-      W.style.cssText='width:1100px!important;max-width:1100px!important;'+
-        'min-width:1100px!important;padding:16px!important;margin:0!important;'+
-        'position:relative!important;box-sizing:border-box!important;';
+      const PDF_W=1100;
+      W.style.cssText=`width:${PDF_W}px!important;max-width:${PDF_W}px!important;`+
+        `min-width:${PDF_W}px!important;padding:20px!important;`+
+        `margin:0 auto!important;box-sizing:border-box!important;`;
 
+      // scroll top แล้วรอ browser layout
       window.scrollTo(0,0);
-      await new Promise(r=>setTimeout(r,900));
+      await new Promise(r=>setTimeout(r,1200));
 
-      /* ═══════════════════════════════════════════════
-         STEP 2 : หา Y boundaries ของแต่ละ card
-                  เพื่อใช้ตัดหน้าให้ไม่ขาดกลาง card
-      ═══════════════════════════════════════════════ */
-      const Wrect=W.getBoundingClientRect();
-      const Wtop=Wrect.top+window.scrollY;
+      /* ══════════════════════════════════════
+         STEP 2 : CAPTURE ทั้ง .W ครั้งเดียว
+                  (ไม่ scroll ระหว่าง capture)
+      ══════════════════════════════════════ */
+      const totalH = W.scrollHeight;
+      const totalW = W.scrollWidth;
 
-      // elements ที่เป็น "block" หลัก — หา top/bottom เทียบกับ W
-      const blockSels=[
-        'header','.kg','.pie-section','.DS',
-        '.G2',                           // S1+S4
-        '#s2body',                       // S2 (จะ closest card)
-        '#s3body',                       // S3
-        '.C2:not(.MS~.C2):not([style])', // S5+S6
-        '#prooms',                       // S7
-        '.SB'
-      ];
-
-      // เก็บ Y-ranges (px เทียบกับ top ของ W) ของแต่ละ block
-      const blockRanges=[];
-      const seenEls=new Set();
-      for(const sel of blockSels){
-        let el=document.querySelector(sel);
-        if(!el) continue;
-        // ถ้าเป็น tbody/id ให้หา card wrapper
-        if(el.tagName==='TBODY'||el.id==='prooms')
-          el=el.closest('.card')||el;
-        if(seenEls.has(el)) continue;
-        seenEls.add(el);
-        const r=el.getBoundingClientRect();
-        const top=(r.top+window.scrollY-Wtop);
-        const bot=(r.bottom+window.scrollY-Wtop);
-        if(bot>top) blockRanges.push({el,top,bot});
-      }
-      blockRanges.sort((a,b)=>a.top-b.top);
-
-      /* ═══════════════════════════════════════════════
-         STEP 3 : CAPTURE
-      ═══════════════════════════════════════════════ */
-      const SCALE=2;
-      const cv=await html2canvas(W,{
-        scale:SCALE,
-        useCORS:true,
-        allowTaint:true,
-        backgroundColor:'#080d14',
-        logging:false,
-        foreignObjectRendering:false,
-        width:W.offsetWidth,
-        height:W.scrollHeight,
-        windowWidth:W.offsetWidth,
-        windowHeight:W.scrollHeight,
+      // บอก html2canvas ให้ render ทั้งหน้าโดยไม่ clip
+      const fullCanvas = await html2canvas(W, {
+        scale       : 2,
+        useCORS     : true,
+        allowTaint  : true,
+        backgroundColor : '#080d14',
+        logging     : false,
+        foreignObjectRendering: false,
+        width       : totalW,
+        height      : totalH,
+        windowWidth : totalW,
+        windowHeight: totalH,
+        x           : 0,
+        y           : 0,
+        scrollX     : 0,
+        scrollY     : 0,
       });
 
-      /* ═══════════════════════════════════════════════
-         STEP 4 : RESTORE DOM
-      ═══════════════════════════════════════════════ */
+      /* ══════════════════════════════════════
+         STEP 3 : RESTORE DOM
+      ══════════════════════════════════════ */
       st.remove();
       W.style.cssText=prevW;
-      if(!s3was&&s3w){
-        s3w.style.cssText='max-height:0;opacity:0;'+
-          'transition:max-height .5s cubic-bezier(.4,0,.2,1),opacity .4s ease;overflow:hidden;';
-      }
+      if(!s3was&&s3w) s3w.style.cssText=
+        'max-height:0;opacity:0;transition:max-height .5s,opacity .4s;overflow:hidden;';
       HIDE.forEach(id=>{
         const e=document.getElementById(id);
         if(e) e.style.cssText=prevSt[id]||'';
       });
       document.querySelectorAll('.DS .DP').forEach(dp=>dp.style.cssText='');
       window.scrollTo(0,0);
-      if(!cv||cv.width<10) throw new Error('Capture failed');
 
-      /* ═══════════════════════════════════════════════
-         STEP 5 : สร้าง PDF
-         — คำนวณ page break จาก blockRanges
-         — ไม่ตัดกลาง card
-      ═══════════════════════════════════════════════ */
+      if(!fullCanvas||fullCanvas.width<10) throw new Error('Capture failed');
+      console.log('Full canvas:',fullCanvas.width,'×',fullCanvas.height);
+
+      /* ══════════════════════════════════════
+         STEP 4 : หา Y ของแต่ละ card บน canvas
+                  โดยอ่านจาก element.offsetTop
+                  (ไม่ใช้ getBoundingClientRect)
+      ══════════════════════════════════════ */
+      const SCALE=2;
+
+      // หา direct children ของ W ที่เป็น block หลัก
+      // เพิ่ม S3-detail ด้วยถ้าเปิดอยู่
+      const C2outer=(()=>{
+        for(const el of document.querySelectorAll('.C2'))
+          if(el.parentElement===W) return el;
+        return null;
+      })();
+
+      const mainEls=[
+        W.querySelector('header'),
+        W.querySelector('.kg'),
+        W.querySelector('.pie-section'),
+        W.querySelector('.DS'),
+        W.querySelector('.G2'),
+        document.getElementById('s2body')?.closest('.card'),
+        document.getElementById('s3body')?.closest('.card'),
+        C2outer,
+        document.getElementById('prooms')?.closest('.card'),
+        W.querySelector('.SB'),
+      ].filter(Boolean);
+
+      // คำนวณ top/bottom ของแต่ละ element เทียบกับ W (px บน DOM)
+      function getRelTop(el){
+        let top=0, e=el;
+        while(e&&e!==W){top+=e.offsetTop; e=e.offsetParent;}
+        return top;
+      }
+      // card boundaries บน canvas (pixels)
+      const cardBounds=mainEls.map(el=>({
+        top : getRelTop(el)*SCALE,
+        bot : (getRelTop(el)+el.offsetHeight)*SCALE,
+      })).filter(b=>b.bot>b.top+4);
+
+      console.log('Cards:',cardBounds.length);
+
+      /* ══════════════════════════════════════
+         STEP 5 : สร้าง PDF — slice canvas
+                  ตัดตรงช่องว่างระหว่าง card เท่านั้น
+      ══════════════════════════════════════ */
       const {jsPDF}=window.jspdf;
       const PW=210, PH=297;
       const MX=8, MY=8, FH=9;
-      const CW=PW-MX*2;            // 194 mm
-      const AVAIL=PH-MY*2-FH;      // 272 mm
+      const CW=PW-MX*2;       // 194 mm
+      const AVAIL=PH-MY*2-FH; // 272 mm
 
-      // mm per canvas-pixel
-      const mmPx=CW/cv.width;
-      // pixels per A4 page (content area)
-      const pxPage=AVAIL/mmPx;
+      const mmPx   = CW/fullCanvas.width;
+      const pxPage = AVAIL/mmPx;  // pixels ต่อหน้า
 
-      // สร้าง page-break list จาก block boundaries
-      // กฎ: ถ้า block ข้ามหน้า → ขึ้นหน้าใหม่ก่อน block นั้น
-      // แต่ถ้า block ยาวกว่า 1 หน้า → ยอมให้ตัด
-      const breaks=[0]; // srcY pixels
-      let curBudget=pxPage; // pixels remaining on current page
+      // สร้าง page-break list
+      // กฎ: หา gap ระหว่าง card ที่ใกล้กับ page boundary ที่สุด
+      const breaks=[0];
+      let pageStart=0;
 
-      for(const {top,bot} of blockRanges){
-        const topPx=top*SCALE;
-        const botPx=bot*SCALE;
-        const blockH=botPx-topPx;
-
-        // ตรวจว่า block นี้เริ่มอยู่ในงบหน้าปัจจุบันไหม
-        const lastBreak=breaks[breaks.length-1];
-        const usedInPage=topPx-lastBreak;
+      for(let i=0;i<cardBounds.length;i++){
+        const {top,bot}=cardBounds[i];
+        const cardH=bot-top;
+        const usedInPage=top-pageStart;
         const remaining=pxPage-usedInPage;
 
-        if(blockH<=pxPage && remaining<blockH && remaining<pxPage*0.15){
-          // block ไม่พอหน้า และเหลือน้อยกว่า 15% → ขึ้นหน้าใหม่ก่อน block
-          breaks.push(topPx);
-          curBudget=pxPage;
+        // ถ้า card นี้จะล้นหน้า และ card พอดีในหน้าหนึ่ง → ขึ้นหน้าก่อน card
+        if(cardH<=pxPage && remaining < cardH){
+          // ตัดที่ top ของ card นี้ (เริ่มหน้าใหม่ที่ card นี้)
+          breaks.push(top);
+          pageStart=top;
         }
+        // ถ้า card ยาวกว่าหน้า → ปล่อยให้ slice ธรรมชาติ
       }
 
-      // สร้าง slices จาก breaks
+      // เพิ่ม end
+      breaks.push(fullCanvas.height);
+
+      // สร้าง slices จาก breaks — แต่ละ slice ต้องไม่เกิน pxPage
       const slices=[];
-      for(let i=0;i<breaks.length;i++){
-        const startY=breaks[i];
-        const endY=i+1<breaks.length
-          ? breaks[i+1]
-          : cv.height;
-        if(endY>startY) slices.push({startY,endY});
-      }
-
-      // ถ้า slice ไหนยาวกว่า pxPage → ตัดย่อย
-      const finalSlices=[];
-      for(const {startY,endY} of slices){
-        let sy=startY;
-        while(sy<endY){
-          const sh=Math.min(pxPage, endY-sy);
-          finalSlices.push({sy,sh});
+      for(let i=0;i<breaks.length-1;i++){
+        let sy=breaks[i];
+        const ey=breaks[i+1];
+        while(sy<ey){
+          const sh=Math.min(pxPage, ey-sy);
+          slices.push({sy, sh});
           sy+=sh;
         }
       }
 
       const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
 
-      finalSlices.forEach(({sy,sh},idx)=>{
+      slices.forEach(({sy,sh},idx)=>{
         if(idx>0) pdf.addPage();
+
         const sl=document.createElement('canvas');
-        sl.width=cv.width; sl.height=Math.ceil(sh);
+        sl.width=fullCanvas.width;
+        sl.height=Math.ceil(sh);
         const ctx=sl.getContext('2d');
         ctx.fillStyle='#080d14';
         ctx.fillRect(0,0,sl.width,sl.height);
-        ctx.drawImage(cv, 0,sy, cv.width,sh, 0,0, sl.width,sl.height);
-        const imgH=sh*mmPx;
-        // วางภาพกึ่งกลาง — MX จาก edge ทั้งสองข้าง
-        pdf.addImage(sl.toDataURL('image/jpeg',0.92),
-          'JPEG', MX, MY, CW, imgH, undefined,'FAST');
+        ctx.drawImage(fullCanvas, 0,sy, fullCanvas.width,sh, 0,0, sl.width,sl.height);
+
+        const imgH=sl.height*mmPx;
+        // กึ่งกลางแนวตั้ง: วางที่ MY
+        pdf.addImage(
+          sl.toDataURL('image/jpeg',0.93),
+          'JPEG', MX, MY, CW, imgH,
+          undefined, 'FAST'
+        );
       });
 
-      /* ═══════════════════════════════════════════════
+      /* ══════════════════════════════════════
          STEP 6 : FOOTER
-      ═══════════════════════════════════════════════ */
+      ══════════════════════════════════════ */
       const tot=pdf.internal.getNumberOfPages();
       const now=new Date();
-      const ds=now.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+      const ds=now.toLocaleDateString('th-TH',
+        {day:'2-digit',month:'short',year:'numeric'});
       for(let i=1;i<=tot;i++){
         pdf.setPage(i);
-        pdf.setDrawColor(50,90,150); pdf.setLineWidth(0.2);
+        pdf.setDrawColor(50,90,150);
+        pdf.setLineWidth(0.3);
         pdf.line(MX,PH-FH,PW-MX,PH-FH);
-        pdf.setFontSize(7); pdf.setTextColor(100,130,170);
-        pdf.text('Construction Progress Dashboard  ·  '+ds, MX, PH-FH+3.5);
-        pdf.text('Page '+i+' / '+tot, PW-MX, PH-FH+3.5, {align:'right'});
+        pdf.setFontSize(7.5);
+        pdf.setTextColor(100,130,170);
+        pdf.text('Construction Progress Dashboard  ·  '+ds, MX, PH-FH+3.8);
+        pdf.text('Page '+i+' / '+tot, PW-MX, PH-FH+3.8, {align:'right'});
       }
 
       pdf.save('Construction_Report_'+now.toISOString().slice(0,10)+'.pdf');
-      showToast('PDF saved — '+tot+' pages','ok');
+      showToast('PDF บันทึกแล้ว — '+tot+' หน้า','ok');
 
     }catch(err){
-      console.error('PDF:',err);
+      console.error('PDF error:',err);
       document.getElementById('_pdf')?.remove();
-      showToast('PDF failed: '+err.message,'err',8000);
+      showToast('PDF ล้มเหลว: '+err.message,'err',8000);
     }
-  }).catch(()=>showToast('Failed to load library','err',6000));
+  }).catch(()=>showToast('โหลด library ล้มเหลว','err',6000));
 }
 // ── Toggle S3 รายละเอียดแต่ละชั้น ──
 let _s3Open = false;
