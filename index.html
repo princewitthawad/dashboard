@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -871,7 +872,7 @@ body.view-mode .view-badge { display:flex!important; }
   <div class="DSH">
     <div><div style="font-size:15px;font-weight:800">🎯 Circular Progress Dashboard — แดชบอร์ดวงกลมแยกงาน 1–7</div>
     <div style="font-size:12px;color:var(--tx2);margin-top:3px;font-family:var(--m)">เลือกแท็บเพื่อดูรายละเอียดแต่ละงาน · กรอกตัวเลขได้ในทุกหน้าต่าง</div></div>
-
+    <div id="hdr-donut" style="flex-shrink:0"></div>
   </div>
   <div class="TABS">
     <button class="TAB ACT" onclick="showTab('all',this)">ภาพรวมทั้งหมด</button>
@@ -1689,7 +1690,7 @@ function buildDonuts(){
   ].map(([pct,tgt,col,lbl,id,sub])=>donutHTML(id,pct,tgt,col,lbl,sub,[{k:'ทำได้',v:parseFloat(pct).toFixed(1)+'%'},{k:'เหลือ',v:Math.max(0,tgt-pct).toFixed(1)+'%'}])).join('');
   // header
   const ovr=(V.s1/100+V.f25/100+V.out/50+V.s4/100+V.s5/80+V.s6/50+V.s7/40)/7*100;
-  const _hdrD=document.getElementById('hdr-donut'); if(_hdrD) _hdrD.innerHTML=donutHTML('d-ov',ovr,100,gcol(ovr/100),'ภาพรวม','ทุกงาน 1–7',[]);
+  document.getElementById('hdr-donut').innerHTML=donutHTML('d-ov',ovr,100,gcol(ovr/100),'ภาพรวม','ทุกงาน 1–7',[]);
   // S1
   document.getElementById('g-s1').innerHTML=donutHTML('d-s1-r',V.s1,100,'#00e676','หลังคาเมทัลชีท','ภาพรวม',[{k:'เป้าหมาย',v:'100%'},{k:'ทำได้',v:V.s1+'%'},{k:'คงเหลือ',v:Math.max(0,100-V.s1)+'%'}],true)+
     `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">${['ด้านขวา','กลางอาคาร','ด้านซ้าย'].map((lbl,i)=>`<div style="padding:16px;background:var(--dg);border:1px solid rgba(0,230,118,.3);border-radius:8px;text-align:center"><div style="font-size:22px">🟢</div><div style="font-size:12px;color:var(--green);font-weight:700;margin-top:6px">${lbl}</div><div style="font-size:10px;color:var(--tx2);margin-top:3px">${i===0?'เริ่มต้น':i===2?'สิ้นสุด':'ผ่านแล้ว'}</div></div>`).join('<div style="display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--blue)">→</div>')}</div>`;
@@ -2589,13 +2590,13 @@ function refreshAdvice(){
 // ไม่มี print dialog, โทนขาวหรู, จัดหน้าแน่นไม่มีช่องว่าง
 // ═══════════════════════════════════════════════════════════
 function exportPDF(){
-  showToast('Creating PDF...','info',30000);
+  showToast('Creating PDF...','info',25000);
 
   function loadSc(src,chk){
     return new Promise((res,rej)=>{
       if(chk&&window[chk]){res();return;}
       const s=document.createElement('script');
-      s.src=src; s.onload=()=>setTimeout(res,200); s.onerror=rej;
+      s.src=src; s.onload=()=>setTimeout(res,150); s.onerror=rej;
       document.head.appendChild(s);
     });
   }
@@ -2604,191 +2605,260 @@ function exportPDF(){
   .then(()=>loadSc('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js','jspdf'))
   .then(async()=>{
     try{
-
-      /* ════════════════════════════════════════
-         WHITE THEME CSS — inject ลง DOM จริงๆ
-         ทำให้ html2canvas เห็นสีขาว 100%
-      ════════════════════════════════════════ */
-      const WHITE_CSS=`
-        :root{
-          --bg:#080d14!important;--bg2:#0d1520!important;
-          --bgc:#111b28!important;--bgch:#162233!important;
-          --bdr:rgba(56,139,253,.15)!important;--bdrb:rgba(56,139,253,.4)!important;
-          --tx:#e8f0fe!important;--tx2:#8899aa!important;--tx3:#445566!important;
-          --green:#00e676!important;--orange:#ff9500!important;
-          --red:#ff4444!important;--blue:#388bfd!important;--cyan:#00d4ff!important;
-        }
-        html,body{background:#080d14!important;color:#e8f0fe!important;}
-        body::before,.orb,body::after{display:none!important;}
-        *{
-          animation:none!important;transition:none!important;
-          backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
-          box-shadow:none!important;
-        }
-        /* ── ซ่อน UI ที่ไม่ต้องการ ── */
-        .edit-only,.view-badge,.live,.IG,.DCI,.PI,.DC-inp,
-        .save-bar,#toast,#lock-modal,#jupiter-overlay,
-        #analysis-overlay,#rt-guide-overlay,#fb-guide,
-        button{display:none!important;}
-        /* ── แสดง s2-desktop ── */
-        .s2-desktop{display:block!important;}
-        .s2-mobile{display:none!important;}
-      `;
-
-
-      /* ── inject style ── */
-      const styleTag=document.createElement('style');
-      styleTag.id='pdf-white-inject';
-      styleTag.textContent=WHITE_CSS;
-      document.head.appendChild(styleTag);
-
       /* ── ซ่อน overlay ── */
-      const HIDE_IDS=['lock-modal','jupiter-overlay','rt-guide-overlay','fb-guide','toast','analysis-overlay'];
+      const HIDE=['lock-modal','jupiter-overlay','rt-guide-overlay','fb-guide','toast'];
       const prevD={};
-      HIDE_IDS.forEach(id=>{
-        const el=document.getElementById(id);
-        if(el){prevD[id]=el.style.display;el.style.setProperty('display','none','important');}
-      });
+      HIDE.forEach(id=>{const el=document.getElementById(id);if(el){prevD[id]=el.style.display;el.style.setProperty('display','none','important');}});
 
       /* ── เปิด s3 detail ── */
       const s3wrap=document.getElementById('s3-detail-wrap');
-      const s3was=_s3Open;
-      if(!s3was&&s3wrap){s3wrap.style.maxHeight='3000px';s3wrap.style.opacity='1';}
+      const s3wasOpen=_s3Open;
+      if(!s3wasOpen&&s3wrap){s3wrap.style.maxHeight='3000px';s3wrap.style.opacity='1';}
+
+      /* ── เตรียม analysis overlay ── */
+      // เปิด analysis overlay ก่อน capture
+      let aov=document.getElementById('analysis-overlay');
+      const aovExisted=!!aov;
+      if(!aovExisted) showAnalysis(); // สร้าง overlay
+      aov=document.getElementById('analysis-overlay');
+      // ซ่อนชั่วคราวแต่ยังอยู่ใน DOM
+      if(aov) aov.style.setProperty('display','none','important');
+      // สร้าง chart ใน analysis
+      await new Promise(r=>setTimeout(r,800));
 
       window.scrollTo(0,0);
-      await new Promise(r=>setTimeout(r,500));
+      await new Promise(r=>setTimeout(r,400));
 
-      /* ════════════════════════════════════════
-         CAPTURE helper
-      ════════════════════════════════════════ */
-      async function cap(el){
+      /* ── White-theme CSS ── */
+      const WHITE_CSS = `
+        :root{
+          --bg:#ffffff!important; --bg2:#f8f9fb!important;
+          --bgc:#f4f6f9!important; --bgch:#eef1f6!important;
+          --bdr:#d1d9e6!important; --bdrb:#6366f1!important;
+          --tx:#1a1a2e!important; --tx2:#4b5563!important; --tx3:#9ca3af!important;
+          --green:#059669!important; --orange:#d97706!important;
+          --red:#dc2626!important; --blue:#4f46e5!important; --cyan:#0891b2!important;
+          --r:10px!important; --rs:8px!important;
+        }
+        *{box-shadow:none!important;text-shadow:none!important;
+          animation:none!important;transition:none!important;
+          backdrop-filter:none!important;-webkit-backdrop-filter:none!important;}
+        body,html{background:#ffffff!important;color:#1a1a2e!important;}
+        body::before,.orb{display:none!important;}
+        button,.edit-only,.view-badge,.live,.IG,.DCI,.PI,.DC-inp,
+        .save-bar,#toast,#lock-modal,#jupiter-overlay,#rt-guide-overlay,
+        #analysis-overlay,.TABS,.DP{display:none!important;}
+        header{background:linear-gradient(135deg,#f0f4ff,#e8eeff)!important;
+          border:1px solid #c7d2fe!important;border-top:4px solid #4f46e5!important;
+          border-radius:0 0 10px 10px!important;}
+        header::before,header::after{display:none!important;}
+        .kc{background:#ffffff!important;border:1px solid #e2e8f0!important;}
+        .kc::before,.kc::after{display:none!important;}
+        .kl{color:#6b7280!important;font-size:9pt!important;}
+        .ks{color:#9ca3af!important;}
+        .PBG,.TPB{background:#e9ecef!important;border-radius:99px!important;}
+        .PF,.TPF{border-radius:99px!important;}
+        .PF.g,.TPF.g{background:linear-gradient(90deg,#059669,#34d399)!important;}
+        .PF.o,.TPF.o{background:linear-gradient(90deg,#d97706,#fbbf24)!important;}
+        .PF.r,.TPF.r{background:linear-gradient(90deg,#dc2626,#f87171)!important;}
+        .pie-section{background:#f8faff!important;border:1px solid #e0e7ff!important;
+          border-left:4px solid #6366f1!important;border-radius:0 10px 10px 0!important;}
+        .pie-section::before{display:none!important;}
+        .pie-center-pct{color:#4f46e5!important;}
+        .legend-item{background:#ffffff!important;border:1px solid #e2e8f0!important;}
+        .DS{background:#f8faff!important;border:1px solid #e0e7ff!important;
+          border-top:3px solid #6366f1!important;border-radius:0 0 10px 10px!important;}
+        .DS::before{display:none!important;}
+        .DC{background:#ffffff!important;border:1px solid #e2e8f0!important;border-radius:8px!important;}
+        .DC-lbl{color:#374151!important;} .DC-sub,.DC-k{color:#9ca3af!important;}
+        .DC-row{border-bottom:1px solid #f3f4f6!important;}
+        .card{background:#ffffff!important;border:1px solid #e2e8f0!important;border-radius:10px!important;}
+        .card::before,.card::after{display:none!important;}
+        .FR{background:#ffffff!important;border:1px solid #e2e8f0!important;}
+        .FR th{background:#f1f5f9!important;color:#374151!important;
+          border-bottom:2px solid #6366f1!important;border-color:#e2e8f0!important;}
+        .FR td{background:#ffffff!important;color:#374151!important;border-color:#f3f4f6!important;}
+        .FR tr:nth-child(even) td{background:#f8faff!important;}
+        .s2card{background:#ffffff!important;border:1px solid #e2e8f0!important;border-radius:8px!important;}
+        .s2-desktop{display:block!important;} .s2-mobile{display:none!important;}
+        .RC{background:#ffffff!important;border:1px solid #e2e8f0!important;border-radius:8px!important;}
+        .MS{background:#f0f4ff!important;border:1px solid #e0e7ff!important;border-radius:8px!important;}
+        .SB{background:linear-gradient(135deg,#f0f4ff,#e8eeff)!important;
+          border:1px solid #c7d2fe!important;border-radius:10px!important;}
+        .PB{background:#ffffff!important;border:1px solid #e2e8f0!important;border-radius:8px!important;}
+        .PB.dn{background:#ecfdf5!important;border-color:#6ee7b7!important;}
+        .SBt{color:#4f46e5!important;}
+        .Stg{background:#eef2ff!important;border:1px solid #c7d2fe!important;color:#4f46e5!important;}
+        [style*="color:var(--green)"]{color:#059669!important;}
+        [style*="color:var(--orange)"]{color:#d97706!important;}
+        [style*="color:var(--red)"]{color:#dc2626!important;}
+        [style*="color:var(--blue)"]{color:#4f46e5!important;}
+        [style*="color:var(--cyan)"]{color:#0891b2!important;}
+        [style*="background:var(--green)"]{background:#059669!important;}
+        [style*="background:var(--orange)"]{background:#d97706!important;}
+        [style*="background:var(--red)"]{background:#dc2626!important;}
+      `;
+
+      /* ── White CSS สำหรับ analysis ── */
+      const ANALYSIS_CSS = `
+        :root{
+          --bg:#ffffff!important; --bg2:#f8f9fb!important;
+          --bgc:#f4f6f9!important; --bdr:#d1d9e6!important;
+          --tx:#1a1a2e!important; --tx2:#4b5563!important; --tx3:#9ca3af!important;
+          --green:#059669!important; --orange:#d97706!important;
+          --red:#dc2626!important; --blue:#4f46e5!important; --cyan:#0891b2!important;
+        }
+        *{box-shadow:none!important;animation:none!important;transition:none!important;backdrop-filter:none!important;}
+        body,html{background:#ffffff!important;}
+        [style*="background:rgba(4,8,16"]{background:#ffffff!important;}
+        [style*="background:rgba(0,0,0"]{background:#ffffff!important;}
+        [style*="color:var(--green)"]{color:#059669!important;}
+        [style*="color:var(--cyan)"]{color:#0891b2!important;}
+        [style*="color:var(--tx2)"]{color:#4b5563!important;}
+        [style*="color:var(--tx3)"]{color:#9ca3af!important;}
+        [style*="background:var(--bgc)"]{background:#f4f6f9!important;}
+        [style*="background:var(--bg2)"]{background:#f8f9fb!important;}
+        [style*="border:1px solid var(--bdr)"]{border-color:#d1d9e6!important;}
+        button[onclick*="switchAnalysis"]{display:none!important;}
+        button[onclick*="remove()"]{display:none!important;}
+      `;
+
+      /* ── capture helper ── */
+      async function capEl(el, extraCss){
         if(!el||el.offsetHeight<2) return null;
         return html2canvas(el,{
-          scale:2.8,
+          scale:3,
           useCORS:true,
           allowTaint:true,
-          backgroundColor:'#080d14',
+          backgroundColor:'#ffffff',
           logging:false,
-          foreignObjectRendering:false,
+          onclone:(cloneDoc)=>{
+            const st=cloneDoc.createElement('style');
+            st.textContent=(extraCss||WHITE_CSS);
+            cloneDoc.head.insertBefore(st, cloneDoc.head.firstChild);
+            HIDE.forEach(id=>{const e=cloneDoc.getElementById(id);if(e)e.style.setProperty('display','none','important');});
+            // ซ่อน analysis overlay ใน clone ด้วย
+            const cao=cloneDoc.getElementById('analysis-overlay');
+            if(cao) cao.style.setProperty('display','none','important');
+          }
         });
       }
 
-      /* ── แสดง .DP ทั้งหมดและซ่อน .TABS ชั่วคราว ── */
-      const dpEls=document.querySelectorAll('.DS .DP');
-      const tabsEl=document.querySelector('.DS .TABS');
-      dpEls.forEach(dp=>{dp.style.setProperty('display','block','important');});
-      if(tabsEl) tabsEl.style.setProperty('display','none','important');
-      await new Promise(r=>setTimeout(r,300));
+      /* ── รายการ sections หลัก ── */
+      const mainSections=[
+        document.querySelector('header'),
+        document.querySelector('.kg'),
+        document.querySelector('.pie-section'),
+        document.querySelector('.DS'),
+        ...Array.from(document.querySelectorAll('.W>.card')),
+        document.querySelector('.SB'),
+      ].filter(Boolean);
 
-      /* ── ระบุ sections ทีละตัวตาม DOM จริง ── */
-      // โครงสร้าง: .W > header, .kg, .pie-section, .DS, .G2, card(S2), card(S3), .C2, card(S7), .SB
-      const W = document.querySelector('.W');
-      const allDirect = W ? Array.from(W.children) : [];
-      // map ตาม tag/class ที่รู้จัก
-      function getEl(sel){ return document.querySelector(sel); }
-
-      const imgs=[];
-      const captureList=[
-        getEl('header'),
-        getEl('.kg'),
-        getEl('.pie-section'),
-        getEl('.DS'),
-        getEl('.G2'),                    // S1 + S4
-        getEl('#s2body')?.closest('.card'),  // S2
-        getEl('#s3body')?.closest('.card'),  // S3
-        getEl('.C2:not([style])'),       // S5 + S6 (ไม่ใช่ inline C2)
-        getEl('#prooms')?.closest('.card'), // S7
-        getEl('.SB'),
-      ].filter(el=>el&&el.offsetHeight>2);
-
-      // deduplicate
-      const seen=new Set();
-      const uniq=captureList.filter(el=>{if(seen.has(el))return false;seen.add(el);return true;});
-
-      for(const el of uniq){
-        const cv=await cap(el);
-        if(cv&&cv.width>10) imgs.push(cv);
+      /* ── capture main sections ── */
+      const images=[];
+      for(const el of mainSections){
+        if(!el||el.offsetHeight<2) continue;
+        const cv=await capEl(el, WHITE_CSS);
+        if(cv&&cv.width>10) images.push({cv, label:'main'});
         await new Promise(r=>setTimeout(r,50));
       }
 
-      /* ── คืน .DP กลับ ── */
-      dpEls.forEach(dp=>{dp.style.removeProperty('display');});
-      if(tabsEl) tabsEl.style.removeProperty('display');
+      /* ── capture analysis panels ── */
+      // แสดง analysis overlay ชั่วคราว
+      if(aov){
+        aov.style.removeProperty('display');
+        aov.style.position='absolute';
+        aov.style.top='0'; aov.style.left='0';
+        aov.style.width='960px';
+        aov.style.zIndex='-1';
+        aov.style.background='#fff';
+        await new Promise(r=>setTimeout(r,500));
+
+        // capture แต่ละ panel
+        for(let i=0;i<4;i++){
+          // switch tab
+          switchAnalysisTab(i);
+          await new Promise(r=>setTimeout(r,400));
+          const panel=document.getElementById('apanel-'+i);
+          if(panel&&panel.offsetHeight>10){
+            const cv=await capEl(aov, ANALYSIS_CSS);
+            if(cv&&cv.width>10) images.push({cv, label:'analysis-'+i});
+          }
+        }
+        // ซ่อนกลับ
+        aov.style.setProperty('display','none','important');
+        aov.style.position='fixed';
+        aov.style.zIndex='99998';
+        aov.style.background='rgba(4,8,16,.97)';
+        if(!aovExisted){aov.remove();}
+      }
 
       /* ── คืน DOM ── */
-      if(!s3was&&s3wrap){s3wrap.style.maxHeight='0';s3wrap.style.opacity='0';}
-      HIDE_IDS.forEach(id=>{
-        const el=document.getElementById(id);
-        if(el) el.style.display=prevD[id]||'';
-      });
-      styleTag.remove(); // ลบ white theme ออก
+      if(!s3wasOpen&&s3wrap){s3wrap.style.maxHeight='0';s3wrap.style.opacity='0';}
+      HIDE.forEach(id=>{const el=document.getElementById(id);if(el)el.style.display=prevD[id]||'';});
 
-      if(imgs.length===0) throw new Error('Nothing captured');
+      if(images.length===0) throw new Error('No sections captured');
 
-      /* ════════════════════════════════════════
-         BUILD PDF
-      ════════════════════════════════════════ */
+      /* ── build PDF ── */
       const {jsPDF}=window.jspdf;
-      const PW=210,PH=297,MX=6,MY=7,GAP=2,FH=7;
+      const PW=210, PH=297, MX=6, MY=6, GAP=2.5;
       const CW=PW-MX*2;
-      const AVAIL=PH-MY*2-FH;
+      const FOOTER_H=8;
+      const AVAIL=PH-MY*2-FOOTER_H;
 
       const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
       let curY=MY, pg=0;
 
-      for(const cv of imgs){
-        const ratio=CW/cv.width;
-        const ih=cv.height*ratio;
+      function needNewPage(h){
+        return curY+h > PH-MY-FOOTER_H+0.5 && curY>MY;
+      }
 
-        if(ih<=AVAIL){
-          // ถ้าไม่พอหน้านี้ → ขึ้นหน้าใหม่
-          if(curY+ih>PH-MY-FH+0.5&&curY>MY){
-            pdf.addPage();pg++;curY=MY;
-          }
-          pdf.addImage(cv.toDataURL('image/jpeg',0.93),'JPEG',MX,curY,CW,ih,undefined,'FAST');
-          curY+=ih+GAP;
+      for(const {cv} of images){
+        const ratio=CW/cv.width;
+        const imgH=cv.height*ratio;
+
+        if(imgH<=AVAIL){
+          if(needNewPage(imgH)){pdf.addPage();pg++;curY=MY;}
+          pdf.addImage(cv.toDataURL('image/jpeg',0.94),'JPEG',MX,curY,CW,imgH,undefined,'FAST');
+          curY+=imgH+GAP;
         } else {
-          // ตัด slice สำหรับ section ที่ยาวมาก
-          const pxPP=Math.floor(AVAIL/ratio);
-          let sy=0;
-          while(sy<cv.height){
+          // ตัด slice
+          const pxPerPage=Math.floor(AVAIL/ratio);
+          let srcY=0;
+          while(srcY<cv.height){
             if(curY>MY){pdf.addPage();pg++;curY=MY;}
-            const sh=Math.min(pxPP,cv.height-sy);
+            const slH=Math.min(pxPerPage,cv.height-srcY);
             const sl=document.createElement('canvas');
-            sl.width=cv.width; sl.height=sh;
+            sl.width=cv.width; sl.height=slH;
             const ctx=sl.getContext('2d');
-            ctx.fillStyle='#080d14';ctx.fillRect(0,0,sl.width,sh);
-            ctx.drawImage(cv,0,sy,cv.width,sh,0,0,cv.width,sh);
-            pdf.addImage(sl.toDataURL('image/jpeg',0.93),'JPEG',MX,curY,CW,sh*ratio,undefined,'FAST');
-            curY+=sh*ratio+GAP;
-            sy+=sh;
+            ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,sl.width,slH);
+            ctx.drawImage(cv,0,srcY,cv.width,slH,0,0,cv.width,slH);
+            pdf.addImage(sl.toDataURL('image/jpeg',0.93),'JPEG',MX,curY,CW,slH*ratio,undefined,'FAST');
+            curY+=slH*ratio+GAP;
+            srcY+=slH;
           }
         }
       }
 
       /* ── Footer ── */
-      const tot=pdf.internal.getNumberOfPages();
+      const total=pdf.internal.getNumberOfPages();
       const now=new Date();
       const ds=now.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
-      for(let i=1;i<=tot;i++){
+      for(let i=1;i<=total;i++){
         pdf.setPage(i);
-        // เส้นคั่น
-        pdf.setDrawColor(200,212,228);pdf.setLineWidth(0.2);
-        pdf.line(MX,PH-FH-0.5,PW-MX,PH-FH-0.5);
-        // ข้อความ
-        pdf.setFontSize(7);pdf.setTextColor(150,165,185);
-        pdf.text('Construction Progress Dashboard  -  '+ds,MX,PH-FH+2.5);
-        pdf.text('Page '+i+' / '+tot,PW-MX,PH-FH+2.5,{align:'right'});
+        pdf.setFontSize(7);
+        pdf.setTextColor(150,165,185);
+        pdf.text('Construction Progress Dashboard  -  '+ds, MX, PH-MY+1);
+        pdf.text('Page '+i+' / '+total, PW-MX, PH-MY+1, {align:'right'});
+        pdf.setDrawColor(205,215,230); pdf.setLineWidth(0.15);
+        pdf.line(MX, PH-MY-1, PW-MX, PH-MY-1);
       }
 
       pdf.save('Construction_Report_'+now.toISOString().slice(0,10)+'.pdf');
-      showToast('PDF saved — '+tot+' pages','ok');
+      showToast('PDF saved — '+total+' pages','ok');
 
     }catch(err){
       console.error('PDF:',err);
-      // ลบ style inject ถ้ายังค้างอยู่
-      const st=document.getElementById('pdf-white-inject');
-      if(st) st.remove();
       showToast('PDF failed: '+err.message,'err',8000);
     }
   }).catch(()=>showToast('Failed to load library','err',6000));
