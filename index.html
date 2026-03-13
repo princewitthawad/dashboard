@@ -2610,143 +2610,31 @@ function exportPDF(){
          ทำให้ html2canvas เห็นสีขาว 100%
       ════════════════════════════════════════ */
       const WHITE_CSS=`
-        #pdf-white-theme-tag{display:block}
         :root{
-          --bg:#fff!important;--bg2:#f8f9fb!important;
-          --bgc:#f4f6f9!important;--bgch:#eef1f6!important;
-          --bdr:#d8e0ec!important;--bdrb:#6366f1!important;
-          --tx:#1a1a2e!important;--tx2:#4b5563!important;--tx3:#9ca3af!important;
-          --green:#059669!important;--orange:#d97706!important;
-          --red:#dc2626!important;--blue:#4f46e5!important;--cyan:#0891b2!important;
+          --bg:#080d14!important;--bg2:#0d1520!important;
+          --bgc:#111b28!important;--bgch:#162233!important;
+          --bdr:rgba(56,139,253,.15)!important;--bdrb:rgba(56,139,253,.4)!important;
+          --tx:#e8f0fe!important;--tx2:#8899aa!important;--tx3:#445566!important;
+          --green:#00e676!important;--orange:#ff9500!important;
+          --red:#ff4444!important;--blue:#388bfd!important;--cyan:#00d4ff!important;
         }
-        html,body{background:#fff!important;color:#1a1a2e!important;}
+        html,body{background:#080d14!important;color:#e8f0fe!important;}
         body::before,.orb,body::after{display:none!important;}
         *{
           animation:none!important;transition:none!important;
           backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
-          box-shadow:none!important;text-shadow:none!important;
+          box-shadow:none!important;
         }
-        /* ── ซ่อนปุ่มและ UI ที่ไม่ต้องการ ── */
+        /* ── ซ่อน UI ที่ไม่ต้องการ ── */
         .edit-only,.view-badge,.live,.IG,.DCI,.PI,.DC-inp,
         .save-bar,#toast,#lock-modal,#jupiter-overlay,
         #analysis-overlay,#rt-guide-overlay,#fb-guide,
         button,.TABS,.DP{display:none!important;}
-        /* ── Header ── */
-        header{
-          background:linear-gradient(135deg,#f0f4ff,#e8eeff)!important;
-          border:1px solid #c7d2fe!important;
-          border-top:4px solid #4f46e5!important;
-          border-radius:0 0 10px 10px!important;
-        }
-        header::before,header::after{display:none!important;}
-        header *{color:#1e1b4b!important;}
-        .ht{color:#312e81!important;font-weight:800!important;}
-        .hs{color:#6366f1!important;}
-        /* ── KPI ── */
-        .kg{background:transparent!important;}
-        .kc{
-          background:#fff!important;
-          border:1px solid #e2e8f0!important;
-          border-radius:10px!important;
-        }
-        .kc::before,.kc::after{display:none!important;}
-        .kl{color:#6b7280!important;}
-        .ks{color:#9ca3af!important;}
-        .kc.G .kv{color:#059669!important;}
-        .kc.O .kv{color:#d97706!important;}
-        .kc.B .kv{color:#4f46e5!important;}
-        .kc.R .kv{color:#dc2626!important;}
-        /* ── Progress bars ── */
-        .PBG,.TPB{background:#e9ecef!important;border-radius:99px!important;}
-        .PF,.TPF{border-radius:99px!important;}
-        .PF.g,.TPF.g{background:linear-gradient(90deg,#059669,#34d399)!important;}
-        .PF.o,.TPF.o{background:linear-gradient(90deg,#d97706,#fbbf24)!important;}
-        .PF.r,.TPF.r{background:linear-gradient(90deg,#dc2626,#f87171)!important;}
-        /* ── Pie Section ── */
-        .pie-section{
-          background:#f8faff!important;
-          border:1px solid #e0e7ff!important;
-          border-left:4px solid #6366f1!important;
-          border-radius:0 10px 10px 0!important;
-        }
-        .pie-section::before,.pie-section::after{display:none!important;}
-        .pie-title{color:#312e81!important;}
-        .pie-sub{color:#6b7280!important;}
-        .pie-center-pct{color:#4f46e5!important;}
-        .pie-center-lbl{color:#6b7280!important;}
-        .legend-item{
-          background:#fff!important;
-          border:1px solid #e2e8f0!important;
-          border-radius:8px!important;
-        }
-        /* ── DS Circular ── */
-        .DS{
-          background:#f8faff!important;
-          border:1px solid #e0e7ff!important;
-          border-top:3px solid #6366f1!important;
-          border-radius:0 0 10px 10px!important;
-        }
-        .DS::before,.DS::after{display:none!important;}
-        .DSH *{color:#312e81!important;}
-        .DC{
-          background:#fff!important;
-          border:1px solid #e2e8f0!important;
-          border-radius:8px!important;
-        }
-        .DC-lbl{color:#374151!important;}
-        .DC-sub,.DC-k{color:#9ca3af!important;}
-        .DC-pct{font-weight:800!important;}
-        .DC-tgt{color:#9ca3af!important;}
-        .DC-row{border-bottom:1px solid #f3f4f6!important;}
-        /* ── Cards ── */
-        .card{
-          background:#fff!important;
-          border:1px solid #e2e8f0!important;
-          border-radius:10px!important;
-        }
-        .card::before,.card::after{display:none!important;}
-        /* ── Tables ── */
-        .FR{background:#fff!important;border:1px solid #e2e8f0!important;border-radius:8px!important;}
-        .FR th{
-          background:#f1f5f9!important;color:#374151!important;
-          border-bottom:2px solid #6366f1!important;
-          border-color:#e2e8f0!important;font-weight:700!important;
-        }
-        .FR td{background:#fff!important;color:#374151!important;border-color:#f3f4f6!important;}
-        .FR tr:nth-child(even) td{background:#f8faff!important;}
-        /* ── Room cells ── */
-        .RC{background:#fff!important;border:1px solid #e2e8f0!important;border-radius:8px!important;}
-        .RN{color:#1e1b4b!important;font-weight:700!important;}
-        .RW{color:#9ca3af!important;}
-        /* ── s2 cards ── */
-        .s2card{background:#fff!important;border:1px solid #e2e8f0!important;border-radius:8px!important;}
+        /* ── แสดง s2-desktop ── */
         .s2-desktop{display:block!important;}
         .s2-mobile{display:none!important;}
-        /* ── MS ── */
-        .MS{background:#f0f4ff!important;border:1px solid #e0e7ff!important;border-radius:8px!important;}
-        .MSl{color:#6b7280!important;}
-        .MSv{color:#312e81!important;font-weight:700!important;}
-        /* ── SB Summary ── */
-        .SB{
-          background:linear-gradient(135deg,#f0f4ff,#e8eeff)!important;
-          border:1px solid #c7d2fe!important;
-          border-radius:10px!important;
-        }
-        .SBt{color:#4f46e5!important;}
-        .SBl{color:#6b7280!important;}
-        .PB{background:#fff!important;border:1px solid #e2e8f0!important;border-radius:8px!important;}
-        .PB.dn{background:#ecfdf5!important;border-color:#6ee7b7!important;}
-        /* ── Stg badges ── */
-        .Stg{background:#eef2ff!important;border:1px solid #c7d2fe!important;color:#4f46e5!important;}
-        /* ── Inline style overrides ── */
-        [style*="background:#080d14"],[style*="background:#0d1520"],
-        [style*="background:#111b28"],[style*="background:rgba(4,8,16"],
-        [style*="background:rgba(8,13,20"],[style*="background:rgba(13,21,32"],
-        [style*="background:rgba(17,27,40"]{background:#fff!important;}
-        [style*="color:#e8f0fe"],[style*="color:#8899aa"],[style*="color:#445566"]
-          {color:#374151!important;}
-        [style*="border-color:rgba(56,139,253"]{border-color:#e2e8f0!important;}
       `;
+
 
       /* ── inject style ── */
       const styleTag=document.createElement('style');
@@ -2779,7 +2667,7 @@ function exportPDF(){
           scale:2.8,
           useCORS:true,
           allowTaint:true,
-          backgroundColor:'#ffffff',
+          backgroundColor:'#080d14',
           logging:false,
           foreignObjectRendering:false,
         });
@@ -2844,7 +2732,7 @@ function exportPDF(){
             const sl=document.createElement('canvas');
             sl.width=cv.width; sl.height=sh;
             const ctx=sl.getContext('2d');
-            ctx.fillStyle='#fff';ctx.fillRect(0,0,sl.width,sh);
+            ctx.fillStyle='#080d14';ctx.fillRect(0,0,sl.width,sh);
             ctx.drawImage(cv,0,sy,cv.width,sh,0,0,cv.width,sh);
             pdf.addImage(sl.toDataURL('image/jpeg',0.93),'JPEG',MX,curY,CW,sh*ratio,undefined,'FAST');
             curY+=sh*ratio+GAP;
