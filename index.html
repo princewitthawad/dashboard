@@ -2673,38 +2673,42 @@ function exportPDF(){
         });
       }
 
-      /* ── แสดง .DP ทั้งหมดใน .DS ชั่วคราวก่อน capture ── */
+      /* ── แสดง .DP ทั้งหมดและซ่อน .TABS ชั่วคราว ── */
       const dpEls=document.querySelectorAll('.DS .DP');
       const tabsEl=document.querySelector('.DS .TABS');
       dpEls.forEach(dp=>{dp.style.setProperty('display','block','important');});
       if(tabsEl) tabsEl.style.setProperty('display','none','important');
-      await new Promise(r=>setTimeout(r,200));
+      await new Promise(r=>setTimeout(r,300));
 
-      /* ── capture main sections ── */
+      /* ── ระบุ sections ทีละตัวตาม DOM จริง ── */
+      // โครงสร้าง: .W > header, .kg, .pie-section, .DS, .G2, card(S2), card(S3), .C2, card(S7), .SB
+      const W = document.querySelector('.W');
+      const allDirect = W ? Array.from(W.children) : [];
+      // map ตาม tag/class ที่รู้จัก
+      function getEl(sel){ return document.querySelector(sel); }
+
       const imgs=[];
-      const mainEls=[
-        document.querySelector('header'),
-        document.querySelector('.kg'),
-        document.querySelector('.pie-section'),
-        document.querySelector('.DS'),
-        document.querySelector('.G2'),           // S1 + S4
-        document.querySelector('.W>.card:nth-of-type(1)'), // S2
-        ...Array.from(document.querySelectorAll('.W>.card')).filter(el=>{
-          // กรองเฉพาะ card ที่อยู่ใน .W โดยตรง ไม่ใช่ใน .G2 หรือ .C2
-          return el.parentElement && el.parentElement.classList.contains('W');
-        }),
-        document.querySelector('.C2'),           // S5 + S6
-        document.querySelector('.SB'),
+      const captureList=[
+        getEl('header'),
+        getEl('.kg'),
+        getEl('.pie-section'),
+        getEl('.DS'),
+        getEl('.G2'),                    // S1 + S4
+        getEl('#s2body')?.closest('.card'),  // S2
+        getEl('#s3body')?.closest('.card'),  // S3
+        getEl('.C2:not([style])'),       // S5 + S6 (ไม่ใช่ inline C2)
+        getEl('#prooms')?.closest('.card'), // S7
+        getEl('.SB'),
       ].filter(el=>el&&el.offsetHeight>2);
 
       // deduplicate
       const seen=new Set();
-      const uniqueEls=mainEls.filter(el=>{if(seen.has(el))return false;seen.add(el);return true;});
+      const uniq=captureList.filter(el=>{if(seen.has(el))return false;seen.add(el);return true;});
 
-      for(const el of uniqueEls){
+      for(const el of uniq){
         const cv=await cap(el);
         if(cv&&cv.width>10) imgs.push(cv);
-        await new Promise(r=>setTimeout(r,40));
+        await new Promise(r=>setTimeout(r,50));
       }
 
       /* ── คืน .DP กลับ ── */
