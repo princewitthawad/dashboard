@@ -330,19 +330,6 @@ body.view-mode .edit-only{display:none!important}
 </style>
 </head>
 <body>
-<!-- EXPORT MENU POPUP -->
-<div id="export-menu" style="display:none;position:fixed;background:#0d1520;border:1px solid rgba(56,139,253,.5);border-radius:12px;min-width:210px;z-index:99999;box-shadow:0 12px 40px rgba(0,0,0,.85),0 0 0 1px rgba(255,255,255,.06)">
-  <div style="padding:9px 14px 7px;font-size:10px;font-weight:700;color:var(--tx2);letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.07)">📤 เลือกรูปแบบ Export</div>
-  <button onclick="exportPDF();closeExportMenu()" style="display:flex;align-items:center;gap:10px;width:100%;padding:12px 16px;background:none;border:none;color:#e8f0fe;font-family:var(--f);font-size:13px;font-weight:600;cursor:pointer;transition:background .15s" onmouseover="this.style.background='rgba(56,139,253,.18)'" onmouseout="this.style.background='none'">
-    <span style="font-size:18px">📄</span>
-    <div style="text-align:left"><div>Export PDF</div><div style="font-size:10px;color:var(--tx2);font-weight:400">บันทึกเป็นไฟล์ PDF</div></div>
-  </button>
-  <div style="height:1px;background:rgba(255,255,255,.07)"></div>
-  <button onclick="printDashboard();closeExportMenu()" style="display:flex;align-items:center;gap:10px;width:100%;padding:12px 16px;background:none;border:none;color:#e8f0fe;font-family:var(--f);font-size:13px;font-weight:600;cursor:pointer;transition:background .15s" onmouseover="this.style.background='rgba(0,230,118,.12)'" onmouseout="this.style.background='none'">
-    <span style="font-size:18px">🖨️</span>
-    <div style="text-align:left"><div>Print</div><div style="font-size:10px;color:var(--tx2);font-weight:400">พิมพ์ผ่าน browser</div></div>
-  </button>
-</div>
 <div class="orb o1"></div><div class="orb o2"></div>
 <div id="toast"></div>
 
@@ -366,9 +353,7 @@ body.view-mode .edit-only{display:none!important}
     <div class="live-badge"><div class="ld"></div>LIVE</div>
     <div class="view-badge">👁️ โหมดดูอย่างเดียว</div>
     <button class="btn btn-g edit-only" onclick="saveData()">💾 บันทึก</button>
-    <div class="edit-only" style="position:relative;display:inline-block" id="export-wrap">
-      <button class="btn" onclick="toggleExportMenu(event)" style="background:rgba(0,180,120,.15);color:#00e676;border:1px solid rgba(0,230,118,.4)">📤 Export ▾</button>
-    </div>
+    <button class="btn edit-only" onclick="printDashboard()" style="background:rgba(0,180,120,.15);color:#00e676;border:1px solid rgba(0,230,118,.4)">🖨️ Print</button>
     <button class="btn btn-b edit-only" onclick="showFirebaseGuide()">⚙️ Cloud</button>
     <button class="btn btn-gold edit-only" onclick="showPwChange()">🔑 รหัสผ่าน</button>
     <button class="btn btn-r edit-only" onclick="clearData()">🗑️ ล้าง</button>
@@ -387,7 +372,7 @@ body.view-mode .edit-only{display:none!important}
 </div>
 
 <!-- KPI -->
-<div class="kg">
+<div class="kg" id="zone-kpi">
   <div class="kc G"><div class="ki">✅</div><div class="kl">งานเสร็จสมบูรณ์</div><div class="kv" id="kp-d">—</div><div class="ks">จาก 7 รายการ</div></div>
   <div class="kc O"><div class="ki">⚡</div><div class="kl">กำลังดำเนินการ</div><div class="kv" id="kp-p">—</div><div class="ks">ติดตามอย่างใกล้ชิด</div></div>
   <div class="kc B"><div class="ki">📊</div><div class="kl">ความคืบหน้ารวม</div><div class="kv" id="kp-o">—</div><div class="ks">เฉลี่ยทุกหัวข้อ</div></div>
@@ -395,7 +380,7 @@ body.view-mode .edit-only{display:none!important}
 </div>
 
 <!-- PIE CHART -->
-<div class="pie-sec">
+<div class="pie-sec" id="zone-pie">
   <div class="pie-top">
     <div><div class="pie-title">🥧 3D Pie Chart — ภาพรวมความคืบหน้าทุกงาน</div><div class="pie-sub">สัดส่วนแต่ละหัวข้อ · คลิก Legend เพื่อ highlight</div></div>
     <button class="btn btn-b" style="font-size:11px;padding:5px 11px" onclick="togglePieMode()"><span id="pie-mode-lbl">เปลี่ยน: % ที่ทำได้</span></button>
@@ -418,7 +403,7 @@ body.view-mode .edit-only{display:none!important}
 </div>
 
 <!-- DONUT DASHBOARD -->
-<div class="DS">
+<div class="DS" id="zone-donut">
   <div style="margin-bottom:16px"><div style="font-size:14px;font-weight:800">🎯 Circular Progress Dashboard</div><div style="font-size:11px;color:var(--tx2);margin-top:2px;font-family:var(--m)">เลือกแท็บเพื่อดูรายละเอียดแต่ละงาน</div></div>
   <div class="TABS">
     <button class="TAB ACT" onclick="showTab('all',this)">ภาพรวม</button>
@@ -441,7 +426,7 @@ body.view-mode .edit-only{display:none!important}
 </div>
 
 <!-- S1 + S4 -->
-<div class="G2">
+<div class="G2" id="zone-s1s4">
 <div class="card">
   <div class="SH"><div class="SN">1</div><div class="ST">งานติดตั้งหลังคาเมทัลชีท</div><div class="Stg" style="margin-left:auto">เป้า 100%</div></div>
   <div class="PW"><div class="PM"><span class="PL">ความคืบหน้ารวม</span><div class="IG"><input class="PI" type="number" min="0" max="100" id="s1" value="100" oninput="onS1()"><span class="Ps">%</span><span class="PP" id="s1p">100%</span></div></div><div class="PBG"><div class="PF g" id="s1b" style="width:100%"></div></div></div>
@@ -469,14 +454,14 @@ body.view-mode .edit-only{display:none!important}
 </div>
 
 <!-- S2 -->
-<div class="card">
+<div class="card" id="zone-s2">
   <div class="SH"><div class="SN">2</div><div class="ST">งานก่ออิฐภายใน (ชั้น 2–5)</div><div class="Stg" style="margin-left:auto">เป้า 100% ต่อชั้น</div></div>
   <div class="s2-desktop"><table class="FT"><thead><tr><th>ชั้น</th><th>ทิศทาง</th><th>ห้องทั้งหมด</th><th>ทำแล้ว</th><th style="min-width:160px">ความคืบหน้า</th><th>กรอกข้อมูล</th></tr></thead><tbody id="s2body"></tbody></table></div>
   <div class="s2-mobile" id="s2cards"></div>
 </div>
 
 <!-- S3 -->
-<div class="card">
+<div class="card" id="zone-s3">
   <div class="SH">
     <div class="SN" style="background:var(--cyan);color:#000">3</div>
     <div class="ST">งานก่ออิฐภายนอก</div>
@@ -513,7 +498,7 @@ body.view-mode .edit-only{display:none!important}
 </div>
 
 <!-- S5 S6 -->
-<div class="C2">
+<div class="C2" id="zone-s5s6">
 <div class="card">
   <div class="SH"><div class="SN" style="background:#9c27b0">5</div><div class="ST">งานไฟฟ้า กรีดผนัง+ฝังท่อ</div><div class="Stg" style="margin-left:auto">เป้า 80%</div></div>
   <div class="C2" style="margin-bottom:12px"><div class="MS"><span class="MSi">🔌</span><div><div class="MSl">ห้องทั้งหมด</div><div class="MSv">44 ห้อง</div></div></div><div class="MS"><span class="MSi">⚖️</span><div><div class="MSl">น้ำหนักต่อห้อง</div><div class="MSv">2.27%</div></div></div></div>
@@ -529,7 +514,7 @@ body.view-mode .edit-only{display:none!important}
 </div>
 
 <!-- S7 -->
-<div class="card">
+<div class="card" id="zone-s7">
   <div class="SH"><div class="SN" style="background:#f57c00">7</div><div class="ST">งานฉาบผนังภายใน (ชั้น 4 และ ชั้น 2)</div><div class="Stg" style="margin-left:auto">เป้า 40%</div><span style="font-size:10px;color:var(--tx3);background:var(--bg2);border:1px solid var(--bdr);padding:2px 7px;border-radius:4px">น้ำหนักห้องละ 4.55%</span></div>
   <div class="G2" style="gap:16px;align-items:stretch">
     <div style="display:flex;flex-direction:column">
