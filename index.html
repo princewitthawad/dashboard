@@ -2605,204 +2605,157 @@ function exportPDF(){
   .then(async()=>{
     try{
 
-      /* ═══ 1. PREPARE DOM ═══ */
-      const HIDE_IDS=['lock-modal','jupiter-overlay','rt-guide-overlay','fb-guide','toast','analysis-overlay'];
-      const prevD={};
-      HIDE_IDS.forEach(id=>{
-        const el=document.getElementById(id);
-        if(el){prevD[id]=el.style.cssText;el.style.setProperty('display','none','important');}
-      });
-      document.querySelectorAll('.save-bar').forEach(el=>el.style.setProperty('display','none','important'));
-      document.querySelectorAll('button').forEach(el=>el.style.setProperty('display','none','important'));
-      document.querySelectorAll('.edit-only,.view-badge,.live,.IG,.DCI,.PI,.DC-inp')
-        .forEach(el=>el.style.setProperty('display','none','important'));
+      /* ═══ 1. INJECT CSS บังคับแสดงทุก element ═══ */
+      const forceCSS=`
+        /* หยุด animation/transition */
+        *{animation:none!important;transition:none!important;
+          backdrop-filter:none!important;-webkit-backdrop-filter:none!important;}
+        /* ซ่อน UI ที่ไม่ต้องการ */
+        body::before,.orb{display:none!important;}
+        button,.edit-only,.view-badge,.live,
+        .IG,.DCI,.PI,.DC-inp,.save-bar,
+        #toast,#lock-modal,#jupiter-overlay,
+        #analysis-overlay,#rt-guide-overlay,#fb-guide{display:none!important;}
+        /* บังคับแสดง desktop layout */
+        .s2-desktop{display:block!important;}
+        .s2-mobile{display:none!important;}
+        /* บังคับแสดง Circular tab-all — ต้องชนะ .DP{display:none} */
+        html body .W .DS .DP{display:none!important;}
+        html body .W .DS #tab-all{display:block!important;}
+        html body .W .DS .TABS{display:none!important;}
+      `;
+      const st=document.createElement('style');
+      st.id='pdf-force';
+      st.textContent=forceCSS;
+      document.head.appendChild(st);
 
-      // เปิด s3 detail
+      /* ═══ 2. เตรียม DOM ═══ */
+      // ซ่อน overlay ผ่าน inline style ด้วย (double insurance)
+      const HIDE=['lock-modal','jupiter-overlay','rt-guide-overlay',
+                  'fb-guide','toast','analysis-overlay'];
+      const prevStyle={};
+      HIDE.forEach(id=>{
+        const el=document.getElementById(id);
+        if(el){prevStyle[id]=el.style.cssText;
+               el.style.setProperty('display','none','important');}
+      });
+
+      // เปิด S3 detail
       const s3wrap=document.getElementById('s3-detail-wrap');
       const s3was=_s3Open;
       if(!s3was&&s3wrap){
-        s3wrap.style.cssText='max-height:6000px!important;opacity:1!important;transition:none!important;overflow:visible!important;';
+        s3wrap.style.cssText='max-height:6000px!important;opacity:1!important;'+
+          'transition:none!important;overflow:visible!important;';
       }
 
-      // แสดง Circular tab-all — ต้อง override .DP{display:none} และ @media print
-      // วิธีเดียวที่ชนะ !important คือ inject <style> ที่มี specificity สูงกว่า
-      const forceShowCSS=`
-        /* FORCE SHOW for PDF capture */
-        #tab-all, #tab-all.DP, .DS #tab-all,
-        html body .DS #tab-all,
-        html body .W .DS #tab-all { display:block!important; }
-        /* ซ่อน tab อื่นๆ */
-        #tab-s1,#tab-s2,#tab-s3,#tab-s4,
-        #tab-s5,#tab-s6,#tab-s7 { display:none!important; }
-        /* ซ่อน TABS bar */
-        .DS .TABS { display:none!important; }
-        /* ซ่อน UI */
-        body::before,.orb{display:none!important;}
-        *{animation:none!important;transition:none!important;
-          backdrop-filter:none!important;-webkit-backdrop-filter:none!important;}
-        .s2-desktop{display:block!important;}
-        .s2-mobile{display:none!important;}
-      `;
-      const stForce=document.createElement('style');
-      stForce.id='pdf-force-show';
-      stForce.textContent=forceShowCSS;
-      document.head.appendChild(stForce);
+      // จัด .W ให้กว้างแน่นอน 1200px ก่อน capture
+      const W=document.querySelector('.W');
+      const prevWstyle=W.style.cssText;
+      W.style.cssText='max-width:1200px!important;margin:0 auto!important;'+
+        'padding:20px!important;width:1200px!important;';
 
       window.scrollTo(0,0);
-      await new Promise(r=>setTimeout(r,700));
+      await new Promise(r=>setTimeout(r,800));
 
-      /* ═══ 2. CAPTURE ทีละ element ═══
-         — capture แต่ละ section แยก แล้วเรียงใน PDF
-         — ทำแบบนี้เพราะ @media print ซ่อน elements บางตัวใน full-page capture
-      ═══════════════════════════════════════════════ */
-      async function cap(el){
-        if(!el) return null;
-        // force แสดง element
-        const origVis=el.style.visibility;
-        const origOp=el.style.opacity;
-        el.style.visibility='visible';
-        el.style.opacity='1';
-        // scroll to element
-        el.scrollIntoView({block:'start'});
-        await new Promise(r=>setTimeout(r,80));
-        let cv=null;
-        try{
-          cv=await html2canvas(el,{
-            scale:2.5,
-            useCORS:true,
-            allowTaint:true,
-            backgroundColor:'#080d14',
-            logging:false,
-            foreignObjectRendering:false,
-            ignoreElements:(node)=>{
-              const id=node.id||'';
-              const cls=(node.className||'').toString();
-              if(['lock-modal','jupiter-overlay','rt-guide-overlay',
-                  'fb-guide','toast','analysis-overlay'].includes(id)) return true;
-              if(cls.includes('save-bar')) return true;
-              return false;
-            },
-          });
-        }catch(e){console.warn('cap error',e);}
-        el.style.visibility=origVis;
-        el.style.opacity=origOp;
-        return cv;
-      }
-
-      // รายการ elements ที่จะ capture ตามลำดับ
-      const captureItems=[
-        {el: document.querySelector('header'),        label:'header'},
-        {el: document.querySelector('.kg'),           label:'KPI'},
-        {el: document.querySelector('.pie-section'),  label:'Pie'},
-        {el: document.querySelector('.DS'),           label:'Circular DS'},
-        {el: document.querySelector('.G2'),           label:'S1+S4'},
-        {el: document.getElementById('s2body')?.closest('.card'), label:'S2'},
-        {el: document.getElementById('s3body')?.closest('.card'), label:'S3'},
-        // S5+S6: หาจาก .C2 ที่เป็น direct child ของ .W
-        {el: (()=>{
-          for(const el of document.querySelectorAll('.C2')){
-            if(el.parentElement===document.querySelector('.W')) return el;
-          }
-          return null;
-        })(), label:'S5+S6'},
-        {el: document.getElementById('prooms')?.closest('.card'), label:'S7'},
-        {el: document.querySelector('.SB'),           label:'Summary'},
-      ];
-
-      const imgs=[];
-      for(const item of captureItems){
-        if(!item.el){console.warn('not found:',item.label);continue;}
-        if(item.el.offsetHeight<1 && item.el.offsetWidth<1){
-          console.warn('zero size:',item.label);continue;
-        }
-        console.log('capturing:',item.label, item.el.offsetHeight+'px');
-        const cv=await cap(item.el);
-        if(cv&&cv.width>10&&cv.height>10){
-          imgs.push({cv,label:item.label});
-          console.log('captured:',item.label,cv.width+'x'+cv.height);
-        } else {
-          console.warn('capture failed:',item.label);
-        }
-        await new Promise(r=>setTimeout(r,60));
-      }
-
-      /* ═══ 3. RESTORE DOM ═══ */
-      stForce.remove();
-      if(!s3was&&s3wrap){
-        s3wrap.style.cssText='max-height:0;opacity:0;transition:max-height .5s cubic-bezier(.4,0,.2,1),opacity .4s ease;overflow:hidden;';
-      }
-      HIDE_IDS.forEach(id=>{
-        const el=document.getElementById(id);
-        if(el) el.style.cssText=prevD[id]||'';
+      /* ═══ 3. CAPTURE .W ทั้งก้อน ═══ */
+      const fullH=W.scrollHeight;
+      const fullW=W.scrollWidth;
+      const cv=await html2canvas(W,{
+        scale:2,
+        useCORS:true,
+        allowTaint:true,
+        backgroundColor:'#080d14',
+        logging:false,
+        foreignObjectRendering:false,
+        width:fullW,
+        height:fullH,
+        windowWidth:fullW,
+        windowHeight:fullH,
       });
-      document.querySelectorAll('.save-bar').forEach(el=>el.style.removeProperty('display'));
-      document.querySelectorAll('button').forEach(el=>el.style.removeProperty('display'));
-      document.querySelectorAll('.edit-only,.view-badge,.live,.IG,.DCI,.PI,.DC-inp')
-        .forEach(el=>el.style.removeProperty('display'));
+
+      /* ═══ 4. RESTORE DOM ═══ */
+      st.remove();
+      W.style.cssText=prevWstyle;
+      if(!s3was&&s3wrap){
+        s3wrap.style.cssText=
+          'max-height:0;opacity:0;transition:max-height .5s,opacity .4s;overflow:hidden;';
+      }
+      HIDE.forEach(id=>{
+        const el=document.getElementById(id);
+        if(el) el.style.cssText=prevStyle[id]||'';
+      });
+      // คืน tab-all เป็น SHW ตามปกติ
+      document.querySelectorAll('.DS .DP').forEach(dp=>{
+        dp.style.cssText='';
+      });
       window.scrollTo(0,0);
 
-      if(imgs.length===0) throw new Error('Nothing captured');
+      if(!cv||cv.width<10) throw new Error('Capture failed');
 
-      /* ═══ 4. BUILD PDF ═══ */
+      /* ═══ 5. สร้าง PDF — slice แบบ smart (ตัดที่ช่องว่างระหว่าง card) ═══ */
       const {jsPDF}=window.jspdf;
-      const PW=210,PH=297,MX=7,MY=7,GAP=3,FH=8;
-      const CW=PW-MX*2;
-      const AVAIL=PH-MY*2-FH;
+
+      // A4 dimensions
+      const PW_MM=210, PH_MM=297;
+      const MX=8, MY=8, FH=9;           // margin mm
+      const CW=PW_MM-MX*2;              // content width = 194mm
+      const AVAIL=PH_MM-MY*2-FH;        // content height per page = 272mm
+
+      // px ↔ mm ratio
+      const mmPerPx=CW/cv.width;        // mm per pixel
+      const pxPerPage=Math.floor(AVAIL/mmPerPx); // pixels per page
 
       const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
-      let curY=MY;
 
-      for(const {cv,label} of imgs){
-        const ratio=CW/cv.width;   // mm per px
-        const ih=cv.height*ratio;  // image height in mm
+      let srcY=0;
+      let pageNum=0;
 
-        if(ih<=AVAIL){
-          // ภาพพอดีในหน้าเดียว
-          if(curY+ih>PH-MY-FH && curY>MY){
-            pdf.addPage(); curY=MY;
-          }
-          pdf.addImage(cv.toDataURL('image/jpeg',0.92),'JPEG',MX,curY,CW,ih,undefined,'FAST');
-          curY+=ih+GAP;
-        } else {
-          // ภาพยาวกว่า 1 หน้า → ตัด slice
-          const pxPerPage=Math.floor(AVAIL/ratio);
-          let sy=0;
-          while(sy<cv.height){
-            if(curY>MY){ pdf.addPage(); curY=MY; }
-            const sh=Math.min(pxPerPage, cv.height-sy);
-            const sl=document.createElement('canvas');
-            sl.width=cv.width; sl.height=sh;
-            const ctx=sl.getContext('2d');
-            ctx.fillStyle='#080d14';
-            ctx.fillRect(0,0,sl.width,sh);
-            ctx.drawImage(cv,0,sy,cv.width,sh,0,0,sl.width,sh);
-            const imgH=sh*ratio;
-            pdf.addImage(sl.toDataURL('image/jpeg',0.92),'JPEG',MX,curY,CW,imgH,undefined,'FAST');
-            curY+=imgH+GAP;
-            sy+=sh;
-          }
-        }
+      while(srcY<cv.height){
+        if(pageNum>0) pdf.addPage();
+        pageNum++;
+
+        const slH=Math.min(pxPerPage, cv.height-srcY);
+
+        // สร้าง slice canvas
+        const sl=document.createElement('canvas');
+        sl.width=cv.width;
+        sl.height=slH;
+        const ctx=sl.getContext('2d');
+        ctx.fillStyle='#080d14';
+        ctx.fillRect(0,0,sl.width,slH);
+        ctx.drawImage(cv, 0,srcY, cv.width,slH, 0,0, sl.width,slH);
+
+        const imgH_mm=slH*mmPerPx;
+        pdf.addImage(
+          sl.toDataURL('image/jpeg',0.92),
+          'JPEG', MX, MY, CW, imgH_mm,
+          undefined, 'FAST'
+        );
+
+        srcY+=slH;
       }
 
-      /* ═══ 5. FOOTER ═══ */
+      /* ═══ 6. FOOTER ทุกหน้า ═══ */
       const tot=pdf.internal.getNumberOfPages();
       const now=new Date();
       const ds=now.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
       for(let i=1;i<=tot;i++){
         pdf.setPage(i);
-        pdf.setDrawColor(56,100,160); pdf.setLineWidth(0.2);
-        pdf.line(MX,PH-FH,PW-MX,PH-FH);
-        pdf.setFontSize(7); pdf.setTextColor(120,140,170);
-        pdf.text('Construction Progress Dashboard  ·  '+ds,MX,PH-FH+3.5);
-        pdf.text('Page '+i+' / '+tot,PW-MX,PH-FH+3.5,{align:'right'});
+        pdf.setDrawColor(56,100,160);
+        pdf.setLineWidth(0.2);
+        pdf.line(MX, PH_MM-FH, PW_MM-MX, PH_MM-FH);
+        pdf.setFontSize(7);
+        pdf.setTextColor(120,140,170);
+        pdf.text('Construction Progress Dashboard  ·  '+ds, MX, PH_MM-FH+3.5);
+        pdf.text('Page '+i+' / '+tot, PW_MM-MX, PH_MM-FH+3.5, {align:'right'});
       }
 
       pdf.save('Construction_Report_'+now.toISOString().slice(0,10)+'.pdf');
       showToast('PDF saved — '+tot+' pages','ok');
 
     }catch(err){
-      console.error('PDF error:',err);
-      document.getElementById('pdf-force-show')?.remove();
+      console.error('PDF:',err);
+      document.getElementById('pdf-force')?.remove();
       showToast('PDF failed: '+err.message,'err',8000);
     }
   }).catch(()=>showToast('Failed to load library','err',6000));
