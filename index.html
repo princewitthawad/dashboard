@@ -441,7 +441,26 @@ body.view-mode .view-badge { display:flex!important; }
   background:#102030;flex-shrink:0;
   animation:lmdot 3s ease-in-out infinite;
 }
-@keyframes lmdot{0%,100%{opacity:.3}50%{opacity:.8}}
+.lm-dot-inp{
+  width:12px;height:12px;border-radius:50%;
+  background:#0d1a28;border:1.5px solid #1e3050;
+  transition:background .15s,border-color .15s;
+}
+.lm-dot-inp.filled{
+  background:#388bfd;border-color:#388bfd;
+}
+.lm-num{
+  padding:16px 8px;border-radius:12px;
+  background:#080f1a;border:1px solid #101e2e;
+  color:#c0d4ec;font-size:20px;font-weight:600;
+  font-family:var(--f);cursor:pointer;
+  touch-action:manipulation;-webkit-tap-highlight-color:transparent;
+  transition:background .1s,transform .08s;
+  user-select:none;-webkit-user-select:none;
+}
+.lm-num:active{background:#0d1a2e;transform:scale(.93)}
+.lm-num-clear{color:#4a6080;font-size:11px}
+.lm-num-del{color:#4a6080;font-size:18px}
 </style>
 </head>
 <body>
@@ -736,33 +755,39 @@ body.view-mode .view-badge { display:flex!important; }
       <div class="lm-h">Restricted Access</div>
       <div class="lm-p">ระบบนี้ถูกจำกัดสิทธิ์การแก้ไข<br>กรอกรหัสผ่านเพื่อเข้าสู่โหมดแก้ไขข้อมูล</div>
 
-      <label class="lm-lbl" for="lm-pw">Access Password</label>
-      <div class="lm-field">
-        <input
-          id="lm-pw"
-          type="password"
-          placeholder="••••••••"
-          maxlength="30"
-          autocomplete="current-password"
-          autocorrect="off"
-          autocapitalize="off"
-          spellcheck="false"
+      <label class="lm-lbl" for="lm-pw">รหัสผ่าน (Password)</label>
+
+      <!-- ปุ่มกดตัวเลข สำหรับมือถือ/iPad -->
+      <div id="lm-numpad" style="margin-bottom:16px">
+        <div id="lm-dots" style="display:flex;justify-content:center;gap:14px;margin-bottom:18px">
+          <div class="lm-dot-inp" id="dot0"></div>
+          <div class="lm-dot-inp" id="dot1"></div>
+          <div class="lm-dot-inp" id="dot2"></div>
+          <div class="lm-dot-inp" id="dot3"></div>
+          <div class="lm-dot-inp" id="dot4"></div>
+          <div class="lm-dot-inp" id="dot5"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:260px;margin:0 auto">
+          <button class="lm-num" onclick="numPress('1')">1</button>
+          <button class="lm-num" onclick="numPress('2')">2</button>
+          <button class="lm-num" onclick="numPress('3')">3</button>
+          <button class="lm-num" onclick="numPress('4')">4</button>
+          <button class="lm-num" onclick="numPress('5')">5</button>
+          <button class="lm-num" onclick="numPress('6')">6</button>
+          <button class="lm-num" onclick="numPress('7')">7</button>
+          <button class="lm-num" onclick="numPress('8')">8</button>
+          <button class="lm-num" onclick="numPress('9')">9</button>
+          <button class="lm-num lm-num-clear" onclick="numClear()" style="font-size:11px;letter-spacing:.5px">ล้าง</button>
+          <button class="lm-num" onclick="numPress('0')">0</button>
+          <button class="lm-num lm-num-del" onclick="numDel()">&#x232B;</button>
+        </div>
+      </div>
+
+      <!-- input ซ่อนไว้สำหรับ keyboard ปกติ (คอม) -->
+      <div class="lm-field" style="display:none">
+        <input id="lm-pw" type="password" placeholder="••••••••" maxlength="30"
+          autocomplete="current-password" autocorrect="off" autocapitalize="off" spellcheck="false"
           onkeydown="if(event.key==='Enter'){event.preventDefault();doUnlock();}">
-        <button type="button" class="lm-eye" id="lm-eye-btn" title="แสดง/ซ่อนรหัสผ่าน"
-          onclick="(function(){
-            var i=document.getElementById('lm-pw');
-            var toText=(i.type==='password');
-            i.type=toText?'text':'password';
-            document.getElementById('lm-eye-btn').innerHTML=toText
-              ?'<svg width=15 height=15 viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round'><line x1='1' y1='1' x2='23' y2='23'/><path d='M10.6 5.1A9 9 0 0 1 12 5c7 0 11 7 11 7a18 18 0 0 1-2.5 3.3M6.6 6.6A18 18 0 0 0 1 12s4 7 11 7a9 9 0 0 0 5.4-1.8'/></svg>'
-              :'<svg width=15 height=15 viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round'><path d='M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z'/><circle cx='12' cy='12' r='3'/></svg>';
-          })()">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round">
-            <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/>
-            <circle cx="12" cy="12" r="3"/>
-          </svg>
-        </button>
       </div>
 
       <div class="lm-err" id="lm-err"></div>
@@ -932,6 +957,7 @@ async function loadData(){
     applyState(s);
     try{ localStorage.setItem('cp_backup', JSON.stringify(s)); }catch(e){}
     const t = s.savedAt ? new Date(s.savedAt).toLocaleString('th-TH') : '—';
+    _lastSavedAt = s.savedAt || '';
     setSaveStatus('saved','☁️ Cloud โหลดสำเร็จ ✓', t);
     showToast('โหลดข้อมูล Cloud สำเร็จ 📂','ok');
   }catch(e){
@@ -2992,7 +3018,7 @@ function saveLogEntry(){
 // ═══════════════════════════════════════════════════════════
 // PASSWORD LOCK SYSTEM
 // ═══════════════════════════════════════════════════════════
-const PASS_HASH = '3f3523ac168330e6b429b23d2b25b6c6d7efaf564c1a9f1feaf5398d2bb45318'; // "2589"
+const PASS_HASH = 'b8d0e8083fee10ac52f6fa0d8d15592232fa442b16d3656bbb695ad4d61540f3'; // "085236"
 
 let _isUnlocked = false;
 
@@ -3063,14 +3089,13 @@ function togglePwVis(){
 function showLockModal(){
   const m = document.getElementById('lock-modal');
   m.style.display = 'flex';
-  const inp = document.getElementById('lm-pw');
+  // reset numpad
+  _numVal = '';
+  _syncDots();
   const err = document.getElementById('lm-err');
-  if(inp){ inp.value=''; inp.type='password'; inp.removeAttribute('disabled'); }
   if(err) err.textContent = '';
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    const i = document.getElementById('lm-pw');
-    if(i) i.focus();
-  }));
+  const inp = document.getElementById('lm-pw');
+  if(inp){ inp.value=''; inp.type='password'; inp.removeAttribute('disabled'); }
 }
 
 function closeLockModal(){
@@ -3079,13 +3104,45 @@ function closeLockModal(){
   if(!_isUnlocked) applyViewMode();
 }
 
+// ── Numpad ──
+let _numVal = '';
+function numPress(d){
+  if(_numVal.length >= 6) return;
+  _numVal += d;
+  _syncDots();
+  if(_numVal.length === 6) setTimeout(doUnlock, 150);
+}
+function numDel(){
+  _numVal = _numVal.slice(0,-1);
+  _syncDots();
+}
+function numClear(){
+  _numVal = '';
+  _syncDots();
+}
+function _syncDots(){
+  for(let i=0;i<6;i++){
+    const d=document.getElementById('dot'+i);
+    if(d) d.classList.toggle('filled', i<_numVal.length);
+  }
+  const inp=document.getElementById('lm-pw');
+  if(inp) inp.value=_numVal;
+  if(_numVal.length>0){
+    const err=document.getElementById('lm-err');
+    if(err) err.textContent='';
+  }
+}
+
+// ── Unlock ──
 function doUnlock(){
-  const inp = document.getElementById('lm-pw');
-  const pw = inp ? inp.value.trim() : '';
+  // อ่านรหัสจาก numpad ก่อน ถ้าไม่มีค่อยอ่านจาก input
+  const pw = (_numVal || (document.getElementById('lm-pw')||{}).value || '').trim();
   if(!pw){ document.getElementById('lm-err').textContent='กรุณากรอกรหัสผ่าน'; return; }
   const hash = sha256(pw);
   if(hash === PASS_HASH){
     _isUnlocked = true;
+    _numVal = '';
+    if(_refreshTimer){ clearInterval(_refreshTimer); _refreshTimer=null; }
     const m = document.getElementById('lock-modal');
     m.style.display = 'none';
     document.getElementById('lm-err').textContent = '';
@@ -3100,9 +3157,11 @@ function doUnlock(){
     showToast('ปลดล็อกสำเร็จ — โหมดแก้ไขพร้อมใช้งาน','ok');
   } else {
     document.getElementById('lm-err').textContent = 'รหัสผ่านไม่ถูกต้อง';
-    inp.value = '';
-    inp.focus();
-    // shake animation
+    _numVal = '';
+    _syncDots();
+    const inp = document.getElementById('lm-pw');
+    if(inp) inp.value = '';
+    // shake
     const card = document.querySelector('#lock-modal .lm-card');
     if(card){
       card.style.transition='none'; card.style.transform='translateX(-8px)';
@@ -3241,21 +3300,48 @@ function showRealtimeGuide(){
 }
 
 async function init(){
-  // สร้าง DOM ทั้งหมดก่อน เพื่อให้ applyViewMode เจอ input ครบทุกตัว
   buildS2(); buildS3(); buildDonuts(); updPlaster(); updKPI();
   buildPieChart();
   updS3Area();
   refreshAdvice();
-  // โหลดข้อมูลก่อน
   if(!isFirebaseReady()){
     setSaveStatus('unsaved','กรุณาตั้งค่า Cloud ก่อนใช้งาน');
   } else {
     await loadData();
   }
-  // ล็อกหลังสร้าง DOM และโหลดข้อมูลครบแล้ว
   applyViewMode();
   showLockModal();
+  // ── Auto-refresh สำหรับเครื่อง view-only ──
+  // โหลดข้อมูลใหม่จาก Firebase ทุก 15 วินาที
+  // หยุดเมื่อ unlock เป็น edit mode
+  startAutoRefresh();
 }
+
+let _refreshTimer = null;
+function startAutoRefresh(){
+  if(_refreshTimer) clearInterval(_refreshTimer);
+  _refreshTimer = setInterval(async()=>{
+    // refresh เฉพาะเครื่องที่ยังล็อกอยู่ (view-only) และ Firebase พร้อม
+    if(!_isUnlocked && isFirebaseReady()){
+      try{
+        const res = await fetch(fbPath());
+        if(!res.ok) return;
+        const s = await res.json();
+        if(!s) return;
+        // ตรวจว่าข้อมูลใหม่กว่าของที่แสดงอยู่
+        const newTime = s.savedAt || '';
+        if(newTime !== _lastSavedAt){
+          _lastSavedAt = newTime;
+          applyState(s);
+          const t = newTime ? new Date(newTime).toLocaleString('th-TH') : '—';
+          setSaveStatus('saved','อัปเดตอัตโนมัติ', t);
+        }
+      } catch(e){ /* silent fail */ }
+    }
+  }, 15000); // 15 วินาที
+}
+
+let _lastSavedAt = '';
 
 init();
 </script>
