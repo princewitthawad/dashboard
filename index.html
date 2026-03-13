@@ -2589,7 +2589,7 @@ function refreshAdvice(){
 // EXPORT PDF
 // ═══════════════════════════════════════════════════════════
 function exportPDF(){
-  showToast("กำลังสร้าง PDF...","info",120000);
+  showToast("Creating PDF...","info",120000);
 
   function loadLib(src,check){
     return new Promise((ok,fail)=>{
@@ -2658,7 +2658,7 @@ function exportPDF(){
       await new Promise(r=>setTimeout(r,1400));
 
       // ─── E. COLLECT CARD ELEMENTS & THEIR offsetTop ───────
-      //   (ทำหลัง reflow เพื่อให้ offsetTop ถูกต้อง)
+      //   (after reflow so offsetTop is accurate)
       const C2direct = (()=>{
         for(const el of document.querySelectorAll(".C2"))
           if(el.parentElement===W) return el;
@@ -2678,14 +2678,14 @@ function exportPDF(){
         W.querySelector(".SB"),
       ].filter(Boolean);
 
-      // offsetTop สะสม relative to W
+      // Cumulative offsetTop relative to W
       function relTop(el){
         let t=0, e=el;
         while(e && e!==W){ t+=e.offsetTop; e=e.offsetParent; }
         return t;
       }
 
-      // เก็บ {topPx, botPx} ใน DOM px (ก่อน *SCALE)
+      // Store {top, bot} in DOM px (before *SCALE)
       const domCards = cardEls.map(el=>({
         top: relTop(el),
         bot: relTop(el) + el.offsetHeight,
@@ -2746,31 +2746,31 @@ function exportPDF(){
 
       // ─── I. COMPUTE PAGE-BREAK POSITIONS ──────────────────
       //
-      // อัลกอริทึม:
-      //   1. แบ่งหน้าด้วย pxPerPage ก่อน (breaks ปกติ)
-      //   2. สำหรับทุก break — ถ้า break นั้นตัดกลาง card ใด
-      //      → เลื่อน break ขึ้นมาที่ top ของ card นั้น
-      //      (card จะเริ่มหน้าใหม่แทน)
+      // Algorithm:
+      //   1. Divide canvas into pages by pxPerPage (raw breaks)
+      //   2. For each break — if it cuts through a card
+      //      → shift break UP to card.top
+      //      (card starts on the next page instead)
       //
       const canvasH = bigCanvas.height;
 
-      // แปลง domCards → canvas px
+      // Convert domCards → canvas px
       const cards = domCards.map(c=>({
         top: c.top * SCALE,
         bot: c.bot * SCALE,
       }));
 
-      // สร้าง raw page-breaks ก่อน (ทุก pxPerPage)
+      // Build raw page-breaks (every pxPerPage)
       const rawBreaks = [];
       for(let y = pxPerPage; y < canvasH - 10; y += pxPerPage)
         rawBreaks.push(y);
 
-      // ปรับ break: ถ้าตัดกลาง card → ขยับขึ้นที่ top card
+      // Adjust break: if it cuts through a card → shift to card.top
       const adjBreaks = rawBreaks.map(brk=>{
         for(const card of cards){
-          // break อยู่กลาง card (ไม่ใช่ที่ขอบ)
+          // break is inside a card (not at edge)
           if(brk > card.top + 4 && brk < card.bot - 4){
-            // ถ้า card.top > 0 (ไม่ใช่ card แรกสุด) → ขึ้นหน้าที่ top card
+            // card.top > 0 (not first card) → break at card top
             if(card.top > 10) return card.top;
           }
         }
@@ -2784,7 +2784,7 @@ function exportPDF(){
       // ─── J. SLICE & BUILD PDF ──────────────────────────────
       const pdf = new jsPDF({orientation:"portrait",unit:"mm",format:"a4"});
 
-      // สร้าง slice ranges
+      // Build slice ranges
       const sliceStarts = [0, ...finalBreaks];
       const sliceEnds   = [...finalBreaks, canvasH];
 
@@ -2806,11 +2806,13 @@ function exportPDF(){
           0, 0,      sl.width,        sl.height);
 
         const imgHmm = sl.height * mmPerPx;
+        // Every page: image starts at top margin MY
+        // Last page will have blank space at bottom — that is correct A4 layout
         pdf.addImage(
           sl.toDataURL("image/jpeg", 0.93),
           "JPEG",
-          MX, MY,        // x, y (กึ่งกลาง A4)
-          CW, imgHmm,    // width, height
+          MX, MY,     // always top-left of content area
+          CW, imgHmm,
           undefined, "FAST"
         );
       });
@@ -2835,14 +2837,14 @@ function exportPDF(){
 
       // ─── L. SAVE ──────────────────────────────────────────
       pdf.save("Construction_Report_"+now.toISOString().slice(0,10)+".pdf");
-      showToast("PDF บันทึกแล้ว — "+total+" หน้า","ok");
+      showToast("PDF saved — "+total+" pages","ok");
 
     } catch(err){
       console.error("PDF error:", err);
       document.getElementById("_pdfStyle")?.remove();
-      showToast("PDF ล้มเหลว: "+err.message,"err",8000);
+      showToast("PDF failed: "+err.message,"err",8000);
     }
-  }).catch(()=>showToast("โหลด library ล้มเหลว","err",6000));
+  }).catch(()=>showToast("Failed to load library","err",6000));
 }
 // ── Toggle S3 รายละเอียดแต่ละชั้น ──
 let _s3Open = false;
