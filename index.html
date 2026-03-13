@@ -2066,111 +2066,38 @@ function exportPDF(){
   document.head.appendChild(style);
   const W=document.querySelector('.W');
   const origW=W.style.width;W.style.width='1200px';
-
-  // หา card S7 และ Summary Bar
-  function findS7(){
-    for(const c of W.querySelectorAll('.card')){
-      const sn=c.querySelector('.SN');
-      if(sn&&sn.textContent.trim()==='7') return c;
-    }
-    return null;
-  }
-  function findSummary(){return W.querySelector('.SB');}
-
-  function loadScript(src,cb){
-    if(document.querySelector(`script[src="${src}"]`)){cb();return;}
-    const s=document.createElement('script');s.src=src;s.onload=cb;document.head.appendChild(s);
-  }
-
-  const s7El=findS7();
-  const sbEl=findSummary();
-
-  // ซ่อน S7 + Summary ก่อน capture หน้า 1
-  if(s7El) s7El.style.visibility='hidden';
-  if(sbEl) sbEl.style.visibility='hidden';
-
-  loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',async()=>{
-    // === หน้า 1: ทุกอย่างยกเว้น S7+Summary ===
-    const canvas1=await html2canvas(W,{scale:1.5,useCORS:true,backgroundColor:'#080d14',logging:false});
-
-    // คืน S7 + Summary แล้วซ่อนส่วนอื่นเพื่อ capture หน้า 2
-    if(s7El) s7El.style.visibility='';
-    if(sbEl) sbEl.style.visibility='';
-
-    // ซ่อนทุกอย่างยกเว้น S7 และ Summary
-    const hideP2=[];
-    W.querySelectorAll(':scope > *').forEach(el=>{
-      if(el!==s7El && el!==sbEl && el.id!=='_pdf_style'){
-        hideP2.push(el);
-        el.style.visibility='hidden';
-      }
-    });
-
-    // === หน้า 2: เฉพาะ S7 + Summary ===
-    const canvas2=await html2canvas(W,{scale:1.5,useCORS:true,backgroundColor:'#080d14',logging:false});
-
-    // restore ทุกอย่าง
-    hideP2.forEach(el=>el.style.visibility='');
-    document.getElementById('_pdf_style')?.remove();
-    W.style.width=origW;
-
-    loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',()=>{
+  const script=document.createElement('script');
+  script.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+  script.onload=async()=>{
+    const canvas=await html2canvas(W,{scale:1.5,useCORS:true,backgroundColor:'#080d14',logging:false});
+    const jsPDFScript=document.createElement('script');
+    jsPDFScript.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+    jsPDFScript.onload=()=>{
       const{jsPDF}=window.jspdf;
       const pdf=new jsPDF('p','mm','a4');
       const pgW=210,pgH=297,margin=8;
       const imgW=pgW-margin*2;
+      const totalH=canvas.height*(imgW/(canvas.width));
       const pagesH=pgH-margin*2;
-
-      function addCanvas(c,isFirstPage){
-        if(!isFirstPage) pdf.addPage();
-        const pxPerMm=c.width/imgW;
-        const rendH=Math.min(c.height/pxPerMm, pagesH);
-        pdf.addImage(c.toDataURL('image/jpeg',.9),'JPEG',margin,margin,imgW,rendH);
+      let y=0;
+      while(y<totalH){
+        if(y>0)pdf.addPage();
+        const srcY=Math.round(y*canvas.width/imgW);
+        const srcH=Math.round(pagesH*canvas.width/imgW);
+        const pc=document.createElement('canvas');
+        pc.width=canvas.width;pc.height=Math.min(srcH,canvas.height-srcY);
+        pc.getContext('2d').drawImage(canvas,0,srcY,canvas.width,pc.height,0,0,canvas.width,pc.height);
+        pdf.addImage(pc.toDataURL('image/jpeg',.9),'JPEG',margin,margin,imgW,pc.height*(imgW/canvas.width));
+        y+=pagesH;
       }
-
-      // หน้า 1: scale ให้พอดี A4 เสมอ
-      function addCanvasFit(c){
-        const pxPerMm=c.width/imgW;
-        const naturalH=c.height/pxPerMm;
-        // ถ้าสูงเกิน pagesH ให้ย่อ scale ลงพอดี
-        const fitH=Math.min(naturalH,pagesH);
-        const fitW=imgW*(fitH/naturalH)*( naturalH<=pagesH ? 1 : (pagesH/naturalH) );
-        const finalW=naturalH<=pagesH ? imgW : imgW*(pagesH/naturalH);
-        const finalH=naturalH<=pagesH ? naturalH : pagesH;
-        const offX=margin+(imgW-finalW)/2;
-        pdf.addImage(c.toDataURL('image/jpeg',.9),'JPEG',offX,margin,finalW,finalH);
-      }
-
-      // trim canvas2: ตัดพื้นที่ว่างด้านบน/ล่างออก
-      function trimCanvas(c){
-        const ctx=c.getContext('2d');
-        const d=ctx.getImageData(0,0,c.width,c.height).data;
-        const bg=[8,13,20]; // #080d14
-        let top=0,bot=c.height-1;
-        const tol=30;
-        function isBg(y){
-          for(let x=0;x<c.width;x+=8){
-            const i=(y*c.width+x)*4;
-            if(Math.abs(d[i]-bg[0])>tol||Math.abs(d[i+1]-bg[1])>tol||Math.abs(d[i+2]-bg[2])>tol) return false;
-          }
-          return true;
-        }
-        while(top<bot&&isBg(top)) top++;
-        while(bot>top&&isBg(bot)) bot--;
-        const h=bot-top+1;
-        const out=document.createElement('canvas');
-        out.width=c.width;out.height=h;
-        out.getContext('2d').drawImage(c,0,top,c.width,h,0,0,c.width,h);
-        return out;
-      }
-
-      addCanvasFit(canvas1);
-      addCanvas(trimCanvas(canvas2),false);
-
       pdf.save('construction-progress-'+todayStr()+'.pdf');
+      document.getElementById('_pdf_style')?.remove();
+      W.style.width=origW;
       showToast('สร้าง PDF สำเร็จ 📄','ok');
-    });
-  });
+    };
+    document.head.appendChild(jsPDFScript);
+  };
+  document.head.appendChild(script);
 }
 
 // ═══════════════════════════════
