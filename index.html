@@ -74,11 +74,11 @@ body.view-mode .view-badge{display:flex!important}
 
 /* PIE */
 .pie-sec{background:var(--bgc);border:1px solid var(--bdr);border-radius:var(--r);padding:24px;margin-bottom:20px;position:relative;overflow:visible}
-.pie-sec::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(56,139,253,.04),transparent 50%);pointer-events:none;border-radius:var(--r)}
+.pie-sec::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(56,139,253,.04),transparent 50%);pointer-events:none;border-radius:var(--r);overflow:hidden}
 .pie-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;gap:10px;flex-wrap:wrap}
 .pie-title{font-size:15px;font-weight:800}.pie-sub{font-size:11px;color:var(--tx2);margin-top:3px;font-family:var(--m)}
 .pie-layout{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:center}
-.pie-wrap{width:100%;max-width:380px;margin:0 auto;position:relative}
+.pie-wrap{width:100%;max-width:380px;margin:0 auto;position:relative;padding:10px}
 .pie-square{position:relative;width:100%}
 .pie-square canvas{display:block;width:100%!important}
 .pie-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;z-index:2}
@@ -534,10 +534,15 @@ body.view-mode .edit-only{display:none!important}
 <!-- S7 -->
 <div class="card">
   <div class="SH"><div class="SN" style="background:#f57c00">7</div><div class="ST">งานฉาบผนังภายใน (ชั้น 4 และ ชั้น 2)</div><div class="Stg" style="margin-left:auto">เป้า 40%</div><span style="font-size:10px;color:var(--tx3);background:var(--bg2);border:1px solid var(--bdr);padding:2px 7px;border-radius:4px">น้ำหนักห้องละ 4.55%</span></div>
-  <div class="G2" style="gap:16px">
-    <div>
-      <div class="PW"><div class="PM"><span class="PL">ความคืบหน้าฉาบผนัง</span><div class="IG"><input class="PI" type="number" min="0" max="100" step=".01" id="s7" value="18.2" oninput="setBar('s7','s7b','s7p');updPlaster();ra()"><span class="Ps">%</span><span class="PP" id="s7p" style="color:var(--orange)">18.2%</span></div></div><div class="PBG"><div class="PF o" id="s7b" style="width:18.2%"></div></div></div>
+  <div class="G2" style="gap:16px;align-items:stretch">
+    <div style="display:flex;flex-direction:column">
+      <div class="PW"><div class="PM"><span class="PL">ความคืบหน้าฉาบผนัง</span><div class="IG"><input class="PI" type="number" min="0" max="100" step=".01" id="s7" value="18.2" oninput="setBar('s7','s7b','s7p');updPlaster();updS7Chart();ra()"><span class="Ps">%</span><span class="PP" id="s7p" style="color:var(--orange)">18.2%</span></div></div><div class="PBG"><div class="PF o" id="s7b" style="width:18.2%"></div></div></div>
       <div style="margin-top:9px;padding:9px 12px;background:var(--bg2);border-radius:7px;border:1px solid var(--bdr)"><div style="display:flex;justify-content:space-between"><span style="font-size:11px;color:var(--tx2)">ทำแล้ว: <span style="color:var(--green);font-weight:700;font-family:var(--m)" id="s7dr">4 ห้อง</span></span><span style="font-size:11px;color:var(--tx2)">ยังต้องทำ: <span style="color:var(--orange);font-weight:700;font-family:var(--m)" id="s7r">21.8%</span></span></div></div>
+      <!-- S7 Line Chart — flex:1 ยืดเต็มพื้นที่ที่เหลือ -->
+      <div style="margin-top:14px;background:var(--bg2);border:1px solid var(--bdr);border-radius:9px;padding:12px 14px;flex:1;display:flex;flex-direction:column">
+        <div style="font-size:11px;font-weight:700;color:var(--orange);margin-bottom:8px;flex-shrink:0">📈 กราฟความคืบหน้า vs เป้าหมาย</div>
+        <div style="position:relative;flex:1"><canvas id="s7LineChart"></canvas></div>
+      </div>
     </div>
     <div><div style="font-size:11px;color:var(--tx2);margin-bottom:9px">สถานะห้อง (แต่ละช่อง = 4.55%)</div><div class="PR" id="prooms"></div></div>
   </div>
@@ -553,8 +558,33 @@ body.view-mode .edit-only{display:none!important}
 <!-- ACTION BUTTONS -->
 <div style="display:flex;justify-content:center;gap:12px;padding:16px 0 6px;flex-wrap:wrap">
   <button onclick="showRealtimeGuide()" class="btn btn-b" style="padding:9px 20px;font-size:12px">🌐 คู่มือแชร์ Realtime</button>
+  <button onclick="openChecklistPage()" style="background:linear-gradient(135deg,rgba(0,60,120,.6),rgba(56,139,253,.2));color:var(--blue);border:1px solid rgba(56,139,253,.5);border-radius:10px;padding:12px 28px;font-size:14px;cursor:pointer;font-family:var(--f);font-weight:700;display:inline-flex;align-items:center;gap:8px;transition:all .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">📋 Checklist ประสานงานหน้างาน ↗</button>
   <button onclick="openJupiterPage()" style="background:linear-gradient(135deg,rgba(26,35,126,.6),rgba(255,214,0,.2));color:var(--gold);border:1px solid rgba(255,214,0,.5);border-radius:10px;padding:12px 28px;font-size:14px;cursor:pointer;font-family:var(--f);font-weight:700;display:inline-flex;align-items:center;gap:8px;transition:all .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">🪐 Jupiter — คำแนะนำบริหารงาน ↗</button>
   <button onclick="openAnalysisPage()" style="background:linear-gradient(135deg,rgba(0,100,60,.6),rgba(0,230,118,.2));color:var(--green);border:1px solid rgba(0,230,118,.4);border-radius:10px;padding:12px 28px;font-size:14px;cursor:pointer;font-family:var(--f);font-weight:700;display:inline-flex;align-items:center;gap:8px;transition:all .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">📈 วิเคราะห์ — กราฟ & แผนรายวัน ↗</button>
+</div>
+
+<!-- CHECKLIST OVERLAY -->
+<div id="checklist-overlay" class="overlay">
+  <button class="ov-close" onclick="document.getElementById('checklist-overlay').classList.remove('show')">✕ ปิด</button>
+  <div class="ov-inner" style="max-width:860px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:10px">
+      <div>
+        <div style="font-size:18px;font-weight:800">📋 Checklist การประสานงานหน้างาน</div>
+        <div style="font-size:11px;color:var(--tx2);margin-top:3px;font-family:var(--m)">ภายในและภายนอกองค์กร · ติ๊กรายการที่ดำเนินการแล้ว</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button onclick="resetChecklist()" class="btn btn-r" style="font-size:11px">🔄 รีเซ็ต</button>
+        <button onclick="exportChecklistPDF()" class="btn edit-only" style="background:rgba(220,38,38,.15);color:#ff4444;border:1px solid rgba(220,38,38,.4);font-size:11px">📄 Export PDF</button>
+      </div>
+    </div>
+    <!-- Progress summary -->
+    <div style="background:var(--bg2);border:1px solid var(--bdr);border-radius:9px;padding:12px 16px;margin-bottom:18px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+      <div style="font-size:12px;color:var(--tx2)">ความคืบหน้า: <span style="font-weight:800;font-family:var(--m);color:var(--green)" id="cl-done-count">0</span> / <span style="font-weight:800;font-family:var(--m)" id="cl-total-count">0</span> รายการ</div>
+      <div style="flex:1;min-width:120px"><div class="PBG" style="height:8px"><div class="PF g" id="cl-progress-bar" style="width:0%"></div></div></div>
+      <div style="font-size:13px;font-weight:800;font-family:var(--m);color:var(--green)" id="cl-pct">0%</div>
+    </div>
+    <div id="checklist-body"></div>
+  </div>
 </div>
 
 <!-- LOCK MODAL -->
@@ -1189,11 +1219,11 @@ function buildPieChart(){
   const shadow=data.map(v=>v*0.08);
   _pie=new Chart(ctx,{type:'doughnut',data:{
     datasets:[
-      {data,backgroundColor:SUMDEF.map(d=>d.col+'cc'),borderColor:SUMDEF.map(d=>d.col),borderWidth:2,hoverOffset:12},
+      {data,backgroundColor:SUMDEF.map(d=>d.col+'cc'),borderColor:SUMDEF.map(d=>d.col),borderWidth:2,hoverOffset:6},
       {data:shadow,backgroundColor:SUMDEF.map(d=>d.col+'33'),borderWidth:0,hoverOffset:0}
     ],
     labels:SUMDEF.map(d=>d.lbl)
-  },options:{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>{if(ctx.datasetIndex!==0)return null;const v=ctx.dataset.data[ctx.dataIndex];return ` ${ctx.label}: ${v.toFixed(1)}%`;}}}},animation:{animateRotate:true,duration:900}}});
+  },options:{responsive:true,maintainAspectRatio:false,cutout:'62%',layout:{padding:8},plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>{if(ctx.datasetIndex!==0)return null;const v=ctx.dataset.data[ctx.dataIndex];return ` ${ctx.label}: ${v.toFixed(1)}%`;}}}},animation:{animateRotate:true,duration:900}}});
   // Force square immediately
   setTimeout(forcePieSquare,0);
   setTimeout(forcePieSquare,200);
@@ -1432,8 +1462,243 @@ function doUnlock(){
 }
 
 // ═══════════════════════════════
-// LABOR CONFIG (ข้อ 3)
+// S7 LINE CHART — คืบหน้า vs เป้า
 // ═══════════════════════════════
+let _s7Chart=null;
+function buildS7Chart(){
+  const ctx=document.getElementById('s7LineChart')?.getContext('2d');if(!ctx)return;
+  if(_s7Chart){_s7Chart.destroy();}
+  const logs=getDailyLog();
+  const DAYS=25;
+  const tgt=40;
+  // สร้าง labels = Day 1 .. Day 25
+  const dayLabels=Array.from({length:DAYS},(_,i)=>'วัน '+(i+1));
+  // เส้นเป้า: linear จาก 0 → 40% ใน 25 วัน
+  const targetLine=dayLabels.map((_,i)=>parseFloat(((tgt/(DAYS-1))*i).toFixed(2)));
+  // เส้นจริง: ดึงจาก daily log (max DAYS จุด) + ปัจจุบัน
+  const actualPoints=logs.slice(-DAYS).map(l=>parseFloat((l.vals?.[6]||0).toFixed(1)));
+  // เติม null สำหรับวันที่ยังไม่มีข้อมูล
+  const actualLine=dayLabels.map((_,i)=>i<actualPoints.length?actualPoints[i]:null);
+  // วันปัจจุบันเพิ่มจากค่า input
+  const curVal=gv('s7');
+  if(actualLine.every(v=>v===null)||actualPoints.length===0){
+    // ยังไม่มี log → แสดงแค่จุดปัจจุบัน
+    actualLine[0]=curVal;
+  }
+
+  _s7Chart=new Chart(ctx,{
+    type:'line',
+    data:{
+      labels:dayLabels,
+      datasets:[
+        {
+          label:'ที่ควรทำได้ (เป้า)',
+          data:targetLine,
+          borderColor:'rgba(56,139,253,.7)',
+          backgroundColor:'rgba(56,139,253,.08)',
+          fill:true,tension:.4,pointRadius:0,borderWidth:2,borderDash:[6,4]
+        },
+        {
+          label:'ที่ทำได้จริง',
+          data:actualLine,
+          borderColor:'#ff9500',
+          backgroundColor:'rgba(255,149,0,.15)',
+          fill:true,tension:.4,
+          pointRadius:(ctx)=>ctx.dataIndex===actualPoints.length-1||actualPoints.length===0?5:2,
+          pointBackgroundColor:'#ff9500',borderWidth:2.5,
+          spanGaps:false
+        }
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:{
+          display:true,
+          position:'top',
+          labels:{color:'#8899aa',font:{size:10},boxWidth:20,padding:8}
+        },
+        tooltip:{
+          backgroundColor:'rgba(8,13,20,.95)',
+          borderColor:'rgba(56,139,253,.3)',borderWidth:1,
+          titleColor:'#e8f0fe',bodyColor:'#8899aa',padding:9,
+          callbacks:{label:c=>` ${c.dataset.label}: ${c.parsed.y!=null?c.parsed.y.toFixed(1):''}%`}
+        }
+      },
+      scales:{
+        x:{ticks:{color:'#8899aa',font:{size:9},maxTicksLimit:8},grid:{color:'rgba(255,255,255,.03)'},border:{color:'rgba(56,139,253,.1)'}},
+        y:{min:0,max:45,ticks:{color:'#8899aa',font:{size:9},callback:v=>v+'%'},grid:{color:'rgba(255,255,255,.04)'},border:{color:'rgba(56,139,253,.1)'}}
+      },
+      animation:{duration:600}
+    }
+  });
+}
+function updS7Chart(){setTimeout(()=>{buildS7Chart();},50);}
+
+// ═══════════════════════════════
+// CHECKLIST DATA
+// ═══════════════════════════════
+const CHECKLIST_DATA=[
+  {
+    id:'A',title:'A. การประสานงานภายในทีมงาน',sub:'ใช้เป็นประจำทุกวัน',col:'#388bfd',icon:'👥',
+    items:[
+      'ก่อนเวลา 10.00 น. ผู้ควบคุมงานต้องเข้าไซต์งานและส่งรูปหรือวิดีโอแสดงการเปิดไซต์งาน',
+      'รายงานว่าวันนั้นมีงานที่ก่อให้เกิดเสียงดังหรือไม่ หากมีต้องระบุช่วงเวลาให้ชัดเจน',
+      'ระหว่างวัน หากมี Owner หรือบุคคลภายนอกเข้าไซต์งาน ต้องแจ้งในกลุ่มสื่อสารทันที',
+      'งานที่มีความเสี่ยง (เช่น งานที่สูง งานขนย้ายวัสดุหนัก) ต้องมีอุปกรณ์ป้องกันความปลอดภัยครบถ้วน',
+      'ก่อนเลิกงาน ต้องส่งรูปหรือวิดีโอแสดงความสะอาดและความเรียบร้อยของไซต์งาน',
+    ]
+  },
+  {
+    id:'B',title:'B. การประสานงานกับ Supplier และบุคคลภายนอก',sub:'งานสำคัญ',col:'#00e676',icon:'🤝',
+    items:[
+      'ยืนยันรายละเอียดงาน เช่น ปริมาณงาน และเวลาที่จะเข้าหน้างาน',
+      'ยืนยันอุปกรณ์ที่ต้องใช้ให้ครบถ้วนก่อนเริ่มงาน',
+      'มีเบอร์ติดต่อของผู้รับผิดชอบหรือผู้ประสานงานโดยตรง (คนคุมงานในวันนั้น)',
+      'ต้องมีข้อความหรือเอกสารยืนยันซ้ำก่อนวันปฏิบัติงานจริง',
+    ]
+  },
+  {
+    id:'C',title:'C. การทำงานในวันหยุดหรือช่วงนอกเวลาปกติ',sub:'',col:'#ffd600',icon:'🕐',
+    items:[
+      'ต้องไม่มีงานที่ก่อให้เกิดเสียงดัง หากไม่ได้รับอนุญาตล่วงหน้า',
+      'กำหนดขอบเขตและลักษณะงานให้ชัดเจนก่อนเริ่มงาน',
+      'ต้องมีผู้รับผิดชอบดูแลไซต์งานตลอดช่วงเวลาที่ทำงาน',
+      'หากเกิดปัญหาหรือข้อร้องเรียน ให้หยุดงานทันทีและรายงานผู้บริหาร',
+    ]
+  },
+  {
+    id:'D',title:'D. ความปลอดภัยในการทำงาน',sub:'',col:'#ff4444',icon:'🦺',
+    items:[
+      'งานที่สูงต้องมีอุปกรณ์ป้องกันการตก และติดตั้งอย่างถูกต้อง',
+      'ห้ามวางวัสดุหรืออุปกรณ์ในตำแหน่งที่มีความเสี่ยงต่อการร่วงหล่น',
+      'การขนย้ายวัสดุต้องมีผู้ควบคุมดูแลตลอดเวลา',
+      'ต้องมีการแจ้งเตือนและควบคุมพื้นที่เมื่อมีบุคคลภายนอกเข้าไซต์งาน',
+    ]
+  },
+  {
+    id:'E',title:'E. การรายงานผลต่อ Owner',sub:'อย่างน้อยวันละ 2 ครั้ง',col:'#ce93d8',icon:'📹',
+    items:[
+      'ส่งวิดีโอรายงานหน้างานความยาวประมาณ 3–5 นาที ก่อนเวลา 10.00 น.',
+      'ส่งวิดีโอรายงานหน้างานความยาวประมาณ 3–5 นาที ก่อนเวลา 17.00 น.',
+      'รายงานต้องกระชับ ชัดเจน และเป็นข้อเท็จจริง โดยไม่กล่าวโทษบุคคลใด',
+      'เนื้อหาการรายงานต้องครอบคลุม: ความปลอดภัย ความสะอาด และการควบคุมงาน',
+    ]
+  },
+];
+
+let _clState={};
+function getClKey(){return 'cp_checklist_'+todayStr();}
+function loadClState(){try{return JSON.parse(localStorage.getItem(getClKey())||'{}');}catch(e){return{};}}
+function saveClState(){try{localStorage.setItem(getClKey(),JSON.stringify(_clState));}catch(e){}}
+
+function openChecklistPage(){
+  _clState=loadClState();
+  renderChecklist();
+  document.getElementById('checklist-overlay').classList.add('show');
+}
+function renderChecklist(){
+  const body=document.getElementById('checklist-body');if(!body)return;
+  let total=0,done=0;
+  CHECKLIST_DATA.forEach(g=>g.items.forEach((_,i)=>{total++;if(_clState[g.id+'-'+i])done++;}));
+  // update progress
+  const pct=total>0?Math.round(done/total*100):0;
+  document.getElementById('cl-done-count').textContent=done;
+  document.getElementById('cl-total-count').textContent=total;
+  document.getElementById('cl-pct').textContent=pct+'%';
+  document.getElementById('cl-progress-bar').style.width=pct+'%';
+  document.getElementById('cl-progress-bar').className='PF '+(pct>=80?'g':pct>=50?'b':pct>=30?'o':'r');
+
+  body.innerHTML=CHECKLIST_DATA.map(g=>{
+    const gDone=g.items.filter((_,i)=>_clState[g.id+'-'+i]).length;
+    return`<div style="background:var(--bg2);border:1px solid ${g.col}33;border-left:4px solid ${g.col};border-radius:9px;padding:16px;margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap">
+        <span style="font-size:18px">${g.icon}</span>
+        <div style="flex:1">
+          <div style="font-weight:700;font-size:13px;color:${g.col}">${g.title}</div>
+          ${g.sub?`<div style="font-size:10px;color:var(--tx3);margin-top:1px">${g.sub}</div>`:''}
+        </div>
+        <span style="font-size:11px;font-family:var(--m);background:${g.col}20;border:1px solid ${g.col}44;border-radius:20px;padding:2px 10px;color:${g.col}">${gDone}/${g.items.length}</span>
+      </div>
+      ${g.items.map((item,i)=>{
+        const key=g.id+'-'+i;
+        const checked=!!_clState[key];
+        return`<label style="display:flex;align-items:flex-start;gap:10px;margin-bottom:9px;cursor:pointer;padding:8px 10px;background:${checked?g.col+'12':'rgba(255,255,255,.02)'};border:1px solid ${checked?g.col+'44':'var(--bdr)'};border-radius:7px;transition:all .2s;user-select:none" onclick="toggleCl('${key}')">
+          <div style="width:18px;height:18px;border-radius:5px;border:2px solid ${checked?g.col:'var(--tx3)'};background:${checked?g.col:'transparent'};flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .2s">
+            ${checked?`<svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2" stroke="#000" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`:''}
+          </div>
+          <span style="font-size:12px;color:${checked?'var(--tx)':'var(--tx2)'};line-height:1.6;${checked?'text-decoration:line-through;opacity:.65':''}">${item}</span>
+        </label>`;
+      }).join('')}
+    </div>`;
+  }).join('');
+}
+function toggleCl(key){
+  _clState[key]=!_clState[key];
+  saveClState();
+  renderChecklist();
+}
+function resetChecklist(){
+  if(!confirm('รีเซ็ตทุกรายการ?'))return;
+  _clState={};saveClState();renderChecklist();
+  showToast('รีเซ็ต Checklist แล้ว','ok');
+}
+function exportChecklistPDF(){
+  showToast('กำลังสร้าง PDF Checklist...','info',6000);
+  const today=new Date().toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'});
+  let total=0,done=0;
+  CHECKLIST_DATA.forEach(g=>g.items.forEach((_,i)=>{total++;if(_clState[g.id+'-'+i])done++;}));
+  const pct=total>0?Math.round(done/total*100):0;
+
+  const win=window.open('','_blank','width=800,height=900');
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <title>Checklist ประสานงานหน้างาน — ${today}</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Sarabun',sans-serif;background:#fff;color:#1a1a2e;padding:24px;font-size:13px}
+    h1{font-size:18px;font-weight:800;margin-bottom:4px}
+    .sub{color:#666;font-size:11px;margin-bottom:16px}
+    .prog{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding:10px 14px;background:#f8f9ff;border:1px solid #c7d2fe;border-radius:8px}
+    .prog-bar{flex:1;height:8px;background:#e2e8f0;border-radius:99px;overflow:hidden}
+    .prog-fill{height:100%;background:linear-gradient(90deg,#059669,#34d399);border-radius:99px}
+    .section{margin-bottom:16px;border:1px solid #e2e8f0;border-left:4px solid;border-radius:8px;padding:14px}
+    .sec-title{font-weight:700;font-size:13px;margin-bottom:10px}
+    .item{display:flex;align-items:flex-start;gap:9px;margin-bottom:8px;padding:6px 8px;border-radius:5px}
+    .item.done{background:#f0fdf4}
+    .box{width:15px;height:15px;border-radius:3px;border:2px solid #cbd5e1;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center}
+    .box.done{background:#059669;border-color:#059669;color:#fff;font-size:9px;font-weight:700}
+    .item-text{font-size:12px;color:#374151;line-height:1.6}
+    .item.done .item-text{text-decoration:line-through;opacity:.6}
+    @media print{body{padding:10mm}button{display:none}}
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700;800&display=swap" rel="stylesheet">
+  </head><body>
+  <h1>📋 Checklist การประสานงานหน้างาน</h1>
+  <div class="sub">วันที่: ${today} · ภายในและภายนอกองค์กร</div>
+  <div class="prog">
+    <span style="font-size:12px;color:#4b5563">ความคืบหน้า: <strong>${done}/${total} รายการ</strong></span>
+    <div class="prog-bar"><div class="prog-fill" style="width:${pct}%"></div></div>
+    <strong style="color:#059669">${pct}%</strong>
+  </div>
+  ${CHECKLIST_DATA.map(g=>`
+    <div class="section" style="border-left-color:${g.col}">
+      <div class="sec-title" style="color:${g.col}">${g.icon} ${g.title}${g.sub?' <span style="font-weight:400;font-size:11px;color:#9ca3af">('+g.sub+')</span>':''}</div>
+      ${g.items.map((item,i)=>{
+        const checked=!!_clState[g.id+'-'+i];
+        return`<div class="item${checked?' done':''}">
+          <div class="box${checked?' done':''}">${checked?'✓':''}</div>
+          <span class="item-text">${item}</span>
+        </div>`;
+      }).join('')}
+    </div>`).join('')}
+  <div style="margin-top:20px;padding-top:12px;border-top:1px solid #e2e8f0;font-size:10px;color:#9ca3af;text-align:center">
+    Construction Progress Dashboard · พิมพ์วันที่ ${today}
+  </div>
+  <script>window.onload=()=>{window.print();}<\/script>
+  </body></html>`);
+  win.document.close();
+}
 let LABOR={
   mason_ext:2,mason_in:6,mason_plaster:7,
   elec_lead:2,elec_helper:3,
@@ -1900,7 +2165,7 @@ function init(){
   ['s1','s4t','s5','s6','s7'].forEach(id=>setBar(id,id+'b',id+'p'));
   ['r41','r42','r43','r44','r45'].forEach(id=>setBar(id,id+'b',id+'p'));
   updPlaster();
-  setTimeout(()=>{buildPieChart();buildDonuts();ra();},100);
+  setTimeout(()=>{buildPieChart();buildDonuts();buildS7Chart();ra();},100);
   // Try load from cloud on start
   if(isFirebaseReady()){
     setSvStatus('saving','☁️ กำลังซิงค์ข้อมูล...');
