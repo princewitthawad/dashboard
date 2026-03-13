@@ -2300,57 +2300,99 @@ function refreshAdvice(){
 }
 
 // ═══════════════════════════════════════════════════════════
-// EXPORT PDF — ใช้ระบบ Print ของ browser (ทำงานได้ทุกอุปกรณ์)
-// สี กราฟ progress bar ครบ — เหมือนหน้าจอ 100%
+// EXPORT PDF — แนวตั้ง A4
 // ═══════════════════════════════════════════════════════════
 function exportPDF(){
-  showToast('กำลังสร้าง PDF... รอสักครู่ครับ','info',4000);
-  // โหลด html2canvas + jsPDF แบบ dynamic
-  const s1=document.createElement('script');
-  s1.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
-  s1.onload=()=>{
-    const s2=document.createElement('script');
-    s2.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
-    s2.onload=async()=>{
-      try{
-        const el=document.querySelector('.W');
-        const canvas=await html2canvas(el,{
-          scale:1.5, useCORS:true, backgroundColor:'#080d14',
-          ignoreElements:e=>e.id==='lock-modal'||e.id==='jupiter-overlay'||e.id==='analysis-overlay'
-        });
-        const {jsPDF}=window.jspdf;
-        const pdf=new jsPDF({orientation:'landscape',unit:'mm',format:'a3'});
-        const W=pdf.internal.pageSize.getWidth();
-        const H=pdf.internal.pageSize.getHeight();
-        const ratio=Math.min(W/canvas.width,H/canvas.height)*0.96;
-        const iw=canvas.width*ratio; const ih=canvas.height*ratio;
-        const x=(W-iw)/2; const y=6;
-        // แบ่งหน้าถ้าสูงเกิน
-        const pageH=H-12;
-        let srcY=0;
-        while(srcY<canvas.height){
-          const tmpC=document.createElement('canvas');
-          const ph=Math.min(pageH/ratio, canvas.height-srcY);
-          tmpC.width=canvas.width; tmpC.height=ph;
-          tmpC.getContext('2d').drawImage(canvas,0,srcY,canvas.width,ph,0,0,canvas.width,ph);
-          const img=tmpC.toDataURL('image/jpeg',0.88);
-          if(srcY>0) pdf.addPage();
-          pdf.addImage(img,'JPEG',x,y,canvas.width*ratio,ph*ratio);
-          srcY+=ph;
-        }
-        const d=new Date().toLocaleDateString('th-TH').replace(/\//g,'-');
-        pdf.save('Construction_Report_'+d+'.pdf');
-        showToast('✅ บันทึก PDF สำเร็จครับ','ok');
-      }catch(e){
-        console.error(e);
-        showToast('❌ เกิดข้อผิดพลาด: '+e.message,'err');
-      }
-    };
-    document.head.appendChild(s2);
-  };
-  document.head.appendChild(s1);
-}
+  showToast('กำลังสร้าง PDF... รอสักครู่','info',15000);
 
+  function loadScript(src, globalCheck){
+    return new Promise((res,rej)=>{
+      if(globalCheck && window[globalCheck]){ res(); return; }
+      const s=document.createElement('script');
+      s.src=src;
+      s.onload=()=>setTimeout(res,100);
+      s.onerror=()=>rej(new Error('โหลดไม่ได้: '+src));
+      document.head.appendChild(s);
+    });
+  }
+
+  loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js','html2canvas')
+  .then(()=>loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js','jspdf'))
+  .then(async()=>{
+    try{
+      // ซ่อน popup
+      const toHide=['lock-modal','jupiter-overlay','analysis-overlay','rt-guide-overlay','fb-guide','toast'];
+      const prevDisplay={};
+      toHide.forEach(id=>{
+        const el=document.getElementById(id);
+        if(el){ prevDisplay[id]=el.style.display||''; el.style.display='none'; }
+      });
+
+      window.scrollTo(0,0);
+      await new Promise(r=>setTimeout(r,400));
+
+      const canvas=await html2canvas(document.body,{
+        scale:2,
+        useCORS:true,
+        allowTaint:true,
+        backgroundColor:'#080d14',
+        width:document.body.scrollWidth,
+        height:document.body.scrollHeight,
+        windowWidth:document.body.scrollWidth,
+        windowHeight:window.innerHeight,
+        x:0, y:0, scrollX:0, scrollY:0,
+        ignoreElements:e=>{
+          const id=e.id||'';
+          return ['lock-modal','jupiter-overlay','analysis-overlay',
+                  'rt-guide-overlay','fb-guide','toast'].includes(id);
+        }
+      });
+
+      toHide.forEach(id=>{
+        const el=document.getElementById(id);
+        if(el) el.style.display=prevDisplay[id];
+      });
+
+      if(!canvas||canvas.width===0) throw new Error('capture ไม่ได้');
+
+      const {jsPDF}=window.jspdf;
+      const PDF_W=210,PDF_H=297,MARGIN=6;
+      const CW=PDF_W-MARGIN*2, CH=PDF_H-MARGIN*2-8;
+      const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+      const ratio=CW/canvas.width;
+      const pageHpx=Math.floor(CH/ratio);
+      let srcY=0,pg=0;
+
+      while(srcY<canvas.height){
+        if(pg>0) pdf.addPage();
+        const sh=Math.min(pageHpx,canvas.height-srcY);
+        const sl=document.createElement('canvas');
+        sl.width=canvas.width; sl.height=sh;
+        const ctx=sl.getContext('2d');
+        ctx.fillStyle='#080d14';
+        ctx.fillRect(0,0,sl.width,sh);
+        ctx.drawImage(canvas,0,srcY,canvas.width,sh,0,0,canvas.width,sh);
+        const img=sl.toDataURL('image/jpeg',0.90);
+        // header
+        pdf.setFontSize(7); pdf.setTextColor(60,90,130);
+        const ds=new Date().toLocaleDateString('th-TH',{year:'numeric',month:'short',day:'numeric'});
+        pdf.text('Construction Progress Dashboard  ·  '+ds,MARGIN,MARGIN+2);
+        pdf.text('หน้า '+(pg+1),PDF_W-MARGIN,MARGIN+2,{align:'right'});
+        pdf.setDrawColor(25,45,75); pdf.setLineWidth(0.2);
+        pdf.line(MARGIN,MARGIN+4,PDF_W-MARGIN,MARGIN+4);
+        // content
+        pdf.addImage(img,'JPEG',MARGIN,MARGIN+6,CW,sh*ratio);
+        srcY+=sh; pg++;
+      }
+
+      pdf.save('รายงาน_'+new Date().toLocaleDateString('th-TH').replace(/\//g,'-')+'.pdf');
+      showToast('PDF สำเร็จ '+pg+' หน้า','ok');
+    }catch(e){
+      console.error(e);
+      showToast('PDF ล้มเหลว: '+e.message,'err',8000);
+    }
+  }).catch(e=>showToast('โหลด library ไม่ได้','err',6000));
+}
 
 // ── Toggle S3 รายละเอียดแต่ละชั้น ──
 let _s3Open = false;
