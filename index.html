@@ -328,14 +328,15 @@ body.view-mode .view-badge { display:flex!important; }
 #lock-modal{
   position:fixed;inset:0;z-index:99999;
   display:none;
-  align-items:center;justify-content:center;
+  align-items:flex-start;justify-content:center;
   background:rgba(3,7,14,.97);
   backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
-  padding:20px;
+  padding:16px;
+  overflow-y:auto;
 }
 #lock-modal.show{display:flex!important}
 .lm-card{
-  width:100%;max-width:390px;margin:auto;
+  width:100%;max-width:360px;margin:16px auto;
   background:#08111e;
   border:1px solid rgba(56,139,253,.15);
   border-radius:20px;
@@ -347,7 +348,7 @@ body.view-mode .view-badge { display:flex!important; }
   height:2px;
   background:linear-gradient(90deg,transparent,#1a56db 30%,#38bdf8 60%,transparent);
 }
-.lm-content{padding:38px 34px 32px}
+.lm-content{padding:28px 24px 24px}
 .lm-lockbox{
   width:50px;height:50px;margin:0 auto 22px;
   background:rgba(56,139,253,.07);
@@ -361,7 +362,7 @@ body.view-mode .view-badge { display:flex!important; }
 }
 .lm-p{
   font-size:11.5px;color:#253548;font-family:var(--m);
-  text-align:center;line-height:1.8;margin-bottom:32px;
+  text-align:center;line-height:1.8;margin-bottom:20px;
 }
 .lm-lbl{
   display:block;font-size:9.5px;font-weight:700;
@@ -442,25 +443,46 @@ body.view-mode .view-badge { display:flex!important; }
   animation:lmdot 3s ease-in-out infinite;
 }
 .lm-dot-inp{
-  width:12px;height:12px;border-radius:50%;
-  background:#0d1a28;border:1.5px solid #1e3050;
-  transition:background .15s,border-color .15s;
+  width:14px;height:14px;border-radius:50%;
+  background:#0d1a28;border:2px solid #1e3050;
+  transition:background .15s,border-color .15s,transform .1s;
+  flex-shrink:0;
 }
 .lm-dot-inp.filled{
   background:#388bfd;border-color:#388bfd;
+  transform:scale(1.2);
+}
+.lm-numgrid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  width:100%;
+  max-width:280px;
+  margin:0 auto;
 }
 .lm-num{
-  padding:16px 8px;border-radius:12px;
-  background:#080f1a;border:1px solid #101e2e;
-  color:#c0d4ec;font-size:20px;font-weight:600;
-  font-family:var(--f);cursor:pointer;
-  touch-action:manipulation;-webkit-tap-highlight-color:transparent;
-  transition:background .1s,transform .08s;
+  width:100%;
+  min-height:60px;
+  border-radius:14px;
+  background:#080f1a;
+  border:1px solid #152030;
+  color:#c0d4ec;
+  font-size:24px;font-weight:600;
+  font-family:var(--f);
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+  transition:background .08s,transform .07s;
   user-select:none;-webkit-user-select:none;
+  box-sizing:border-box;
 }
-.lm-num:active{background:#0d1a2e;transform:scale(.93)}
-.lm-num-clear{color:#4a6080;font-size:11px}
-.lm-num-del{color:#4a6080;font-size:18px}
+.lm-num:active{
+  background:#0d1e30;
+  transform:scale(.88);
+}
+.lm-num-clear{color:#2d4a6a;font-size:12px;font-weight:700;letter-spacing:.3px}
+.lm-num-del{color:#2d4a6a;font-size:22px}
 </style>
 </head>
 <body>
@@ -759,7 +781,7 @@ body.view-mode .view-badge { display:flex!important; }
 
       <!-- ปุ่มกดตัวเลข สำหรับมือถือ/iPad -->
       <div id="lm-numpad" style="margin-bottom:16px">
-        <div id="lm-dots" style="display:flex;justify-content:center;gap:14px;margin-bottom:18px">
+        <div id="lm-dots" style="display:flex;justify-content:center;gap:16px;margin-bottom:20px;align-items:center">
           <div class="lm-dot-inp" id="dot0"></div>
           <div class="lm-dot-inp" id="dot1"></div>
           <div class="lm-dot-inp" id="dot2"></div>
@@ -767,19 +789,19 @@ body.view-mode .view-badge { display:flex!important; }
           <div class="lm-dot-inp" id="dot4"></div>
           <div class="lm-dot-inp" id="dot5"></div>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:260px;margin:0 auto">
-          <button class="lm-num" onclick="numPress('1')">1</button>
-          <button class="lm-num" onclick="numPress('2')">2</button>
-          <button class="lm-num" onclick="numPress('3')">3</button>
-          <button class="lm-num" onclick="numPress('4')">4</button>
-          <button class="lm-num" onclick="numPress('5')">5</button>
-          <button class="lm-num" onclick="numPress('6')">6</button>
-          <button class="lm-num" onclick="numPress('7')">7</button>
-          <button class="lm-num" onclick="numPress('8')">8</button>
-          <button class="lm-num" onclick="numPress('9')">9</button>
-          <button class="lm-num lm-num-clear" onclick="numClear()" style="font-size:11px;letter-spacing:.5px">ล้าง</button>
-          <button class="lm-num" onclick="numPress('0')">0</button>
-          <button class="lm-num lm-num-del" onclick="numDel()">&#x232B;</button>
+        <div class="lm-numgrid">
+          <button class="lm-num" ontouchstart="numPress('1')" onclick="numPress('1')">1</button>
+          <button class="lm-num" ontouchstart="numPress('2')" onclick="numPress('2')">2</button>
+          <button class="lm-num" ontouchstart="numPress('3')" onclick="numPress('3')">3</button>
+          <button class="lm-num" ontouchstart="numPress('4')" onclick="numPress('4')">4</button>
+          <button class="lm-num" ontouchstart="numPress('5')" onclick="numPress('5')">5</button>
+          <button class="lm-num" ontouchstart="numPress('6')" onclick="numPress('6')">6</button>
+          <button class="lm-num" ontouchstart="numPress('7')" onclick="numPress('7')">7</button>
+          <button class="lm-num" ontouchstart="numPress('8')" onclick="numPress('8')">8</button>
+          <button class="lm-num" ontouchstart="numPress('9')" onclick="numPress('9')">9</button>
+          <button class="lm-num lm-num-clear" ontouchstart="numClear()" onclick="numClear()">ล้าง</button>
+          <button class="lm-num" ontouchstart="numPress('0')" onclick="numPress('0')">0</button>
+          <button class="lm-num lm-num-del" ontouchstart="numDel()" onclick="numDel()">&#x232B;</button>
         </div>
       </div>
 
@@ -3106,17 +3128,28 @@ function closeLockModal(){
 
 // ── Numpad ──
 let _numVal = '';
+let _lastTouch = 0;
 function numPress(d){
+  // ป้องกัน double-fire จาก ontouchstart + onclick บน mobile
+  const now = Date.now();
+  if(now - _lastTouch < 300){ _lastTouch = now; return; }
+  _lastTouch = now;
   if(_numVal.length >= 6) return;
   _numVal += d;
   _syncDots();
   if(_numVal.length === 6) setTimeout(doUnlock, 150);
 }
 function numDel(){
+  const now=Date.now();
+  if(now-_lastTouch<300){_lastTouch=now;return;}
+  _lastTouch=now;
   _numVal = _numVal.slice(0,-1);
   _syncDots();
 }
 function numClear(){
+  const now=Date.now();
+  if(now-_lastTouch<300){_lastTouch=now;return;}
+  _lastTouch=now;
   _numVal = '';
   _syncDots();
 }
