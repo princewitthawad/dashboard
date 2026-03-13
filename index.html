@@ -26,7 +26,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .o1{width:500px;height:500px;background:rgba(56,139,253,.06);top:-150px;right:-100px}
 .o2{width:400px;height:400px;background:rgba(0,212,255,.04);bottom:50px;left:-100px}
 .W{max-width:1600px;margin:0 auto;padding:24px;position:relative;z-index:1}
- 
+
 /* HEADER */
 header{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;background:rgba(13,21,32,.9);border:1px solid var(--bdr);border-radius:var(--r);margin-bottom:20px;backdrop-filter:blur(12px);position:relative;overflow:hidden;flex-wrap:wrap;gap:12px}
 header::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--blue),var(--cyan),transparent)}
@@ -39,7 +39,7 @@ header::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;back
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
 .view-badge{display:none;align-items:center;gap:6px;padding:5px 12px;background:rgba(255,149,0,.12);border:1px solid rgba(255,149,0,.35);border-radius:20px;font-size:11px;font-weight:600;color:var(--orange);font-family:var(--m)}
 body.view-mode .view-badge{display:flex!important}
- 
+
 /* BUTTONS */
 .btn{padding:7px 16px;border:none;border-radius:var(--rs);font-family:var(--f);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
 .btn-g{background:rgba(0,230,118,.15);color:var(--green);border:1px solid rgba(0,230,118,.4)}.btn-g:hover{background:rgba(0,230,118,.25);transform:translateY(-1px)}
@@ -48,7 +48,7 @@ body.view-mode .view-badge{display:flex!important}
 .btn-r{background:rgba(255,68,68,.15);color:var(--red);border:1px solid rgba(255,68,68,.4)}.btn-r:hover{background:rgba(255,68,68,.25)}
 .btn-gold{background:rgba(255,214,0,.12);color:var(--gold);border:1px solid rgba(255,214,0,.35)}.btn-gold:hover{background:rgba(255,214,0,.22)}
 .btn-cyan{background:rgba(0,212,255,.12);color:var(--cyan);border:1px solid rgba(0,212,255,.35)}.btn-cyan:hover{background:rgba(0,212,255,.22)}
- 
+
 /* SAVE BAR */
 .save-bar{display:flex;align-items:center;gap:8px;padding:9px 14px;background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--rs);margin-bottom:18px;flex-wrap:wrap}
 .sv-dot{width:8px;height:8px;border-radius:50%;background:var(--tx3);transition:background .3s;flex-shrink:0}
@@ -57,7 +57,7 @@ body.view-mode .view-badge{display:flex!important}
 .sv-dot.unsaved{background:var(--orange)}
 #sv-msg{font-size:12px;color:var(--tx2);font-family:var(--m)}
 #sv-time{font-size:11px;color:var(--tx3);font-family:var(--m);margin-left:auto}
- 
+
 /* KPI */
 .kg{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
 .kc{background:var(--bgc);border:1px solid var(--bdr);border-radius:var(--r);padding:18px 20px;position:relative;overflow:hidden;transition:border-color .2s,transform .2s;animation:fadein .4s ease both}
@@ -71,7 +71,7 @@ body.view-mode .view-badge{display:flex!important}
 .ks{font-size:11px;color:var(--tx3);margin-top:5px}
 .ki{position:absolute;right:16px;top:14px;font-size:26px;opacity:.13}
 @keyframes fadein{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
- 
+
 /* PIE */
 .pie-sec{background:var(--bgc);border:1px solid var(--bdr);border-radius:var(--r);padding:24px;margin-bottom:20px;position:relative;overflow:visible}
 .pie-sec::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(56,139,253,.04),transparent 50%);pointer-events:none;border-radius:var(--r);overflow:hidden}
@@ -96,7 +96,7 @@ body.view-mode .view-badge{display:flex!important}
 .psi{text-align:center;padding:7px;background:var(--bgc);border-radius:6px}
 .psi-v{font-size:18px;font-weight:800;font-family:var(--m)}
 .psi-l{font-size:9px;color:var(--tx2);margin-top:2px}
- 
+
 /* CARD */
 .card{background:var(--bgc);border:1px solid var(--bdr);border-radius:var(--r);padding:22px;margin-bottom:28px;transition:border-color .2s}
 .card:hover{border-color:var(--bdrh)}
@@ -104,7 +104,7 @@ body.view-mode .view-badge{display:flex!important}
 .SN{width:28px;height:28px;background:var(--blue);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;font-family:var(--m);flex-shrink:0}
 .ST{font-size:15px;font-weight:700}
 .Stg{font-size:11px;font-family:var(--m);color:var(--tx2);background:var(--bg2);padding:3px 9px;border-radius:20px;border:1px solid var(--bdr)}
- 
+
 /* PROGRESS */
 .PW{margin-bottom:10px}
 .PM{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
@@ -115,14 +115,14 @@ body.view-mode .view-badge{display:flex!important}
 @keyframes shim{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
 .PF.g{background:linear-gradient(90deg,#00b248,#00e676)}.PF.o{background:linear-gradient(90deg,#e65c00,#ff9500)}.PF.r{background:linear-gradient(90deg,#c62828,#ff4444)}.PF.b{background:linear-gradient(90deg,#1565c0,#388bfd)}
 .DIV{height:1px;background:var(--bdr);margin:12px 0}
- 
+
 /* INPUTS */
 .IG{display:flex;align-items:center;gap:6px}
 .PI{width:68px;background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--rs);color:var(--tx);font-family:var(--m);font-size:13px;font-weight:600;padding:5px 8px;text-align:center;transition:border-color .2s,box-shadow .2s;outline:none}
 .PI:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(56,139,253,.12)}
 .PI::-webkit-inner-spin-button{-webkit-appearance:none}
 .Ps{font-size:12px;color:var(--tx2)}
- 
+
 /* TABLE */
 .FT{width:100%;border-collapse:separate;border-spacing:0 5px}
 .FT th{font-size:10px;text-transform:uppercase;letter-spacing:.7px;color:var(--tx3);font-weight:600;padding:0 10px 6px;text-align:left}
@@ -137,7 +137,7 @@ body.view-mode .view-badge{display:flex!important}
 .TPF{height:100%;border-radius:99px;transition:width .8s cubic-bezier(.34,1.56,.64,1)}
 .MS{display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--bg2);border-radius:var(--rs);border:1px solid var(--bdr)}
 .MSi{font-size:16px}.MSl{font-size:10px;color:var(--tx2)}.MSv{font-size:14px;font-weight:700;font-family:var(--m)}
- 
+
 /* PLASTER BOXES */
 .PR{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
 .PB{width:88px;padding:12px 6px;border-radius:var(--rs);text-align:center;border:1px solid;transition:all .2s}
@@ -145,14 +145,14 @@ body.view-mode .view-badge{display:flex!important}
 .PB .pn{font-size:37px;font-weight:800;font-family:var(--m);line-height:1.1}.PB.dn .pn{color:var(--green)}.PB.pd .pn{color:var(--tx3)}
 .PB .pl{font-size:9px;margin-top:2px}.PB.dn .pl{color:var(--green)}.PB.pd .pl{color:var(--tx3)}
 .PB .pp{font-size:9px;font-family:var(--m);color:var(--tx3)}
- 
+
 /* ROOM CARDS */
 .RG{display:flex;flex-wrap:wrap;gap:9px;margin-top:10px}
 .RC{flex:1;min-width:140px;background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--rs);padding:12px;position:relative;overflow:hidden;transition:all .2s}
 .RC:hover{border-color:var(--bdrh);transform:translateY(-2px)}
 .RCT{height:3px;border-radius:3px 3px 0 0;position:absolute;top:0;left:0;right:0}
 .RN{font-size:12px;font-weight:700;margin-bottom:3px}.RW{font-size:10px;color:var(--tx3);margin-bottom:9px}
- 
+
 /* DONUT DASHBOARD */
 .DS{background:var(--bgc);border:1px solid var(--bdr);border-radius:var(--r);padding:24px;margin-bottom:20px;position:relative;overflow:hidden}
 .DS::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(56,139,253,.04),transparent 50%);pointer-events:none}
@@ -181,11 +181,11 @@ body.view-mode .view-badge{display:flex!important}
 .DC-row{display:flex;justify-content:space-between;font-size:10px;padding:2px 0;border-bottom:1px solid rgba(255,255,255,.04)}
 .DC-row:last-child{border-bottom:none}
 .DC-k{color:var(--tx3)}.DC-v{font-family:var(--m);font-weight:600}
- 
+
 /* LAYOUT */
 .G2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
 .C2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
- 
+
 /* SUMMARY */
 .SB{background:var(--bgc);border:1px solid var(--bdr);border-radius:var(--r);padding:20px 22px;margin-top:20px;position:relative;overflow:hidden}
 .SB::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(56,139,253,.05),transparent 60%);pointer-events:none}
@@ -196,28 +196,28 @@ body.view-mode .view-badge{display:flex!important}
 .SBb{width:28px;border-radius:4px 4px 0 0;transition:height .8s cubic-bezier(.34,1.56,.64,1)}
 .SBv{font-size:13px;font-weight:800;font-family:var(--m)}
 .LU{font-size:10px;color:var(--tx3);font-family:var(--m);margin-top:14px;text-align:right}
- 
+
 /* MOBILE CARDS FOR S2/S3 */
 .s2-desktop{display:block}.s2-mobile{display:none}
 .mcrd{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--rs);padding:12px 14px;margin-bottom:8px;position:relative;overflow:hidden}
 .mcrd-acc{position:absolute;top:0;left:0;bottom:0;width:4px;border-radius:var(--rs) 0 0 var(--rs)}
 .mcrd-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px}
- 
+
 /* S3 detail toggle */
 .s3-ext{overflow:hidden;max-height:0;opacity:0;transition:max-height .6s ease,opacity .4s ease}
 .s3-ext.open{max-height:900px;opacity:1}
- 
+
 /* VIEW MODE */
 body.view-mode input,body.view-mode .DCI,body.view-mode .PI{pointer-events:none!important;opacity:.45!important;cursor:not-allowed!important}
 body.view-mode .edit-only{display:none!important}
- 
+
 /* TOAST */
 #toast{position:fixed;bottom:24px;right:24px;background:#111b28;border:1px solid;border-radius:10px;padding:10px 18px;font-size:13px;font-weight:600;z-index:9999;display:none;align-items:center;gap:8px;box-shadow:var(--shadow);animation:slideup .3s ease}
 @keyframes slideup{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
 #toast.ok{border-color:rgba(0,230,118,.5);color:var(--green)}
 #toast.err{border-color:rgba(255,68,68,.5);color:var(--red)}
 #toast.info{border-color:rgba(56,139,253,.5);color:var(--blue)}
- 
+
 /* LOCK MODAL */
 #lock-modal{position:fixed;inset:0;z-index:99999;display:none;align-items:flex-start;justify-content:center;background:rgba(3,7,14,.97);backdrop-filter:blur(24px);padding:16px;overflow-y:auto}
 #lock-modal.show{display:flex!important}
@@ -240,7 +240,7 @@ body.view-mode .edit-only{display:none!important}
 .lm-ghost{width:100%;padding:10px;border-radius:10px;background:transparent;border:1px solid #080f1a;color:#1e3050;font-size:11px;font-weight:600;cursor:pointer;touch-action:manipulation;transition:all .15s}
 .lm-ghost:hover{background:#040b14;color:#2d4a6a}
 .lm-foot{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:16px;padding-top:14px;border-top:1px solid #050c16;font-size:9px;color:#0d1a28;font-family:var(--m)}
- 
+
 /* PASSWORD CHANGE MODAL */
 #pwc-modal{position:fixed;inset:0;z-index:99998;display:none;align-items:center;justify-content:center;background:rgba(4,8,16,.95);backdrop-filter:blur(16px);padding:16px}
 #pwc-modal.show{display:flex!important}
@@ -254,16 +254,16 @@ body.view-mode .edit-only{display:none!important}
 .pwc-hint{font-size:10px;margin-top:4px;font-family:var(--m)}
 .pwc-err{font-size:11px;color:var(--red);font-family:var(--m);min-height:15px;margin-bottom:10px}
 .pwc-btns{display:flex;gap:8px}
- 
+
 /* OVERLAY PAGES */
 .overlay{position:fixed;inset:0;z-index:9990;background:rgba(4,8,16,.98);backdrop-filter:blur(16px);overflow-y:auto;display:none}
 .overlay.show{display:block}
 .ov-inner{max-width:1000px;margin:0 auto;padding:24px}
 .ov-close{position:fixed;top:16px;right:20px;background:rgba(255,68,68,.15);border:1px solid rgba(255,68,68,.4);color:var(--red);border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;z-index:9991}
- 
+
 /* SCROLLBAR */
 ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--bdrh);border-radius:99px}
- 
+
 /* RESPONSIVE — mobile / tablet / desktop */
 @media(max-width:900px){
   .pie-layout{grid-template-columns:1fr}.leg-grid{grid-template-columns:1fr 1fr}
@@ -350,9 +350,9 @@ body.view-mode .edit-only{display:none!important}
 <body>
 <div class="orb o1"></div><div class="orb o2"></div>
 <div id="toast"></div>
- 
+
 <div class="W">
- 
+
 <!-- HEADER -->
 <header>
   <div style="display:flex;align-items:center;gap:14px">
@@ -380,7 +380,7 @@ body.view-mode .edit-only{display:none!important}
     <button id="lock-btn" class="btn btn-o" onclick="toggleLock()">🔒 ล็อก</button>
   </div>
 </header>
- 
+
 <!-- SAVE BAR -->
 <div class="save-bar">
   <div class="sv-dot" id="sv-dot"></div>
@@ -388,7 +388,7 @@ body.view-mode .edit-only{display:none!important}
   <span id="sv-time"></span>
   <span style="font-size:10px;color:var(--tx3);font-family:var(--m);margin-left:14px">☁️ Firebase Cloud Sync</span>
 </div>
- 
+
 <!-- KPI -->
 <div class="kg">
   <div class="kc G"><div class="ki">✅</div><div class="kl">งานเสร็จสมบูรณ์</div><div class="kv" id="kp-d">—</div><div class="ks">จาก 7 รายการ</div></div>
@@ -396,7 +396,7 @@ body.view-mode .edit-only{display:none!important}
   <div class="kc B"><div class="ki">📊</div><div class="kl">ความคืบหน้ารวม</div><div class="kv" id="kp-o">—</div><div class="ks">เฉลี่ยทุกหัวข้อ</div></div>
   <div class="kc R"><div class="ki">⏳</div><div class="kl">ยังไม่เริ่ม</div><div class="kv" id="kp-n">—</div><div class="ks">รายการ</div></div>
 </div>
- 
+
 <!-- PIE CHART -->
 <div class="pie-sec">
   <div class="pie-top">
@@ -419,7 +419,7 @@ body.view-mode .edit-only{display:none!important}
     </div>
   </div>
 </div>
- 
+
 <!-- DONUT DASHBOARD -->
 <div class="DS">
   <div style="margin-bottom:16px"><div style="font-size:14px;font-weight:800">🎯 Circular Progress Dashboard</div><div style="font-size:11px;color:var(--tx2);margin-top:2px;font-family:var(--m)">เลือกแท็บเพื่อดูรายละเอียดแต่ละงาน</div></div>
@@ -442,7 +442,7 @@ body.view-mode .edit-only{display:none!important}
   <div class="DP" id="tab-s6"><div style="font-size:12px;color:var(--tx2);margin-bottom:14px">งานท่อน้ำดี · 26 ห้อง · เป้า 50%</div><div class="DGrid" style="grid-template-columns:repeat(4,1fr)" id="g-s6"></div></div>
   <div class="DP" id="tab-s7"><div style="font-size:12px;color:var(--tx2);margin-bottom:14px">งานฉาบผนัง · เป้า 40%</div><div class="DGrid" style="grid-template-columns:repeat(5,1fr)" id="g-s7"></div></div>
 </div>
- 
+
 <!-- S1 + S4 -->
 <div class="G2">
 <div class="card">
@@ -470,14 +470,14 @@ body.view-mode .edit-only{display:none!important}
   </div>
 </div>
 </div>
- 
+
 <!-- S2 -->
 <div class="card">
   <div class="SH"><div class="SN">2</div><div class="ST">งานก่ออิฐภายใน (ชั้น 2–5)</div><div class="Stg" style="margin-left:auto">เป้า 100% ต่อชั้น</div></div>
   <div class="s2-desktop"><table class="FT"><thead><tr><th>ชั้น</th><th>ทิศทาง</th><th>ห้องทั้งหมด</th><th>ทำแล้ว</th><th style="min-width:160px">ความคืบหน้า</th><th>กรอกข้อมูล</th></tr></thead><tbody id="s2body"></tbody></table></div>
   <div class="s2-mobile" id="s2cards"></div>
 </div>
- 
+
 <!-- S3 -->
 <div class="card">
   <div class="SH">
@@ -514,7 +514,7 @@ body.view-mode .edit-only{display:none!important}
     <div id="s3-detail" class="s3-ext"><div id="s3-area-tbl" style="margin-top:12px"></div></div>
   </div>
 </div>
- 
+
 <!-- S5 S6 -->
 <div class="C2">
 <div class="card">
@@ -530,7 +530,7 @@ body.view-mode .edit-only{display:none!important}
   <div style="margin-top:10px;padding:9px 12px;background:var(--bg2);border-radius:7px;border:1px solid var(--bdr)"><div style="font-size:11px;color:var(--tx2)">ยังต้องทำ: <span style="color:var(--orange);font-weight:700;font-family:var(--m)" id="s6r">—</span></div><div style="font-size:11px;color:var(--tx2);margin-top:3px">ห้องที่ทำแล้ว: <span style="color:var(--tx);font-weight:700;font-family:var(--m)" id="s6rm">—</span></div></div>
 </div>
 </div>
- 
+
 <!-- S7 -->
 <div class="card">
   <div class="SH"><div class="SN" style="background:#f57c00">7</div><div class="ST">งานฉาบผนังภายใน (ชั้น 4 และ ชั้น 2)</div><div class="Stg" style="margin-left:auto">เป้า 40%</div><span style="font-size:10px;color:var(--tx3);background:var(--bg2);border:1px solid var(--bdr);padding:2px 7px;border-radius:4px">น้ำหนักห้องละ 4.55%</span></div>
@@ -547,14 +547,14 @@ body.view-mode .edit-only{display:none!important}
     <div><div style="font-size:11px;color:var(--tx2);margin-bottom:9px">สถานะห้อง (แต่ละช่อง = 4.55%)</div><div class="PR" id="prooms"></div></div>
   </div>
 </div>
- 
+
 <!-- SUMMARY BAR -->
 <div class="SB">
   <div class="SBt">สรุปภาพรวมโครงการ</div>
   <div class="SBg" id="sbg"></div>
   <div class="LU" id="lu"></div>
 </div>
- 
+
 <!-- ACTION BUTTONS -->
 <div style="display:flex;justify-content:center;gap:12px;padding:16px 0 6px;flex-wrap:wrap">
   <button onclick="showRealtimeGuide()" class="btn btn-b" style="padding:9px 20px;font-size:12px">🌐 คู่มือแชร์ Realtime</button>
@@ -562,7 +562,7 @@ body.view-mode .edit-only{display:none!important}
   <button onclick="openJupiterPage()" style="background:linear-gradient(135deg,rgba(26,35,126,.6),rgba(255,214,0,.2));color:var(--gold);border:1px solid rgba(255,214,0,.5);border-radius:10px;padding:12px 28px;font-size:14px;cursor:pointer;font-family:var(--f);font-weight:700;display:inline-flex;align-items:center;gap:8px;transition:all .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">🪐 Jupiter — คำแนะนำบริหารงาน ↗</button>
   <button onclick="openAnalysisPage()" style="background:linear-gradient(135deg,rgba(0,100,60,.6),rgba(0,230,118,.2));color:var(--green);border:1px solid rgba(0,230,118,.4);border-radius:10px;padding:12px 28px;font-size:14px;cursor:pointer;font-family:var(--f);font-weight:700;display:inline-flex;align-items:center;gap:8px;transition:all .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">📈 วิเคราะห์ — กราฟ & แผนรายวัน ↗</button>
 </div>
- 
+
 <!-- CHECKLIST OVERLAY -->
 <div id="checklist-overlay" class="overlay">
   <button class="ov-close" onclick="document.getElementById('checklist-overlay').classList.remove('show')">✕ ปิด</button>
@@ -586,7 +586,7 @@ body.view-mode .edit-only{display:none!important}
     <div id="checklist-body"></div>
   </div>
 </div>
- 
+
 <!-- LOCK MODAL -->
 <div id="lock-modal">
   <div class="lm-card">
@@ -621,7 +621,7 @@ body.view-mode .edit-only{display:none!important}
     </div>
   </div>
 </div>
- 
+
 <!-- PASSWORD CHANGE MODAL -->
 <div id="pwc-modal">
   <div class="pwc-card">
@@ -634,7 +634,7 @@ body.view-mode .edit-only{display:none!important}
     <div class="pwc-btns"><button class="btn btn-b" style="flex:1" onclick="doChangePw()">✅ เปลี่ยนรหัสผ่าน</button><button class="btn btn-r" onclick="document.getElementById('pwc-modal').classList.remove('show')">ยกเลิก</button></div>
   </div>
 </div>
- 
+
 <!-- OVERLAY PAGES (Jupiter + Analysis) -->
 <div id="jupiter-overlay" class="overlay">
   <button class="ov-close" onclick="document.getElementById('jupiter-overlay').classList.remove('show')">✕ ปิด</button>
@@ -658,7 +658,7 @@ body.view-mode .edit-only{display:none!important}
     <div id="an-safety" class="DP"></div>
   </div>
 </div>
- 
+
 </div><!-- /W -->
 <script>
 // ═══════════════════════════════
@@ -693,7 +693,7 @@ const SUMDEF=[
   {lbl:'ท่อน้ำดี',   key:'s6',  tgt:50, col:'#388bfd'},
   {lbl:'ฉาบผนัง',   key:'s7',  tgt:40, col:'#ffd600'},
 ];
- 
+
 // ═══════════════════════════════
 // PASSWORD SYSTEM v2
 // Default "085236", stored as hash in localStorage
@@ -701,7 +701,7 @@ const SUMDEF=[
 const DEFAULT_HASH='b8d0e8083fee10ac52f6fa0d8d15592232fa442b16d3656bbb695ad4d61540f3';
 function getPassHash(){return localStorage.getItem('cp_pass_hash')||DEFAULT_HASH;}
 function setPassHash(h){localStorage.setItem('cp_pass_hash',h);}
- 
+
 function sha256(str){
   function rr(v,a){return(v>>>a)|(v<<(32-a));}
   const mp=Math.pow,mw=mp(2,32);
@@ -725,7 +725,7 @@ function sha256(str){
   for(let i=0;i<8;i++)for(let j=3;j+1;j--){const b=(hash[i]>>(j*8))&255;res+=((b<16)?'0':'')+b.toString(16);}
   return res;
 }
- 
+
 function showPwChange(){
   ['pwc-old','pwc-new','pwc-confirm'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   document.getElementById('pwc-err').textContent='';
@@ -756,16 +756,16 @@ function doChangePw(){
   document.getElementById('pwc-modal').classList.remove('show');
   showToast('เปลี่ยนรหัสผ่านสำเร็จ 🔑','ok');
 }
- 
+
 // ═══════════════════════════════
 // FIREBASE CLOUD
 // ═══════════════════════════════
 let _fbUrl=localStorage.getItem('cp_fb_url')||'';
 let _saveTimer=null,_lastSavedAt='';
- 
+
 function fbPath(){return _fbUrl.replace(/\/+$/,'')+'/construction_progress.json';}
 function isFirebaseReady(){return _fbUrl&&_fbUrl.startsWith('https://');}
- 
+
 function showToast(msg,type='ok',dur=3500){
   const t=document.getElementById('toast');
   t.innerHTML=`<span>${type==='ok'?'✅':type==='err'?'❌':'ℹ️'}</span>${msg}`;
@@ -777,7 +777,7 @@ function setSvStatus(st,msg,time=''){
   d.className='sv-dot '+st;m.textContent=msg;
   if(time&&tm)tm.textContent='อัพเดท: '+time;
 }
- 
+
 function collectState(){
   return{
     s1:gv('s1'),s4t:gv('s4t'),s5:gv('s5'),s6:gv('s6'),s7:gv('s7'),
@@ -879,14 +879,14 @@ function startAutoRefresh(){
     }catch(e){}
   },15000);
 }
- 
+
 // ═══════════════════════════════
 // HELPERS
 // ═══════════════════════════════
 function gv(id){return parseFloat(document.getElementById(id)?.value)||0;}
 function gcol(ratio){return ratio>=.9?'var(--green)':ratio>=.5?'var(--blue)':ratio>=.3?'var(--orange)':'var(--red)';}
 function gclass(ratio){return ratio>=.9?'g':ratio>=.5?'b':ratio>=.3?'o':'r';}
- 
+
 function setBar(valId,barId,pctId){
   const v=Math.min(100,Math.max(0,gv(valId)));
   const b=document.getElementById(barId),p=document.getElementById(pctId);
@@ -894,7 +894,7 @@ function setBar(valId,barId,pctId){
   if(p){p.textContent=v+'%';p.style.color=gcol(v/100);}
 }
 function onS1(){setBar('s1','s1b','s1p');ra();}
- 
+
 function calcOut(o){
   const ta=o.fa+o.ba+o.sl+o.sr;
   const da=o.fd+o.bd+o.sld+o.srd;
@@ -910,7 +910,7 @@ function getVals(){
   const s5=gv('s5'),s6=gv('s6'),s7=gv('s7');
   return{s1,f25,out,s4,s5,s6,s7};
 }
- 
+
 // ═══════════════════════════════
 // S2 — ก่ออิฐภายใน ชั้น 2-5
 // ═══════════════════════════════
@@ -946,7 +946,7 @@ function updateFloor(i,v){
   FD[i].pct=Math.min(100,Math.max(0,parseFloat(v)||0));
   buildS2();buildDonuts();ra();scheduleAutoSave();
 }
- 
+
 // ═══════════════════════════════
 // S3 — ก่ออิฐภายนอก
 // ═══════════════════════════════
@@ -1007,7 +1007,7 @@ function toggleS3Detail(){
 function updS3Area(){
   const c=document.getElementById('s3-area-tbl');if(!c)return;
   const labels=OD.map(o=>o.label); // ชั้น 1-5
- 
+
   // ── dataset 1-4: ก่ออิฐนอก 4 ด้าน ──
   const sides=[
     {lbl:'นอก-หน้า', dkey:'fd',akey:'fa',col:'#388bfd'},
@@ -1021,7 +1021,7 @@ function updS3Area(){
     borderColor:s.col,backgroundColor:s.col+'20',fill:false,tension:.35,
     pointRadius:5,pointHoverRadius:8,pointBackgroundColor:s.col,pointBorderColor:'#080d14',pointBorderWidth:2,borderWidth:2,
   }));
- 
+
   // ── dataset 5: รวมก่ออิฐนอก ──
   datasets.push({
     label:'ก่ออิฐนอก รวม',
@@ -1029,7 +1029,7 @@ function updS3Area(){
     borderColor:'#ffd600',backgroundColor:'#ffd60020',fill:false,tension:.35,
     pointRadius:7,pointHoverRadius:10,pointBackgroundColor:'#ffd600',pointBorderColor:'#080d14',pointBorderWidth:2,borderWidth:3,
   });
- 
+
   // ── dataset 6: ก่ออิฐภายใน — per floor (FD มี 4 ชั้น=ชั้น2-5, ชั้น1 ใช้ weighted avg) ──
   // map ให้ตรงกับ OD[0..4] = ชั้น1-5
   const fdMap=[gv('s4t'), FD[0].pct, FD[1].pct, FD[2].pct, FD[3].pct]; // ชั้น1=s4t, 2-5=FD
@@ -1040,7 +1040,7 @@ function updS3Area(){
     pointRadius:5,pointHoverRadius:8,pointBackgroundColor:'#00d4ff',pointBorderColor:'#080d14',pointBorderWidth:2,borderWidth:2,
     borderDash:[8,3],
   });
- 
+
   // ── dataset 7: งานไฟฟ้า (single value แสดงเป็นเส้นแนวนอน) ──
   const s5v=gv('s5');
   datasets.push({
@@ -1050,7 +1050,7 @@ function updS3Area(){
     pointRadius:4,pointHoverRadius:7,pointBackgroundColor:'#f48fb1',pointBorderColor:'#080d14',pointBorderWidth:2,borderWidth:2,
     borderDash:[5,5],
   });
- 
+
   // ── dataset 8: งานสุขาภิบาล ──
   const s6v=gv('s6');
   datasets.push({
@@ -1060,7 +1060,7 @@ function updS3Area(){
     pointRadius:4,pointHoverRadius:7,pointBackgroundColor:'#4dd0e1',pointBorderColor:'#080d14',pointBorderWidth:2,borderWidth:2,
     borderDash:[4,6],
   });
- 
+
   // ── dataset 9: งานฉาบผนัง ──
   const s7v=gv('s7');
   datasets.push({
@@ -1070,7 +1070,7 @@ function updS3Area(){
     pointRadius:4,pointHoverRadius:7,pointBackgroundColor:'#ffcc02',pointBorderColor:'#080d14',pointBorderWidth:2,borderWidth:2,
     borderDash:[3,4],
   });
- 
+
   // ── dataset 10: เป้าหมาย 50% ──
   datasets.push({
     label:'เป้า 50%',
@@ -1078,7 +1078,7 @@ function updS3Area(){
     borderColor:'#ff444866',backgroundColor:'transparent',fill:false,tension:0,
     pointRadius:0,borderWidth:1.5,borderDash:[6,4],
   });
- 
+
   // ── ALL legend items ──
   const legItems=[
     ...sides,
@@ -1089,7 +1089,7 @@ function updS3Area(){
     {lbl:'ฉาบผนัง',     col:'#ffcc02',dash:true},
     {lbl:'เป้า 50%',    col:'#ff4444',dash:true},
   ];
- 
+
   c.innerHTML=`
     <div style="background:var(--bg2);border:1px solid var(--bdr);border-radius:10px;padding:16px;margin-top:4px">
       <div style="margin-bottom:12px">
@@ -1107,7 +1107,7 @@ function updS3Area(){
       <div style="position:relative;height:280px"><canvas id="s3LineChart"></canvas></div>
       <div style="margin-top:14px;display:grid;grid-template-columns:repeat(5,1fr);gap:7px" id="s3-summary-cards"></div>
     </div>`;
- 
+
   const ctx=document.getElementById('s3LineChart')?.getContext('2d');
   if(!ctx)return;
   if(_s3Chart){_s3Chart.destroy();}
@@ -1134,7 +1134,7 @@ function updS3Area(){
       animation:{duration:700,easing:'easeInOutQuart'}
     }
   });
- 
+
   // summary cards
   const sc=document.getElementById('s3-summary-cards');
   if(sc){
@@ -1156,7 +1156,7 @@ function toggleS3Line(i){
   const el=document.getElementById('s3-leg-'+i);
   if(el)el.style.opacity=meta.hidden?'0.3':'1';
 }
- 
+
 // ═══════════════════════════════
 // PLASTER S7
 // ═══════════════════════════════
@@ -1173,7 +1173,7 @@ function updPlaster(){
   }
   c.innerHTML=h;
 }
- 
+
 // ═══════════════════════════════
 // KPI
 // ═══════════════════════════════
@@ -1191,12 +1191,12 @@ function updKPI(){
   const s=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
   s('kp-d',done);s('kp-p',inprog);s('kp-o',ovr.toFixed(1)+'%');s('kp-n',notstarted);
 }
- 
+
 // ═══════════════════════════════
 // PIE CHART
 // ═══════════════════════════════
 let _pie=null,_pieMode=0,_pieRO=null;
- 
+
 function forcePieSquare(){
   const sq=document.getElementById('pie-square-wrap');
   if(!sq)return;
@@ -1204,7 +1204,7 @@ function forcePieSquare(){
   if(w>0){sq.style.height=w+'px';}
   if(_pie){_pie.resize();}
 }
- 
+
 function buildPieChart(){
   const canvas=document.getElementById('pieChart');
   const sq=canvas?.parentElement;
@@ -1286,7 +1286,7 @@ function highlightPie(i){
   if(cl)cl.textContent=SUMDEF[i].lbl;
   _pie.update();
 }
- 
+
 // ═══════════════════════════════
 // DONUT CIRCULAR
 // ═══════════════════════════════
@@ -1318,15 +1318,15 @@ function buildDonuts(){
   ];
   const ga=document.getElementById('g-all');
   if(ga)ga.innerHTML=all.map(x=>donutHTML(x.v,x.tgt,x.col,x.lbl,'',false,'')).join('');
- 
+
   // s1
   const gs1=document.getElementById('g-s1');
   if(gs1)gs1.innerHTML=`<div>${donutHTML(vals.s1,100,'#00e676','หลังคาเมทัลชีท','รวมทั้งอาคาร',true,"setBar('s1','s1b','s1p');ra();scheduleAutoSave()")}</div><div style="color:var(--tx2);font-size:12px;line-height:1.8">หลังคาเมทัลชีทอาคารทั้งหมด<br>ติดตั้งจากด้านขวาไปซ้าย<br><br><strong style="color:var(--green)">สถานะ: เสร็จสมบูรณ์</strong></div>`;
- 
+
   // s2
   const gs2=document.getElementById('g-s2');
   if(gs2)gs2.innerHTML=FD.map((f,i)=>donutHTML(f.pct,100,['#00d4ff','#00bcd4','#26c6da','#4dd0e1'][i],f.label,f.rooms+' ห้อง',true,`updateFloor(${i},this.value)`)).join('');
- 
+
   // s3
   const gs3=document.getElementById('g-s3');
   if(gs3){
@@ -1336,7 +1336,7 @@ function buildDonuts(){
     h+=donutHTML(totWp,50,'#ff9500','รวมทุกชั้น','เป้า 50%',false,'');
     gs3.innerHTML=h;
   }
- 
+
   // s4
   const gs4=document.getElementById('g-s4');
   if(gs4){
@@ -1345,13 +1345,13 @@ function buildDonuts(){
     h+=donutHTML(vals.s4,100,'#ffd600','รวม (Weighted)','',false,'');
     gs4.innerHTML=h;
   }
- 
+
   // s5 s6 s7
   const mk=(s,tgt,col)=>`<div class="DGrid" style="grid-template-columns:repeat(3,1fr)">${donutHTML(gv(s),tgt,col,'งานทั้งหมด','',true,`setBar('${s}','${s}b','${s}p');ra();scheduleAutoSave()`)}</div>`;
   const gs5=document.getElementById('g-s5');if(gs5)gs5.innerHTML=mk('s5',80,'#ce93d8');
   const gs6=document.getElementById('g-s6');if(gs6)gs6.innerHTML=mk('s6',50,'#388bfd');
   const gs7=document.getElementById('g-s7');if(gs7)gs7.innerHTML=mk('s7',40,'#ffd600');
- 
+
   updateDonuts();
 }
 function updateDonuts(){
@@ -1369,7 +1369,7 @@ function updateDonuts(){
     if(cp){cp.textContent=v.toFixed(1)+'%';cp.style.color=gcol(v/tgt);}
   });
 }
- 
+
 // ═══════════════════════════════
 // TABS
 // ═══════════════════════════════
@@ -1379,7 +1379,7 @@ function showTab(id,btn){
   const t=document.getElementById('tab-'+id);if(t)t.classList.add('SHW');
   if(btn)btn.classList.add('ACT');
 }
- 
+
 // ═══════════════════════════════
 // SUMMARY BAR
 // ═══════════════════════════════
@@ -1409,7 +1409,7 @@ function updS5S6(){
   if(s6r)s6r.textContent=(50-s6v).toFixed(1)+'% (เป้า 50%)';
   if(s6rm)s6rm.textContent=Math.round(s6v/3.85)+'/26 ห้อง';
 }
- 
+
 // ═══════════════════════════════
 // MAIN UPDATE (ra)
 // ═══════════════════════════════
@@ -1423,7 +1423,7 @@ function ra(){
   const s7v=gv('s7');
   const s7p=document.getElementById('s7p');if(s7p){s7p.textContent=s7v+'%';s7p.style.color=gcol(s7v/40);}
 }
- 
+
 // ═══════════════════════════════
 // LOCK SYSTEM
 // ═══════════════════════════════
@@ -1460,7 +1460,7 @@ function doUnlock(){
     if(card){card.style.animation='none';card.offsetHeight;card.style.animation='shake .4s ease';}
   }
 }
- 
+
 // ═══════════════════════════════
 // S7 LINE CHART — คืบหน้า vs เป้า
 // ═══════════════════════════════
@@ -1485,7 +1485,7 @@ function buildS7Chart(){
     // ยังไม่มี log → แสดงแค่จุดปัจจุบัน
     actualLine[0]=curVal;
   }
- 
+
   _s7Chart=new Chart(ctx,{
     type:'line',
     data:{
@@ -1535,7 +1535,7 @@ function buildS7Chart(){
   });
 }
 function updS7Chart(){setTimeout(()=>{buildS7Chart();},50);}
- 
+
 // ═══════════════════════════════
 // CHECKLIST DATA
 // ═══════════════════════════════
@@ -1587,12 +1587,12 @@ const CHECKLIST_DATA=[
     ]
   },
 ];
- 
+
 let _clState={};
 function getClKey(){return 'cp_checklist_'+todayStr();}
 function loadClState(){try{return JSON.parse(localStorage.getItem(getClKey())||'{}');}catch(e){return{};}}
 function saveClState(){try{localStorage.setItem(getClKey(),JSON.stringify(_clState));}catch(e){}}
- 
+
 function openChecklistPage(){
   _clState=loadClState();
   renderChecklist();
@@ -1609,7 +1609,7 @@ function renderChecklist(){
   document.getElementById('cl-pct').textContent=pct+'%';
   document.getElementById('cl-progress-bar').style.width=pct+'%';
   document.getElementById('cl-progress-bar').className='PF '+(pct>=80?'g':pct>=50?'b':pct>=30?'o':'r');
- 
+
   body.innerHTML=CHECKLIST_DATA.map(g=>{
     const gDone=g.items.filter((_,i)=>_clState[g.id+'-'+i]).length;
     return`<div style="background:var(--bg2);border:1px solid ${g.col}33;border-left:4px solid ${g.col};border-radius:9px;padding:16px;margin-bottom:12px">
@@ -1650,7 +1650,7 @@ function exportChecklistPDF(){
   let total=0,done=0;
   CHECKLIST_DATA.forEach(g=>g.items.forEach((_,i)=>{total++;if(_clState[g.id+'-'+i])done++;}));
   const pct=total>0?Math.round(done/total*100):0;
- 
+
   const win=window.open('','_blank','width=800,height=900');
   win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
   <title>Checklist ประสานงานหน้างาน — ${today}</title>
@@ -1710,7 +1710,7 @@ function getLaborCfg(){
   try{const s=localStorage.getItem('cp_labor');return s?{...LABOR,...JSON.parse(s)}:LABOR;}catch(e){return LABOR;}
 }
 function saveLaborCfg(cfg){try{localStorage.setItem('cp_labor',JSON.stringify(cfg));}catch(e){}}
- 
+
 // ═══════════════════════════════
 // JUPITER PAGE (ข้อ 2)
 // ═══════════════════════════════
@@ -1725,7 +1725,7 @@ function openJupiterPage(){
   let doneCount=0,urgentCount=0,sumRatio=0;
   vs.forEach((x,i)=>{const r=x/tgts[i];sumRatio+=Math.min(1,r);if(r>=1)doneCount++;else if(x>0)urgentCount++;});
   const overallPct=(sumRatio/vs.length*100).toFixed(1);
- 
+
   // วิเคราะห์แต่ละงาน
   let adviceCards='';
   SUMDEF.forEach((d,i)=>{
@@ -1742,7 +1742,7 @@ function openJupiterPage(){
       5:pct<5?'ท่อน้ำดียังไม่เริ่ม ประสานช่างสุขาภิบาลทันที ต้องเสร็จก่อนฉาบ':'งานท่อน้ำดีกำลังดำเนินการ ประสานกับทีมก่ออิฐชั้น 1',
       6:ratio<0.5?'งานฉาบผนังล่าช้า ต้องแน่ใจว่างานไฟฟ้าและท่อน้ำดีเสร็จก่อน':'งานฉาบผนังคืบหน้าดี',
     }[i]||'';
- 
+
     if(status==='done'){
       adviceCards+=`<div style="background:var(--dg);border:1px solid rgba(0,230,118,.3);border-left:4px solid var(--green);border-radius:9px;padding:13px 16px;margin-bottom:9px">
         <div style="display:flex;align-items:center;gap:10px"><span style="font-size:18px">✅</span><div>
@@ -1770,7 +1770,7 @@ function openJupiterPage(){
       </div>`;
     }
   });
- 
+
   // Labor config
   const lc=getLaborCfg();
   const laborHTML=`
@@ -1808,7 +1808,7 @@ function openJupiterPage(){
         • วิศวกรที่ปรึกษา: 2–4 ครั้ง/สัปดาห์ &nbsp;|&nbsp; กรรมกร: สนับสนุนพื้นที่ 6×26 ม.
       </div>
     </div>`;
- 
+
   const body=document.getElementById('jupiter-body');
   if(!body)return;
   body.innerHTML=`
@@ -1819,7 +1819,7 @@ function openJupiterPage(){
         <div style="font-size:11px;color:var(--tx2);margin-top:4px;font-family:var(--m)">ประสบการณ์ 20 ปี · บ้าน อาคาร โกดัง · ประเมิน ณ ${today.toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'})}</div>
       </div>
     </div>
- 
+
     <!-- Summary KPI -->
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px">
       <div style="background:linear-gradient(135deg,rgba(0,230,118,.15),rgba(0,230,118,.05));border:1px solid rgba(0,230,118,.35);border-radius:10px;padding:16px;text-align:center">
@@ -1838,19 +1838,19 @@ function openJupiterPage(){
         <div style="font-size:10px;color:var(--tx2);margin-top:4px">รายการ</div>
       </div>
     </div>
- 
+
     <!-- Per-task advice -->
     <div style="font-size:13px;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px">📊 การวิเคราะห์รายงานแต่ละงาน ณ วันนี้</div>
     ${adviceCards}
     ${laborHTML}`;
- 
+
   // Apply view-mode hiding to new elements
   if(document.body.classList.contains('view-mode')){
     document.querySelectorAll('#jupiter-body .edit-only').forEach(el=>el.style.display='none');
   }
   document.getElementById('jupiter-overlay').classList.add('show');
 }
- 
+
 function adjLabor(key,delta){
   const lc=getLaborCfg();
   lc[key]=Math.max(1,(lc[key]||1)+delta);
@@ -1858,7 +1858,7 @@ function adjLabor(key,delta){
   const el=document.getElementById('lc-'+key);
   if(el)el.textContent=lc[key];
 }
- 
+
 // ═══════════════════════════════
 // ANALYSIS PAGE
 // ═══════════════════════════════
@@ -1926,7 +1926,7 @@ function saveLogEntry(){
   if(idx>=0)logs[idx]=entry;else logs.push(entry);
   saveDailyLog(logs);renderDailyLogUI();showToast('บันทึกรายวันสำเร็จ 📝','ok');
 }
- 
+
 // ── แผนงาน 25 วัน (ข้อ 3) ──
 function renderPlan(){
   const c=document.getElementById('an-plan');if(!c)return;
@@ -1937,13 +1937,13 @@ function renderPlan(){
   const deadline=new Date(today.getTime()+DAYS*86400000);
   const lc=getLaborCfg();
   const totalPct=(vs.reduce((a,v,i)=>a+Math.min(1,v/SUMDEF[i].tgt),0)/vs.length*100).toFixed(1);
- 
+
   c.innerHTML=`
     <div style="margin-bottom:18px">
       <div style="font-size:15px;font-weight:800;margin-bottom:4px">📅 แผนการทำงาน 25 วัน</div>
       <div style="font-size:11px;color:var(--tx2);font-family:var(--m)">วันที่เริ่ม: ${today.toLocaleDateString('th-TH')} &nbsp;|&nbsp; กำหนดเสร็จ: ${deadline.toLocaleDateString('th-TH')} &nbsp;|&nbsp; เหลือ: ${DAYS} วัน</div>
     </div>
- 
+
     <!-- Timeline bar -->
     <div style="background:var(--bg2);border:1px solid var(--bdr);border-radius:10px;padding:14px 16px;margin-bottom:16px">
       <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--tx2);margin-bottom:8px">
@@ -1951,7 +1951,7 @@ function renderPlan(){
       </div>
       <div class="PBG" style="height:12px"><div class="PF ${gclass(parseFloat(totalPct)/100)}" style="width:${totalPct}%"></div></div>
     </div>
- 
+
     <!-- Per-task plan cards -->
     <div style="display:grid;gap:10px;margin-bottom:20px">
     ${SUMDEF.map((d,i)=>{
@@ -1989,7 +1989,7 @@ function renderPlan(){
       </div>`;
     }).join('')}
     </div>
- 
+
     <!-- Labor summary for Jupiter -->
     <div style="background:var(--bg2);border:1px solid rgba(255,214,0,.25);border-radius:10px;padding:14px 16px">
       <div style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:10px">👷 กำลังพลปัจจุบัน (ข้อมูลสำหรับ Jupiter AI)</div>
@@ -2003,7 +2003,7 @@ function renderPlan(){
       </div>
     </div>`;
 }
- 
+
 // ── Safety (ข้อ 4) ──
 function renderSafety(){
   const c=document.getElementById('an-safety');if(!c)return;
@@ -2077,7 +2077,7 @@ function renderSafety(){
       </div>`).join('')}
     </div>`;
 }
- 
+
 // ═══════════════════════════════
 // EXPORT PDF
 // ═══════════════════════════════
@@ -2122,7 +2122,7 @@ function exportPDF(){
   };
   document.head.appendChild(script);
 }
- 
+
 // ═══════════════════════════════
 // EXPORT EXCEL
 // ═══════════════════════════════
@@ -2156,7 +2156,7 @@ function exportExcel(){
   XLSX.writeFile(wb,'construction-progress-'+todayStr()+'.xlsx');
   showToast('ส่งออก Excel สำเร็จ 📊','ok');
 }
- 
+
 // ═══════════════════════════════
 // INIT
 // ═══════════════════════════════
