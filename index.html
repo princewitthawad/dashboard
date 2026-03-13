@@ -322,9 +322,27 @@ body.view-mode .edit-only{display:none!important}
   .pie-layout{grid-template-columns:200px 1fr}.pie-wrap{max-width:200px}
 }
 /* Export PDF ใช้ new window HTML แทน — ไม่ต้องใช้ @media print ใน main page */
+@media print{
+  header,.save-bar,#export-wrap,.edit-only,.view-badge,.live-badge{display:none!important}
+  body{background:#080d14!important}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
 </style>
 </head>
 <body>
+<!-- EXPORT MENU POPUP -->
+<div id="export-menu" style="display:none;position:fixed;background:#0d1520;border:1px solid rgba(56,139,253,.5);border-radius:12px;min-width:210px;z-index:99999;box-shadow:0 12px 40px rgba(0,0,0,.85),0 0 0 1px rgba(255,255,255,.06)">
+  <div style="padding:9px 14px 7px;font-size:10px;font-weight:700;color:var(--tx2);letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.07)">📤 เลือกรูปแบบ Export</div>
+  <button onclick="exportPDF();closeExportMenu()" style="display:flex;align-items:center;gap:10px;width:100%;padding:12px 16px;background:none;border:none;color:#e8f0fe;font-family:var(--f);font-size:13px;font-weight:600;cursor:pointer;transition:background .15s" onmouseover="this.style.background='rgba(56,139,253,.18)'" onmouseout="this.style.background='none'">
+    <span style="font-size:18px">📄</span>
+    <div style="text-align:left"><div>Export PDF</div><div style="font-size:10px;color:var(--tx2);font-weight:400">บันทึกเป็นไฟล์ PDF</div></div>
+  </button>
+  <div style="height:1px;background:rgba(255,255,255,.07)"></div>
+  <button onclick="printDashboard();closeExportMenu()" style="display:flex;align-items:center;gap:10px;width:100%;padding:12px 16px;background:none;border:none;color:#e8f0fe;font-family:var(--f);font-size:13px;font-weight:600;cursor:pointer;transition:background .15s" onmouseover="this.style.background='rgba(0,230,118,.12)'" onmouseout="this.style.background='none'">
+    <span style="font-size:18px">🖨️</span>
+    <div style="text-align:left"><div>Print</div><div style="font-size:10px;color:var(--tx2);font-weight:400">พิมพ์ผ่าน browser</div></div>
+  </button>
+</div>
 <div class="orb o1"></div><div class="orb o2"></div>
 <div id="toast"></div>
 
@@ -348,13 +366,14 @@ body.view-mode .edit-only{display:none!important}
     <div class="live-badge"><div class="ld"></div>LIVE</div>
     <div class="view-badge">👁️ โหมดดูอย่างเดียว</div>
     <button class="btn btn-g edit-only" onclick="saveData()">💾 บันทึก</button>
-    <button class="btn btn-o edit-only" onclick="loadData()">📂 โหลด</button>
+    <div class="edit-only" style="position:relative;display:inline-block" id="export-wrap">
+      <button class="btn" onclick="toggleExportMenu(event)" style="background:rgba(0,180,120,.15);color:#00e676;border:1px solid rgba(0,230,118,.4)">📤 Export ▾</button>
+    </div>
     <button class="btn btn-b edit-only" onclick="showFirebaseGuide()">⚙️ Cloud</button>
     <button class="btn btn-gold edit-only" onclick="showPwChange()">🔑 รหัสผ่าน</button>
     <button class="btn btn-r edit-only" onclick="clearData()">🗑️ ล้าง</button>
-    <button class="btn edit-only" style="background:rgba(220,38,38,.15);color:#ff4444;border:1px solid rgba(220,38,38,.4)" onclick="exportPDF()">📄 PDF</button>
-    <button class="btn edit-only" style="background:rgba(0,200,83,.15);color:#00c853;border:1px solid rgba(0,200,83,.4)" onclick="exportExcel()">📊 Excel</button>
-    <a id="lockin-link" href="#" onclick="event.preventDefault();showLockModal()" style="font-size:11px;font-weight:600;color:var(--tx2);text-decoration:none;padding:5px 10px;border-radius:6px;transition:color .2s" onmouseover="this.style.color='var(--blue)'" onmouseout="this.style.color='var(--tx2)'">🔓 Lock in</a>
+
+    <a id="lockin-link" href="#" onclick="event.preventDefault();showLockModal()" style="font-size:11px;font-weight:600;color:var(--tx2);text-decoration:none;padding:5px 10px;border-radius:6px;transition:color .2s" onmouseover="this.style.color='var(--blue)'" onmouseout="this.style.color='var(--tx2)'">🔓 Login</a>
     <button id="lock-btn" class="btn btn-o edit-only" onclick="applyViewMode()" style="display:none">🔒 ล็อก</button>
   </div>
 </header>
@@ -535,10 +554,10 @@ body.view-mode .edit-only{display:none!important}
 
 <!-- ACTION BUTTONS -->
 <div style="display:flex;justify-content:center;gap:12px;padding:16px 0 6px;flex-wrap:wrap">
-  <button onclick="showRealtimeGuide()" class="btn btn-b" style="padding:9px 20px;font-size:12px">🌐 คู่มือแชร์ Realtime</button>
-  <button onclick="openChecklistPage()" style="background:linear-gradient(135deg,rgba(0,60,120,.6),rgba(56,139,253,.2));color:var(--blue);border:1px solid rgba(56,139,253,.5);border-radius:10px;padding:12px 28px;font-size:14px;cursor:pointer;font-family:var(--f);font-weight:700;display:inline-flex;align-items:center;gap:8px;transition:all .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">📋 Checklist ประสานงานหน้างาน ↗</button>
-  <button onclick="openJupiterPage()" style="background:linear-gradient(135deg,rgba(26,35,126,.6),rgba(255,214,0,.2));color:var(--gold);border:1px solid rgba(255,214,0,.5);border-radius:10px;padding:12px 28px;font-size:14px;cursor:pointer;font-family:var(--f);font-weight:700;display:inline-flex;align-items:center;gap:8px;transition:all .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">🪐 Jupiter — คำแนะนำบริหารงาน ↗</button>
-  <button onclick="openAnalysisPage()" style="background:linear-gradient(135deg,rgba(0,100,60,.6),rgba(0,230,118,.2));color:var(--green);border:1px solid rgba(0,230,118,.4);border-radius:10px;padding:12px 28px;font-size:14px;cursor:pointer;font-family:var(--f);font-weight:700;display:inline-flex;align-items:center;gap:8px;transition:all .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">📈 วิเคราะห์ — กราฟ & แผนรายวัน ↗</button>
+  <button onclick="showRealtimeGuide()" class="btn btn-b edit-only" style="padding:9px 20px;font-size:12px">🌐 คู่มือแชร์ Realtime</button>
+  <button onclick="openChecklistPage()" class="edit-only" style="background:linear-gradient(135deg,rgba(0,60,120,.6),rgba(56,139,253,.2));color:var(--blue);border:1px solid rgba(56,139,253,.5);border-radius:10px;padding:12px 28px;font-size:14px;cursor:pointer;font-family:var(--f);font-weight:700;display:inline-flex;align-items:center;gap:8px;transition:all .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">📋 Checklist ประสานงานหน้างาน ↗</button>
+  <button onclick="openJupiterPage()" class="edit-only" style="background:linear-gradient(135deg,rgba(26,35,126,.6),rgba(255,214,0,.2));color:var(--gold);border:1px solid rgba(255,214,0,.5);border-radius:10px;padding:12px 28px;font-size:14px;cursor:pointer;font-family:var(--f);font-weight:700;display:inline-flex;align-items:center;gap:8px;transition:all .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">🪐 Jupiter — คำแนะนำบริหารงาน ↗</button>
+  <button onclick="openAnalysisPage()" class="edit-only" style="background:linear-gradient(135deg,rgba(0,100,60,.6),rgba(0,230,118,.2));color:var(--green);border:1px solid rgba(0,230,118,.4);border-radius:10px;padding:12px 28px;font-size:14px;cursor:pointer;font-family:var(--f);font-weight:700;display:inline-flex;align-items:center;gap:8px;transition:all .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">📈 วิเคราะห์ — กราฟ & แผนรายวัน ↗</button>
 </div>
 
 <!-- CHECKLIST OVERLAY -->
@@ -2071,6 +2090,35 @@ function renderSafety(){
 // ═══════════════════════════════
 // EXPORT PDF
 // ═══════════════════════════════
+function toggleExportMenu(e){
+  e && e.stopPropagation();
+  const m=document.getElementById('export-menu');
+  if(!m)return;
+  if(m.style.display==='block'){closeExportMenu();return;}
+  const btn=document.getElementById('export-wrap').querySelector('button');
+  const r=btn.getBoundingClientRect();
+  m.style.top=(r.bottom+6)+'px';
+  m.style.right=(window.innerWidth-r.right)+'px';
+  m.style.left='auto';
+  m.style.display='block';
+  setTimeout(()=>document.addEventListener('click',_exportClose),10);
+}
+function _exportClose(e){
+  const wrap=document.getElementById('export-wrap');
+  const menu=document.getElementById('export-menu');
+  if(!wrap||!menu)return;
+  if(!wrap.contains(e.target)&&!menu.contains(e.target)){closeExportMenu();}
+}
+function closeExportMenu(){
+  const m=document.getElementById('export-menu');
+  if(m)m.style.display='none';
+  document.removeEventListener('click',_exportClose);
+}
+
+function printDashboard(){
+  window.print();
+}
+
 function exportPDF(){
   showToast('กำลังสร้าง PDF...','info',10000);
 
