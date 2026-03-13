@@ -354,7 +354,8 @@ body.view-mode .edit-only{display:none!important}
     <button class="btn btn-r edit-only" onclick="clearData()">🗑️ ล้าง</button>
     <button class="btn edit-only" style="background:rgba(220,38,38,.15);color:#ff4444;border:1px solid rgba(220,38,38,.4)" onclick="exportPDF()">📄 PDF</button>
     <button class="btn edit-only" style="background:rgba(0,200,83,.15);color:#00c853;border:1px solid rgba(0,200,83,.4)" onclick="exportExcel()">📊 Excel</button>
-    <button id="lock-btn" class="btn btn-o" onclick="toggleLock()">🔒 ล็อก</button>
+    <a id="lockin-link" href="#" onclick="event.preventDefault();showLockModal()" style="font-size:11px;font-weight:600;color:var(--tx2);text-decoration:none;padding:5px 10px;border-radius:6px;transition:color .2s" onmouseover="this.style.color='var(--blue)'" onmouseout="this.style.color='var(--tx2)'">🔓 Lock in</a>
+    <button id="lock-btn" class="btn btn-o edit-only" onclick="applyViewMode()" style="display:none">🔒 ล็อก</button>
   </div>
 </header>
 
@@ -774,7 +775,7 @@ function applyState(s){
   buildS2();buildS3();
   ['s1','s4t','s5','s6','s7'].forEach(id=>setBar(id,id+'b',id+'p'));
   ['r41','r42','r43','r44','r45'].forEach(id=>setBar(id,id+'b',id+'p'));
-  updPlaster();buildDonuts();ra();
+  updPlaster();buildDonuts();updS7Chart();ra();
 }
 async function saveData(){
   if(!isFirebaseReady()){showFirebaseGuide();return;}
@@ -841,6 +842,8 @@ function showFirebaseGuide(){
 function showRealtimeGuide(){
   alert('📡 คู่มือแชร์ Realtime\n\n1. ไปที่ firebase.google.com → สร้าง Project ฟรี\n2. Realtime Database → สร้าง Database → โหมด Test\n3. คัดลอก URL (https://...firebaseio.com)\n4. กดปุ่ม ⚙️ Cloud → วาง URL\n5. กด 💾 บันทึก เพื่ออัพโหลดข้อมูล\n\n🔒 ทุกเครื่องที่ใส่ URL เดียวกัน\nจะแชร์ข้อมูลกัน Realtime!');
 }
+
+
 let _autoRefTimer=null;
 function startAutoRefresh(){
   clearInterval(_autoRefTimer);
@@ -1406,13 +1409,23 @@ function ra(){
 // ═══════════════════════════════
 let _isLocked=false,_numBuf='',_lastTouch=0;
 function toggleLock(){
-  if(_isLocked){applyEditMode();_isLocked=false;const b=document.getElementById('lock-btn');if(b){b.textContent='🔒 ล็อก';b.className='btn btn-o';}}
-  else{applyViewMode();showLockModal();}
+  if(_isLocked){applyEditMode();}
+  else{applyViewMode();}
 }
 function showLockModal(){document.getElementById('lock-modal').classList.add('show');}
 function closeLockModal(){document.getElementById('lock-modal').classList.remove('show');_numBuf='';_syncDots();}
-function applyViewMode(){document.body.classList.add('view-mode');_isLocked=true;const b=document.getElementById('lock-btn');if(b){b.textContent='🔓 ปลดล็อก';b.className='btn btn-g';}}
-function applyEditMode(){document.body.classList.remove('view-mode');_isLocked=false;const b=document.getElementById('lock-btn');if(b){b.textContent='🔒 ล็อก';b.className='btn btn-o';}}
+function applyViewMode(){
+  document.body.classList.add('view-mode');
+  _isLocked=true;
+  const link=document.getElementById('lockin-link');
+  if(link) link.style.display='';
+}
+function applyEditMode(){
+  document.body.classList.remove('view-mode');
+  _isLocked=false;
+  const link=document.getElementById('lockin-link');
+  if(link) link.style.display='none';
+}
 function numPress(n){
   const now=Date.now();if(now-_lastTouch<80)return;_lastTouch=now;
   if(_numBuf.length>=6)return;
@@ -2059,23 +2072,7 @@ function renderSafety(){
 // EXPORT PDF
 // ═══════════════════════════════
 function exportPDF(){
-  showToast('กำลังสร้าง PDF...','info',8000);
-  const style=document.createElement('style');
-  style.id='_pdf_style';
-  style.textContent=`button,.IG,.DCI,.PI,.edit-only,.view-badge,.overlay,#toast,#lock-modal,#pwc-modal,.TABS,.DP,.save-bar{display:none!important} .DP#tab-all{display:block!important} .W{max-width:1200px!important} .s2-mobile{display:none!important} .s2-desktop{display:block!important}`;
-  document.head.appendChild(style);
-  const W=document.querySelector('.W');
-  const origW=W.style.width;W.style.width='1200px';
-
-  // หา S7 card และ Summary bar
-  function findS7(){
-    for(const c of W.querySelectorAll('.card')){
-      const sn=c.querySelector('.SN');
-      if(sn&&sn.textContent.trim()==='7') return c;
-    }return null;
-  }
-  const s7El=findS7();
-  const sbEl=W.querySelector('.SB');
+  showToast('กำลังสร้าง PDF...','info',10000);
 
   function loadScript(src,cb){
     if(document.querySelector(`script[src="${src}"]`)){cb();return;}
@@ -2083,84 +2080,136 @@ function exportPDF(){
   }
 
   loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',async()=>{
+  loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',async()=>{
 
-    // ── CAPTURE หน้า 1: ซ่อน S7 + Summary ──
-    if(s7El) s7El.style.visibility='hidden';
-    if(sbEl) sbEl.style.visibility='hidden';
-    const canvas1=await html2canvas(W,{scale:1.5,useCORS:true,backgroundColor:'#080d14',logging:false});
+    // ── รวบรวมข้อมูล snapshot ──
+    const vals=getVals();
+    const vs=[vals.s1,vals.f25,vals.out,vals.s4,vals.s5,vals.s6,vals.s7];
+    const today=new Date().toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'});
+    const ts=new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
 
-    // ── CAPTURE หน้า 2: แสดง S7+Summary, ซ่อนทุกอย่างอื่น ──
-    if(s7El) s7El.style.visibility='';
-    if(sbEl) sbEl.style.visibility='';
-    const hideP2=[];
-    Array.from(W.children).forEach(el=>{
-      if(el!==s7El && el!==sbEl){
-        hideP2.push(el);
-        el.style.visibility='hidden';
-      }
-    });
-    const canvas2=await html2canvas(W,{scale:1.5,useCORS:true,backgroundColor:'#080d14',logging:false});
+    function gcl(v,t){const r=v/t;return r>=1?'#00e676':r>=.5?'#388bfd':r>=.25?'#ff9500':'#ff4444';}
+    function bar(v,t,col){const p=Math.min(100,v/t*100);return`<div style="height:6px;background:#1e2d3d;border-radius:4px;overflow:hidden;margin:5px 0 3px"><div style="height:100%;width:${p}%;background:${col};border-radius:4px"></div></div>`;}
+    function pct(v){return v.toFixed(1)+'%';}
 
-    // restore ทุกอย่าง
-    hideP2.forEach(el=>el.style.visibility='');
-    document.getElementById('_pdf_style')?.remove();
-    W.style.width=origW;
+    // S2 rows
+    const s2r=FD.map(f=>`<div style="display:flex;justify-content:space-between;font-size:9px;padding:2px 0;border-bottom:1px solid #1e2d3d">
+      <span style="color:#8899aa">${f.label}</span>
+      <span style="color:${gcl(f.pct,100)};font-weight:700">${Math.round(f.rooms*f.pct/100)}/${f.rooms} · ${f.pct}%</span></div>`).join('');
 
-    // trim canvas2 ตัดพื้นที่ว่างรอบ S7+Summary ออก
-    function trimCanvas(c){
-      const ctx=c.getContext('2d');
-      const d=ctx.getImageData(0,0,c.width,c.height).data;
-      const bg=[8,13,20];const tol=25;
-      function isBg(y){
-        for(let x=0;x<c.width;x+=6){
-          const i=(y*c.width+x)*4;
-          if(Math.abs(d[i]-bg[0])>tol||Math.abs(d[i+1]-bg[1])>tol||Math.abs(d[i+2]-bg[2])>tol)return false;
-        }return true;
-      }
-      let top=0,bot=c.height-1;
-      while(top<bot&&isBg(top))top++;
-      while(bot>top&&isBg(bot))bot--;
-      top=Math.max(0,top-20);bot=Math.min(c.height-1,bot+20);
-      const h=bot-top+1;
-      const out=document.createElement('canvas');
-      out.width=c.width;out.height=h;
-      out.getContext('2d').drawImage(c,0,top,c.width,h,0,0,c.width,h);
-      return out;
+    // S3 rows
+    const s3r=OD.map(o=>{const{fp}=calcOut(o);return`<div style="display:flex;justify-content:space-between;font-size:9px;padding:2px 0;border-bottom:1px solid #1e2d3d">
+      <span style="color:#8899aa">${o.label}</span>
+      <span style="color:${gcl(fp,50)};font-weight:700">${fp.toFixed(1)}%</span></div>`;}).join('');
+
+    // S4 rows
+    const s4r=S4R.map(r=>{const v=gv(r.id);return`<div style="display:flex;justify-content:space-between;font-size:9px;padding:2px 0;border-bottom:1px solid #1e2d3d">
+      <span style="color:#8899aa">${r.lbl}</span>
+      <span style="color:${gcl(v,100)};font-weight:700">${v.toFixed(1)}%</span></div>`;}).join('');
+
+    // S7 rooms
+    const doneR=Math.round(vs[6]/4.545);
+    const s7rooms=Array.from({length:22},(_,i)=>`<div style="width:18px;height:18px;border-radius:3px;background:${i<doneR?'#f57c00':'#1e2d3d'};border:1px solid ${i<doneR?'#e65100':'#2d3f52'};display:inline-flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;color:${i<doneR?'#fff':'#445566'}">${i<doneR?'✓':i+1}</div>`).join('');
+
+    // Summary bar items
+    const sbItems=SUMDEF.map((d,i)=>`<div style="text-align:center;padding:6px 4px;background:#0d1520;border-radius:6px;border:1px solid #1e2d3d;flex:1">
+      <div style="font-size:8px;color:#8899aa;margin-bottom:3px">${d.lbl}</div>
+      <div style="font-size:16px;font-weight:800;color:${gcl(vs[i],d.tgt)};font-family:monospace">${pct(vs[i])}</div>
+      ${bar(vs[i],d.tgt,d.col)}
+      <div style="font-size:8px;color:#445566">เป้า ${d.tgt}%</div>
+    </div>`).join('');
+
+    function card(num,col,title,tgt,val,body){
+      const c=gcl(val,tgt);
+      return`<div style="background:#111b28;border:1px solid #1e2d3d;border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:4px">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+          <div style="width:18px;height:18px;border-radius:4px;background:${col};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;flex-shrink:0">${num}</div>
+          <span style="font-size:10px;font-weight:700;color:#e8f0fe">${title}</span>
+          <span style="margin-left:auto;font-size:13px;font-weight:800;color:${c};font-family:monospace">${pct(val)}</span>
+        </div>
+        ${bar(val,tgt,col)}
+        <div style="font-size:8px;color:#445566">เป้า ${tgt}%</div>
+        <div style="margin-top:4px">${body}</div>
+      </div>`;
     }
 
-    loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',()=>{
-      const{jsPDF}=window.jspdf;
-      const pdf=new jsPDF('p','mm','a4');
-      const pgW=210,pgH=297,margin=8;
-      const imgW=pgW-margin*2;
-      const pagesH=pgH-margin*2;
+    const html=`<!DOCTYPE html><html><head><meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Sarabun',sans-serif;background:#080d14;color:#e8f0fe;width:960px}</style>
+    </head><body style="padding:12px">
 
-      function addCanvasPage(c,first){
-        if(!first)pdf.addPage();
-        const pxPerMm=c.width/imgW;
-        const natH=c.height/pxPerMm;
-        // ย่อให้พอดีหน้าถ้าสูงเกิน
-        const finalH=Math.min(natH,pagesH);
-        const finalW=natH<=pagesH?imgW:imgW*(pagesH/natH);
-        const offX=margin+(imgW-finalW)/2;
-        pdf.addImage(c.toDataURL('image/jpeg',.92),'JPEG',offX,margin,finalW,finalH);
-      }
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #1e2d3d">
+      <div>
+        <div style="font-size:15px;font-weight:800">🏗️ Construction Progress Dashboard</div>
+        <div style="font-size:9px;color:#8899aa;margin-top:2px">รายงานความคืบหน้างานก่อสร้าง · ${today} · ${ts} น.</div>
+      </div>
+      <div style="font-size:11px;font-weight:700;color:#00e676;background:#0d1f14;border:1px solid #1a4028;border-radius:6px;padding:4px 10px">● LIVE</div>
+    </div>
 
-      function addCanvasPageFill(c){
-        // เต็มความกว้าง A4 เสมอ รักษา proportion
-        const ratio=c.height/c.width;
-        const finalW=imgW;
-        const finalH=finalW*ratio;
-        pdf.addImage(c.toDataURL('image/jpeg',.92),'JPEG',margin,margin,finalW,Math.min(finalH,pagesH));
-      }
+    <!-- 4-col grid: S1 S2 S3 S4 -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:8px">
+      ${card(1,'#00e676','หลังคา',100,vs[0],'')}
+      ${card(2,'#388bfd','ก่ออิฐใน ชั้น 2–5',100,vs[1],s2r)}
+      ${card(3,'#00d4ff','ก่ออิฐนอก',50,vs[2],s3r)}
+      ${card(4,'#ff9500','ก่ออิฐ ชั้น 1',100,vs[3],s4r)}
+    </div>
 
-      addCanvasPageFill(trimCanvas(canvas1));
-      addCanvasPage(trimCanvas(canvas2),false);
+    <!-- 3-col grid: S5 S6 S7 -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 2fr;gap:8px;margin-bottom:8px">
+      ${card(5,'#ce93d8','งานไฟฟ้า',80,vs[4],'')}
+      ${card(6,'#00bcd4','ท่อน้ำดี',50,vs[5],'')}
+      <div style="background:#111b28;border:1px solid #1e2d3d;border-radius:8px;padding:10px">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+          <div style="width:18px;height:18px;border-radius:4px;background:#f57c00;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff">7</div>
+          <span style="font-size:10px;font-weight:700">ฉาบผนัง</span>
+          <span style="margin-left:auto;font-size:13px;font-weight:800;color:${gcl(vs[6],40)};font-family:monospace">${pct(vs[6])}</span>
+        </div>
+        ${bar(vs[6],40,'#f57c00')}
+        <div style="font-size:8px;color:#445566;margin-bottom:6px">เป้า 40%</div>
+        <div style="display:flex;flex-wrap:wrap;gap:2px">${s7rooms}</div>
+      </div>
+    </div>
 
-      pdf.save('construction-progress-'+todayStr()+'.pdf');
-      showToast('สร้าง PDF สำเร็จ 📄','ok');
+    <!-- Summary bar -->
+    <div style="background:#0d1520;border:1px solid #1e2d3d;border-radius:8px;padding:10px">
+      <div style="font-size:10px;font-weight:700;margin-bottom:8px;color:#8899aa">สรุปภาพรวมโครงการ</div>
+      <div style="display:flex;gap:6px">${sbItems}</div>
+    </div>
+
+    </body></html>`;
+
+    // render ใน iframe offscreen
+    const iframe=document.createElement('iframe');
+    iframe.style.cssText='position:fixed;left:-9999px;top:0;width:960px;height:800px;border:none;visibility:hidden';
+    document.body.appendChild(iframe);
+    iframe.contentDocument.open();
+    iframe.contentDocument.write(html);
+    iframe.contentDocument.close();
+
+    await new Promise(r=>setTimeout(r,800)); // รอ font โหลด
+
+    const canvas=await html2canvas(iframe.contentDocument.body,{
+      scale:2,useCORS:true,backgroundColor:'#080d14',logging:false,
+      width:960,windowWidth:960,
     });
-  });
+    document.body.removeChild(iframe);
+
+    const{jsPDF}=window.jspdf;
+    const pdf=new jsPDF('p','mm','a4');
+    const pgW=210,pgH=297,margin=6;
+    const imgW=pgW-margin*2;
+    const imgH=pgH-margin*2;
+    const ratio=canvas.height/canvas.width;
+    let fw=imgW, fh=fw*ratio;
+    if(fh>imgH){fh=imgH;fw=fh/ratio;}
+    const ox=margin+(imgW-fw)/2;
+    const oy=margin+(imgH-fh)/2;
+    pdf.addImage(canvas.toDataURL('image/jpeg',.92),'JPEG',ox,oy,fw,fh);
+    pdf.save('construction-progress-'+todayStr()+'.pdf');
+    showToast('สร้าง PDF สำเร็จ 📄','ok');
+
+  });});
 }
 
 // ═══════════════════════════════
@@ -2205,23 +2254,18 @@ function init(){
   ['s1','s4t','s5','s6','s7'].forEach(id=>setBar(id,id+'b',id+'p'));
   ['r41','r42','r43','r44','r45'].forEach(id=>setBar(id,id+'b',id+'p'));
   updPlaster();
-  setTimeout(()=>{buildPieChart();buildDonuts();buildS7Chart();ra();},100);
-  // Try load from cloud on start
-  if(isFirebaseReady()){
-    setSvStatus('saving','☁️ กำลังซิงค์ข้อมูล...');
-    loadData().catch(()=>{});
-  }else{
-    // fallback local
-    try{const bk=localStorage.getItem('cp_backup');if(bk){applyState(JSON.parse(bk));setSvStatus('saved','💾 โหลดจาก Backup ท้องถิ่น');}}catch(e){}
-    setSvStatus('','💡 กด ⚙️ Cloud เพื่อตั้งค่า Firebase');
-  }
-  startAutoRefresh();
-  // show lock modal on load
   setTimeout(()=>{
-    if(!document.body.classList.contains('view-mode')&&!document.getElementById('lock-modal').classList.contains('show')){
-      showLockModal();
+    buildPieChart();buildDonuts();buildS7Chart();ra();
+    if(isFirebaseReady()){
+      setSvStatus('saving','☁️ กำลังซิงค์ข้อมูล...');
+      loadData().catch(()=>{});
+    }else{
+      try{const bk=localStorage.getItem('cp_backup');if(bk){applyState(JSON.parse(bk));setSvStatus('saved','💾 โหลดจาก Backup ท้องถิ่น');}}catch(e){}
+      setSvStatus('','💡 กด ⚙️ Cloud เพื่อตั้งค่า Firebase');
     }
-  },600);
+    startAutoRefresh();
+    setTimeout(()=>applyViewMode(),300);
+  },150);
 }
 // shake anim for lock card
 const shakeStyle=document.createElement('style');
