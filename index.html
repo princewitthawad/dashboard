@@ -2146,7 +2146,7 @@ function exportPDF(){
         pdf.addImage(c.toDataURL('image/jpeg',.92),'JPEG',offX,margin,finalW,finalH);
       }
 
-      addCanvasPage(canvas1,true);
+      addCanvasPage(trimCanvas(canvas1),true);
       addCanvasPage(trimCanvas(canvas2),false);
 
       pdf.save('construction-progress-'+todayStr()+'.pdf');
