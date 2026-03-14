@@ -1346,16 +1346,18 @@ window.addEventListener('resize',()=>setTimeout(forcePieSquare,50));
 
 document.addEventListener('input',function(e){
   const el=e.target;
-  if((el.classList.contains('PI')||el.classList.contains('DCI'))&&el.type==='text'){
-    const raw=el.value,clean=raw.replace(/[^0-9.]/g,'').replace(/(\.\d*)\./g,'$1');
-    if(clean!==raw){const pos=el.selectionStart;el.value=clean;try{const np=Math.max(0,pos-(raw.length-clean.length));el.setSelectionRange(np,np);}catch(ex){}}
-  }
+  if(!(el.classList.contains('PI')||el.classList.contains('DCI')))return;
+  // iPad: ไม่แตะ cursor ระหว่างพิมพ์ — sanitize เฉพาะ char ที่ไม่ใช่ตัวเลข/จุดเท่านั้น
+  const v=el.value;
+  const clean=v.replace(/[^0-9.]/g,'').replace(/^(\d*\.?\d*).*$/,'$1');
+  if(clean!==v) el.value=clean;
 });
 document.addEventListener('blur',function(e){
   const el=e.target;
-  if((el.classList.contains('PI')||el.classList.contains('DCI'))&&el.type==='text'){
-    let v=parseFloat(el.value)||0;v=Math.min(100,Math.max(0,v));el.value=v;
-  }
+  if(!(el.classList.contains('PI')||el.classList.contains('DCI')))return;
+  let v=parseFloat(el.value);
+  if(isNaN(v))v=0;
+  el.value=Math.min(100,Math.max(0,v));
 },true);
 </script>
 </body>
