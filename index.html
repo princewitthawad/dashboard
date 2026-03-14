@@ -1105,7 +1105,7 @@ function renderChecklist(){
     </div>`;}).join('');
 }
 function toggleCl(key){_clState[key]=!_clState[key];saveClState();renderChecklist();}
-function resetChecklist(){if(!confirm('รีเซ็ตทุกรายการ?'))return;_clState={};saveClState();renderChecklist();showToast('รีเซ็ต Checklist แล้ว','ok');}
+function resetChecklist(){if(!confirm('รีเซ็ตทุกรายการ?'))return;_clState={};saveClState();renderChecklist();localStorage.removeItem('cp_cl_report');const ta=document.getElementById('cl-report-text');if(ta){ta.value='';updReportCount();}showToast('รีเซ็ต Checklist แล้ว','ok');}
 function exportChecklistPDF(){
   showToast('กำลังสร้าง PDF Checklist...','info',6000);
   const today=new Date().toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'});
