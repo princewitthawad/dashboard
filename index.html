@@ -2392,14 +2392,43 @@ async function exportZoneJpeg(){
         y+=dh+GAP;
       }
 
-      // download
-      const link=document.createElement('a');
-      link.download='construction-export-'+todayStr()+'.jpg';
-      link.href=out.toDataURL('image/jpeg',0.92);
-      link.click();
+      // แปลง canvas เป็น blob แล้วใช้ Web Share API
+      out.toBlob(async(blob)=>{
+        const fileName='construction-export-'+todayStr()+'.jpg';
+        const imgFile=new File([blob],fileName,{type:'image/jpeg'});
 
-      st.textContent='✅ Download สำเร็จ!';
-      showToast('Export JPEG สำเร็จ 🖼️','ok');
+        if(navigator.canShare&&navigator.canShare({files:[imgFile]})){
+          try{
+            await navigator.share({
+              files:[imgFile],
+              title:'Construction Progress Dashboard',
+              text:`📊 รายงานความคืบหน้างานก่อสร้าง — ${today}`
+            });
+            st.textContent='✅ แชร์สำเร็จ!';
+            showToast('แชร์ JPEG สำเร็จ 🖼️','ok');
+          }catch(err){
+            if(err.name!=='AbortError'){
+              // fallback download
+              const link=document.createElement('a');
+              link.download=fileName;
+              link.href=URL.createObjectURL(blob);
+              link.click();
+              st.textContent='✅ Download สำเร็จ!';
+              showToast('Export JPEG สำเร็จ 🖼️','ok');
+            } else {
+              st.textContent='';
+            }
+          }
+        }else{
+          // fallback: download
+          const link=document.createElement('a');
+          link.download=fileName;
+          link.href=out.toDataURL('image/jpeg',0.92);
+          link.click();
+          st.textContent='✅ Download สำเร็จ!';
+          showToast('Export JPEG สำเร็จ 🖼️','ok');
+        }
+      },'image/jpeg',0.92);
     }catch(e){
       st.textContent='❌ เกิดข้อผิดพลาด: '+e.message;
       showToast('Export ล้มเหลว','err');
