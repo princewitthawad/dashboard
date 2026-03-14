@@ -1715,10 +1715,10 @@ function shareChecklistLine(){
   let total=0,done=0;
   CHECKLIST_DATA.forEach(g=>g.items.forEach((_,i)=>{total++;if(_clState[g.id+'-'+i])done++;}));
   const pct=total>0?Math.round(done/total*100):0;
+  const pctCol=pct>=80?'#2e7d32':pct>=50?'#1565c0':pct>=25?'#e65100':'#c62828';
 
   const secColors={A:'#1565c0',B:'#2e7d32',C:'#e65100',D:'#c62828',E:'#6a1b9a'};
   const secBg={A:'#e3f2fd',B:'#e8f5e9',C:'#fff3e0',D:'#ffebee',E:'#f3e5f5'};
-  const pctCol=pct>=80?'#2e7d32':pct>=50?'#1565c0':pct>=25?'#e65100':'#c62828';
 
   function buildCardHtml(g){
     const col=secColors[g.id]||g.col;
@@ -1756,8 +1756,8 @@ function shareChecklistLine(){
     </div>`;
   }
 
-  function pageHtml(cardsHtml, pageNum, totalPages, showSummary){
-    const summaryHtml = showSummary ? `
+  function pageHtml(cardsHtml,pageNum,totalPages,showSummary){
+    const summaryHtml=showSummary?`
       <div style="display:flex;align-items:center;gap:16px;padding:14px 18px;
           background:#f8f9ff;border:1px solid #c5cae9;border-radius:10px;margin-bottom:22px">
         <div style="font-size:32px;font-weight:800;color:${pctCol};min-width:64px;text-align:center;line-height:1">${pct}%</div>
@@ -1773,7 +1773,7 @@ function shareChecklistLine(){
         <div style="padding:6px 14px;background:${pctCol};color:#fff;border-radius:20px;font-size:12px;font-weight:700;white-space:nowrap">
           ${pct>=100?'✅ ครบทุกรายการ':pct>=50?'⏳ กำลังดำเนินการ':'🔴 ต้องเร่งดำเนินการ'}
         </div>
-      </div>` : '';
+      </div>`:'';
     return `<!DOCTYPE html><html><head><meta charset="UTF-8">
       <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700;800&display=swap" rel="stylesheet">
       <style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Sarabun',sans-serif;background:#fff;color:#212121;width:794px;padding:28px 32px;min-height:1123px;display:flex;flex-direction:column}</style>
@@ -1799,10 +1799,8 @@ function shareChecklistLine(){
       </body></html>`;
   }
 
-  // หน้า 1: Card A, B, C (พร้อม summary bar)
-  const page1Cards = CHECKLIST_DATA.filter(g=>!['D','E'].includes(g.id)).map(buildCardHtml).join('');
-  // หน้า 2: Card D, E
-  const page2Cards = CHECKLIST_DATA.filter(g=>['D','E'].includes(g.id)).map(buildCardHtml).join('');
+  const page1Cards=CHECKLIST_DATA.filter(g=>!['D','E'].includes(g.id)).map(buildCardHtml).join('');
+  const page2Cards=CHECKLIST_DATA.filter(g=>['D','E'].includes(g.id)).map(buildCardHtml).join('');
 
   showToast('⏳ กำลังสร้าง PDF...','info',10000);
 
@@ -1816,13 +1814,11 @@ function shareChecklistLine(){
     try{
       const{jsPDF}=window.jspdf;
       const pdf=new jsPDF('p','mm','a4');
-      const margin=10, imgW=210-margin*2;
-
+      const margin=10,imgW=210-margin*2;
       const pages=[
         {html:pageHtml(page1Cards,1,2,true)},
         {html:pageHtml(page2Cards,2,2,false)},
       ];
-
       for(let idx=0;idx<pages.length;idx++){
         const iframe=document.createElement('iframe');
         iframe.style.cssText='position:fixed;left:-9999px;top:0;width:794px;height:1123px;border:none;visibility:hidden';
@@ -1831,20 +1827,40 @@ function shareChecklistLine(){
         iframe.contentDocument.write(pages[idx].html);
         iframe.contentDocument.close();
         await new Promise(r=>setTimeout(r,900));
-
         const canvas=await html2canvas(iframe.contentDocument.body,{
           scale:2,useCORS:true,backgroundColor:'#ffffff',logging:false,width:794,windowWidth:794
         });
         document.body.removeChild(iframe);
-
         if(idx>0)pdf.addPage();
-        const imgH=Math.min(297-margin*2, imgW*(canvas.height/canvas.width));
+        const imgH=Math.min(297-margin*2,imgW*(canvas.height/canvas.width));
         pdf.addImage(canvas.toDataURL('image/jpeg',.95),'JPEG',margin,margin,imgW,imgH);
       }
 
       const fileName=`checklist-${new Date().toISOString().slice(0,10)}.pdf`;
-      pdf.save(fileName);
-      showToast('✅ PDF ดาวน์โหลดแล้ว — เปิดไฟล์แล้วแชร์ไป Line ได้เลยครับ','ok',5000);
+      const pdfBlob=pdf.output('blob');
+      const pdfFile=new File([pdfBlob],fileName,{type:'application/pdf'});
+
+      // ลอง Web Share API (iOS/iPadOS/Android popup แชร์ไป Line)
+      if(navigator.canShare&&navigator.canShare({files:[pdfFile]})){
+        try{
+          await navigator.share({
+            files:[pdfFile],
+            title:'Checklist ประสานงานหน้างาน',
+            text:`📋 Checklist ${today} — ${done}/${total} รายการ (${pct}%)`
+          });
+          showToast('✅ แชร์สำเร็จ!','ok',3000);
+        }catch(err){
+          if(err.name!=='AbortError'){
+            // ถ้า share ไม่ได้ให้ download แทน
+            pdf.save(fileName);
+            showToast('✅ PDF ดาวน์โหลดแล้ว — เปิดไฟล์แล้วแชร์ไป Line ได้เลยครับ','ok',5000);
+          }
+        }
+      }else{
+        // fallback: download
+        pdf.save(fileName);
+        showToast('✅ PDF ดาวน์โหลดแล้ว — เปิดไฟล์แล้วแชร์ไป Line ได้เลยครับ','ok',5000);
+      }
     }catch(e){
       showToast('❌ สร้าง PDF ล้มเหลว: '+e.message,'err');
     }
