@@ -133,8 +133,9 @@ body.view-mode .view-badge{display:flex!important}
 .FR:hover td{background:var(--bgh);border-color:var(--bdrh)}
 .FB{display:inline-flex;padding:2px 9px;border-radius:6px;font-size:11px;font-weight:700;font-family:var(--m);background:var(--db);border:1px solid rgba(56,139,253,.3);color:var(--blue)}
 .TP{display:flex;align-items:center;gap:8px}
-.TPB{flex:1;height:7px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden}
-.TPF{height:100%;border-radius:99px;transition:width .8s cubic-bezier(.34,1.56,.64,1)}
+.TPB{flex:1;height:7px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;position:relative}
+.TPF{height:100%;border-radius:99px;transition:width .8s cubic-bezier(.34,1.56,.64,1);position:relative;background:var(--color-badge,#388bfd)}
+.TPF::after{display:none}
 .MS{display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--bg2);border-radius:var(--rs);border:1px solid var(--bdr)}
 .MSi{font-size:16px}.MSl{font-size:10px;color:var(--tx2)}.MSv{font-size:14px;font-weight:700;font-family:var(--m)}
 
@@ -927,7 +928,7 @@ function buildS2(){
       <td style="color:var(--tx2);font-size:11px">${dirs[i]}</td>
       <td><span class="FB">${f.rooms}</span></td>
       <td style="font-family:var(--m);font-weight:700;color:${col}">${done}/${f.rooms}</td>
-      <td><div class="TP"><div class="TPB"><div class="TPF ${cl}" style="width:${pct}%"></div></div><span style="font-size:11px;font-weight:700;font-family:var(--m);color:${col}">${pct}%</span></div></td>
+      <td><div class="TP"><div class="TPB"><div class="TPF ${cl}" style="width:${pct}%;--color-badge:${col}"></div></div></div></td>
       <td><div style="display:flex;align-items:center;gap:6px;justify-content:flex-end"><input class="PI" type="text" inputmode="decimal" pattern="[0-9.]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" min="0" max="100" value="${pct}" oninput="updateFloor(${i},this.value)" style="width:62px"><span class="Ps">%</span></div></td>
     </tr>`;
     // mobile
