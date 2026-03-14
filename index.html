@@ -418,6 +418,17 @@ body.view-mode .edit-only{display:none!important}
   <div class="SH"><div class="SN">2</div><div class="ST">งานก่ออิฐภายใน (ชั้น 2–5)</div><div class="Stg" style="margin-left:auto">เป้า 100% ต่อชั้น</div></div>
   <div class="s2-desktop"><table class="FT"><thead><tr><th>ชั้น</th><th>ทิศทาง</th><th>ห้องทั้งหมด</th><th>ทำแล้ว</th><th style="min-width:160px">ความคืบหน้า</th><th>กรอกข้อมูล</th></tr></thead><tbody id="s2body"></tbody></table></div>
   <div class="s2-mobile" id="s2cards"></div>
+  <div style="margin-top:16px;border-top:1px solid var(--bdr);padding-top:14px">
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <div style="font-size:12px;font-weight:700;color:var(--blue)">🏠 สรุปห้องรวม</div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap">
+        <div style="display:flex;align-items:baseline;gap:4px"><span style="font-size:9px;color:var(--tx3)">ทำแล้ว</span><span style="font-size:16px;font-weight:800;font-family:var(--m);color:var(--cyan)" id="s2-done">—</span><span style="font-size:9px;color:var(--tx3)">ห้อง</span></div>
+        <div style="display:flex;align-items:baseline;gap:4px"><span style="font-size:9px;color:var(--tx3)">ทั้งหมด</span><span style="font-size:16px;font-weight:800;font-family:var(--m);color:var(--tx2)" id="s2-all">—</span><span style="font-size:9px;color:var(--tx3)">ห้อง</span></div>
+        <div style="display:flex;align-items:baseline;gap:4px"><span style="font-size:9px;color:var(--tx3)">เหลือ</span><span style="font-size:16px;font-weight:800;font-family:var(--m);color:var(--orange)" id="s2-rem">—</span><span style="font-size:9px;color:var(--tx3)">ห้อง</span></div>
+        <div style="display:flex;align-items:baseline;gap:4px"><span style="font-size:9px;color:var(--tx3)">รวม</span><span style="font-size:16px;font-weight:800;font-family:var(--m);color:var(--orange)" id="s2tp">—</span></div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div class="card" id="zone-s3">
@@ -473,6 +484,10 @@ body.view-mode .edit-only{display:none!important}
 
 <div class="card" id="zone-s7">
   <div class="SH"><div class="SN" style="background:#f57c00">7</div><div class="ST">งานฉาบผนังภายใน (ชั้น 4 และ ชั้น 2)</div><div class="Stg" style="margin-left:auto">เป้า 40%</div><span style="font-size:10px;color:var(--tx3);background:var(--bg2);border:1px solid var(--bdr);padding:2px 7px;border-radius:4px">น้ำหนักห้องละ 4.55%</span></div>
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;padding:10px 14px;background:rgba(255,149,0,.07);border:1px solid rgba(255,149,0,.25);border-radius:8px">
+    <span style="font-size:22px">🎯</span>
+    <div><div style="font-size:11px;color:var(--tx3);margin-bottom:2px">จำนวนเป้าหมาย</div><div style="font-size:20px;font-weight:800;font-family:var(--m);color:var(--orange)">9 ห้อง <span style="font-size:13px;font-weight:600;color:var(--tx3)">(40% ของ 22 ห้อง)</span></div></div>
+  </div>
   <div class="G2" style="gap:16px;align-items:stretch">
     <div style="display:flex;flex-direction:column">
       <div class="PW"><div class="PM"><span class="PL">ความคืบหน้าฉาบผนัง</span><div class="IG"><input type="hidden" id="s7" value="18.2"><input class="PI" type="text" inputmode="decimal" pattern="[0-9.]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="s7r-inp" maxlength="4" value="4" oninput="updRooms('s7',this.value,22)" style="width:54px"><span class="Ps">ห้อง</span><span class="PP" id="s7p" style="color:var(--orange);font-size:18px;font-weight:800">18.2%</span><span style="font-size:11px;color:var(--tx3);margin-left:3px">/40%</span></div></div><div class="PBG"><div class="PF o" id="s7b" style="width:18.2%"></div></div></div>
@@ -844,6 +859,17 @@ function buildS2(force){
       </div></div>`;
   });
 }
+function updS2Summary(){
+  const totalRooms=FD.reduce((a,f)=>a+f.rooms,0);
+  const doneRooms=FD.reduce((a,f)=>a+Math.round(f.rooms*f.pct/100),0);
+  const remRooms=totalRooms-doneRooms;
+  const pct=totalRooms>0?(doneRooms/totalRooms*100):0;
+  const sd=document.getElementById('s2-done'),sa=document.getElementById('s2-all'),sr=document.getElementById('s2-rem'),tp=document.getElementById('s2tp');
+  if(sd)sd.textContent=doneRooms;
+  if(sa)sa.textContent=totalRooms;
+  if(sr)sr.textContent=remRooms;
+  if(tp){tp.textContent=ceilTo2(pct)+'%';tp.style.color=gcol(pct/100);}
+}
 function updateFloor(i,v){
   const raw=parseFloat(v);
   if(isNaN(raw)&&v!=='')return; // allow partial typing
@@ -865,7 +891,7 @@ function updateFloor(i,v){
     const bar=card.querySelector('.PF');if(bar){bar.style.width=pct+'%';bar.className='PF '+cl;}
     const done2=card.querySelector('span[style*="color:var(--tx2)"]');if(done2)done2.textContent=`ทำแล้ว ${done}/${f.rooms} ห้อง`;
   });
-  buildDonuts();ra();scheduleAutoSave();
+  buildDonuts();ra();updS2Summary();scheduleAutoSave();
 }
 
 function updOut(){
@@ -1122,7 +1148,7 @@ function updS5S6(){
 }
 
 function ra(){
-  updKPI();updatePieChart();updateDonuts();updSummary();updS5S6();
+  updKPI();updatePieChart();updateDonuts();updSummary();updS5S6();updS2Summary();
   const s4v=S4R.reduce((a,r)=>a+(gv(r.id)*r.wt/100),0);
   const e=document.getElementById('s4t');if(e)e.value=s4v.toFixed(2);setBar('s4t','s4tb','s4tp');
   const s7v=gv('s7'),s7p=document.getElementById('s7p');if(s7p){s7p.textContent=ceilTo2(s7v)+'%';s7p.style.color=gcol(s7v/40);}
