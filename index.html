@@ -716,7 +716,7 @@ function applyState(s){
   sv('r41',s.r41);sv('r42',s.r42);sv('r43',s.r43);sv('r44',s.r44);sv('r45',s.r45);
   if(s.fd)FD.forEach((f,i)=>{if(s.fd[i]!==undefined)f.pct=s.fd[i];});
   if(s.od)OD.forEach((o,i)=>{if(s.od[i]){o.fd=s.od[i].fd||0;o.bd=s.od[i].bd||0;o.sld=s.od[i].sld||s.od[i].sd||0;o.srd=s.od[i].srd||0;}});
-  buildS2();buildS3();
+  buildS2(true);buildS3();
   ['s1','s4t','s5','s6','s7'].forEach(id=>setBar(id,id+'b',id+'p'));
   ['r41','r42','r43','r44','r45'].forEach(id=>setBar(id,id+'b',id+'p'));
   updPlaster();buildDonuts();updS7Chart();ra();
@@ -765,7 +765,7 @@ function clearData(){
   if(!confirm('ล้างข้อมูลทั้งหมด (รีเซ็ตเป็นค่าเริ่มต้น)?'))return;
   FD.forEach(f=>{f.pct=0;});OD.forEach(o=>{o.fd=0;o.bd=0;o.sld=0;o.srd=0;});
   ['s1','s4t','s5','s6','s7','r41','r42','r43','r44','r45'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=0;});
-  buildS2();buildS3();
+  buildS2(true);buildS3();
   ['s1','s4t','s5','s6','s7'].forEach(id=>setBar(id,id+'b',id+'p'));
   ['r41','r42','r43','r44','r45'].forEach(id=>setBar(id,id+'b',id+'p'));
   updPlaster();buildDonuts();ra();scheduleAutoSave();showToast('ล้างข้อมูลแล้ว','info');
@@ -814,9 +814,10 @@ function getVals(){
   const s4=S4R.reduce((a,r)=>a+(gv(r.id)*r.wt/100),0),s5=gv('s5'),s6=gv('s6'),s7=gv('s7');
   return{s1,f25,out,s4,s5,s6,s7};
 }
-function buildS2(){
+function buildS2(force){
   const tb=document.getElementById('s2body'),mc=document.getElementById('s2cards');
   if(!tb||!mc)return;
+  if(!force&&tb.children.length===FD.length){FD.forEach((f,i)=>{const inp=tb.querySelectorAll('tr.FR')[i]?.querySelector('input.PI');if(inp&&document.activeElement!==inp)inp.value=f.pct;const inp2=mc.querySelectorAll('.mcrd')[i]?.querySelector('input.PI');if(inp2&&document.activeElement!==inp2)inp2.value=f.pct;});return;}
   const dirs=['ขวา→กลาง','ซ้าย→กลาง','ขวา→กลาง','ซ้าย→กลาง'];
   tb.innerHTML='';mc.innerHTML='';
   FD.forEach((f,i)=>{
@@ -838,7 +839,29 @@ function buildS2(){
       </div></div>`;
   });
 }
-function updateFloor(i,v){FD[i].pct=Math.min(100,Math.max(0,parseFloat(v)||0));buildS2();buildDonuts();ra();scheduleAutoSave();}
+function updateFloor(i,v){
+  const raw=parseFloat(v);
+  if(isNaN(raw)&&v!=='')return; // allow partial typing
+  const pct=v===''?0:Math.min(100,Math.max(0,raw));
+  FD[i].pct=pct;
+  const f=FD[i],done=Math.round(f.rooms*pct/100),ratio=pct/100;
+  const col=gcol(ratio),cl=gclass(ratio);
+  // update table row elements (skip input itself)
+  document.querySelectorAll('#s2body tr.FR').forEach((tr,idx)=>{
+    if(idx!==i)return;
+    const cells=tr.cells;
+    cells[3].style.color=col;cells[3].innerHTML=`${done}/${f.rooms}`;
+    const bar=cells[4].querySelector('.TPF');if(bar){bar.style.width=pct+'%';bar.className='TPF '+cl;bar.style.setProperty('--color-badge',col);}
+  });
+  // update card elements (skip input itself)
+  document.querySelectorAll('#s2cards .mcrd').forEach((card,idx)=>{
+    if(idx!==i)return;
+    const hd=card.querySelector('.mcrd-hd span');if(hd){hd.style.color=col;hd.textContent=pct+'%';}
+    const bar=card.querySelector('.PF');if(bar){bar.style.width=pct+'%';bar.className='PF '+cl;}
+    const done2=card.querySelector('span[style*="color:var(--tx2)"]');if(done2)done2.textContent=`ทำแล้ว ${done}/${f.rooms} ห้อง`;
+  });
+  buildDonuts();ra();scheduleAutoSave();
+}
 
 function updOut(){
   let totalWp=0,totalDone=0,totalAll=0;
@@ -876,9 +899,41 @@ function updOut(){
 function buildS3(){updOut();}
 function updOutField(id,field,v){
   const o=OD.find(x=>x.id===id);if(!o)return;
-  const max=o[field.replace('d','a')]||o.fa;
-  o[field]=Math.min(max,Math.max(0,parseFloat(v)||0));
-  updOut();buildDonuts();ra();scheduleAutoSave();
+  const raw=parseFloat(v);
+  if(isNaN(raw)&&v!=='')return; // allow partial typing
+  const maxKey=field.replace('d','a');
+  const max=o[maxKey]||o.fa;
+  o[field]=v===''?0:Math.min(max,Math.max(0,raw));
+  // recalc this row only
+  const{ta,da,fp,wp}=calcOut(o);
+  const col=gcol(fp/100),cl=gclass(fp/100);
+  // update table row
+  document.querySelectorAll('#s3body tr.FR').forEach(tr=>{
+    if(tr.cells[0].querySelector('strong')?.textContent!==o.label)return;
+    const cells=tr.cells;
+    cells[6].style.color=col;cells[6].textContent=da.toFixed(1);
+    cells[7].style.color=col;cells[7].textContent=fp.toFixed(1)+'%';
+  });
+  // update card
+  document.querySelectorAll('#s3cards .mcrd').forEach(card=>{
+    const lbl=card.querySelector('.mcrd-hd div');if(!lbl||!lbl.textContent.startsWith(o.label))return;
+    const sp=card.querySelector('.mcrd-hd span');if(sp){sp.style.color=col;sp.textContent=fp.toFixed(1)+'%';}
+    const bar=card.querySelector('.PF');if(bar){bar.style.width=fp+'%';bar.className='PF '+cl;}
+    // update area texts
+    const divs=card.querySelectorAll('div[style*="font-size:10px"]');
+    const vals={ด้านหน้า:{d:o.fd,a:o.fa},ด้านหลัง:{d:o.bd,a:o.ba},ด้านซ้าย:{d:o.sld,a:o.sl},ด้านขวา:{d:o.srd,a:o.sr}};
+    divs.forEach(d=>{for(const[k,{d:dv,a:av}]of Object.entries(vals)){if(d.textContent.startsWith(k)){const sp2=d.querySelector('span');if(sp2)sp2.textContent=`${dv}/${av}ม²`;}}});
+  });
+  // update s3 summary bar
+  let totalDone=0,totalAll=0;
+  OD.forEach(x=>{const c=calcOut(x);totalDone+=c.da;totalAll+=c.ta;});
+  const pct=totalAll>0?(totalDone/totalAll)*100:0;
+  const s3bar=document.getElementById('s3bar');
+  if(s3bar){s3bar.style.width=pct+'%';s3bar.className='PF '+gclass(pct/100);}
+  const tp=document.getElementById('s3tp');if(tp)tp.textContent=pct.toFixed(1)+'%';
+  const sd=document.getElementById('s3-done'),sa=document.getElementById('s3-all'),sr=document.getElementById('s3-rem');
+  if(sd)sd.textContent=totalDone.toFixed(1);if(sa)sa.textContent=totalAll.toFixed(1);if(sr)sr.textContent=(totalAll-totalDone).toFixed(1);
+  buildDonuts();ra();scheduleAutoSave();
   if(document.getElementById('s3-detail')?.classList.contains('open'))updS3Area();
 }
 let _s3Chart=null;
@@ -993,7 +1048,7 @@ function buildDonuts(){
   const all=[{v:vals.s1,tgt:100,col:'#00e676',lbl:'หลังคา'},{v:vals.f25,tgt:100,col:'#00d4ff',lbl:'ก่ออิฐใน'},{v:vals.out,tgt:50,col:'#00bcd4',lbl:'ก่ออิฐนอก'},{v:vals.s4,tgt:100,col:'#ff9500',lbl:'ก่ออิฐ ชั้น1'},{v:vals.s5,tgt:80,col:'#ce93d8',lbl:'งานไฟฟ้า'},{v:vals.s6,tgt:50,col:'#388bfd',lbl:'ท่อน้ำดี'},{v:vals.s7,tgt:40,col:'#ffd600',lbl:'ฉาบผนัง'}];
   const ga=document.getElementById('g-all');if(ga)ga.innerHTML=all.map(x=>donutHTML(x.v,x.tgt,x.col,x.lbl,'',false,'')).join('');
   const gs1=document.getElementById('g-s1');if(gs1)gs1.innerHTML=`<div>${donutHTML(vals.s1,100,'#00e676','หลังคาเมทัลชีท','รวมทั้งอาคาร',true,"setBar('s1','s1b','s1p');ra();scheduleAutoSave()")}</div><div style="color:var(--tx2);font-size:12px;line-height:1.8">หลังคาเมทัลชีทอาคารทั้งหมด<br>ติดตั้งจากด้านขวาไปซ้าย<br><br><strong style="color:var(--green)">สถานะ: เสร็จสมบูรณ์</strong></div>`;
-  const gs2=document.getElementById('g-s2');if(gs2)gs2.innerHTML=FD.map((f,i)=>donutHTML(f.pct,100,['#00d4ff','#00bcd4','#26c6da','#4dd0e1'][i],f.label,f.rooms+' ห้อง',true,`updateFloor(${i},this.value)`)).join('');
+  const gs2=document.getElementById('g-s2');if(gs2){const s2c=['#00d4ff','#00bcd4','#26c6da','#4dd0e1'];if(gs2.children.length!==FD.length){gs2.innerHTML=FD.map((f,i)=>donutHTML(f.pct,100,s2c[i],f.label,f.rooms+' ห้อง',true,`updateFloor(${i},this.value)`)).join('');}else{FD.forEach((f,i)=>{const dc=gs2.children[i];if(!dc)return;const col=s2c[i],dash=(CIRC*Math.min(1,f.pct/100)).toFixed(2);const fg=dc.querySelector('.DFG');if(fg){fg.setAttribute('stroke-dasharray',`${dash} ${CIRC.toFixed(2)}`);fg.setAttribute('stroke',col);}const pp=dc.querySelector('.DC-pct');if(pp){pp.textContent=f.pct.toFixed(1)+'%';pp.style.color=gcol(f.pct/100);}const inp=dc.querySelector('.DCI');if(inp&&document.activeElement!==inp)inp.value=f.pct;});}}
   const gs3=document.getElementById('g-s3');if(gs3){let h='',totWp=0;OD.forEach(o=>{const{da,ta,fp}=calcOut(o);totWp+=calcOut(o).wp;h+=donutHTML(fp,100,'#00bcd4',o.label,`${da.toFixed(0)}/${ta.toFixed(0)}ม²`,false,'');});h+=donutHTML(totWp,50,'#ff9500','รวมทุกชั้น','เป้า 50%',false,'');gs3.innerHTML=h;}
   const gs4=document.getElementById('g-s4');if(gs4){let h='';S4R.forEach(r=>{const v=gv(r.id);h+=donutHTML(v,100,'#ff9500',r.lbl,'น้ำหนัก '+r.wt+'%',true,`setBar('${r.id}','${r.id}b','${r.id}p');ra();scheduleAutoSave()`);});h+=donutHTML(vals.s4,100,'#ffd600','รวม (Weighted)','',false,'');gs4.innerHTML=h;}
   const mk=(s,tgt,col)=>`<div class="DGrid" style="grid-template-columns:repeat(3,1fr)">${donutHTML(gv(s),tgt,col,'งานทั้งหมด','',true,`setBar('${s}','${s}b','${s}p');ra();scheduleAutoSave()`)}</div>`;
@@ -1316,7 +1371,7 @@ function exportExcel(){
 }
 
 function init(){
-  buildS2();buildS3();
+  buildS2(true);buildS3();
   ['s1','s4t','s5','s6','s7'].forEach(id=>setBar(id,id+'b',id+'p'));
   ['r41','r42','r43','r44','r45'].forEach(id=>setBar(id,id+'b',id+'p'));
   updPlaster();
