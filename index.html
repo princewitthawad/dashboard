@@ -374,6 +374,7 @@ body.view-mode .edit-only{display:none!important}
     <button class="btn btn-r edit-only" onclick="clearData()">🗑️ ล้าง</button>
 
     <a id="lockin-link" href="#" onclick="event.preventDefault();showLockModal()" style="font-size:11px;font-weight:600;color:var(--tx2);text-decoration:none;padding:5px 10px;border-radius:6px;transition:color .2s" onmouseover="this.style.color='var(--blue)'" onmouseout="this.style.color='var(--tx2)'">🔓 Login</a>
+    <button id="logout-btn" class="btn edit-only" onclick="doLogout()" style="display:none;background:rgba(255,68,68,.12);color:#ff6666;border:1px solid rgba(255,68,68,.3);font-size:11px">🔒 Logout</button>
     <button id="lock-btn" class="btn btn-o edit-only" onclick="applyViewMode()" style="display:none">🔒 ล็อก</button>
   </div>
 </header>
@@ -1428,6 +1429,7 @@ function ra(){
 // LOCK SYSTEM
 // ═══════════════════════════════
 let _isLocked=false,_numBuf='',_lastTouch=0;
+const SESSION_KEY='cp_edit_session';
 function toggleLock(){
   if(_isLocked){applyEditMode();}
   else{applyViewMode();}
@@ -1438,13 +1440,23 @@ function applyViewMode(){
   document.body.classList.add('view-mode');
   _isLocked=true;
   const link=document.getElementById('lockin-link');
+  const logout=document.getElementById('logout-btn');
   if(link) link.style.display='';
+  if(logout) logout.style.display='none';
 }
 function applyEditMode(){
   document.body.classList.remove('view-mode');
   _isLocked=false;
+  sessionStorage.setItem(SESSION_KEY,'1');
   const link=document.getElementById('lockin-link');
+  const logout=document.getElementById('logout-btn');
   if(link) link.style.display='none';
+  if(logout) logout.style.display='';
+}
+function doLogout(){
+  sessionStorage.removeItem(SESSION_KEY);
+  applyViewMode();
+  showToast('ออกจากระบบแล้ว 🔒','ok');
 }
 function numPress(n){
   const now=Date.now();if(now-_lastTouch<80)return;_lastTouch=now;
@@ -2807,7 +2819,13 @@ function init(){
       setSvStatus('','💡 กด ⚙️ Cloud เพื่อตั้งค่า Firebase');
     }
     startAutoRefresh();
-    setTimeout(()=>applyViewMode(),300);
+    setTimeout(()=>{
+      if(sessionStorage.getItem(SESSION_KEY)==='1'){
+        applyEditMode();
+      }else{
+        applyViewMode();
+      }
+    },300);
   },150);
 }
 // shake anim for lock card
