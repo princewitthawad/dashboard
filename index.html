@@ -221,7 +221,7 @@ body.view-mode .edit-only{display:none!important}
 /* LOCK MODAL */
 #lock-modal{position:fixed;inset:0;z-index:99999;display:none;align-items:flex-start;justify-content:center;background:rgba(3,7,14,.97);backdrop-filter:blur(24px);padding:16px;overflow-y:auto}
 #lock-modal.show{display:flex!important}
-.lm-card{width:100%;max-width:340px;margin:16px auto;background:#08111e;border:1px solid rgba(56,139,253,.15);border-radius:18px;overflow:hidden;box-shadow:0 48px 120px rgba(0,0,0,.9)}
+.lm-card{width:100%;max-width:380px;margin:16px auto;background:#08111e;border:1px solid rgba(56,139,253,.15);border-radius:18px;overflow:hidden;box-shadow:0 48px 120px rgba(0,0,0,.9)}
 .lm-acc{height:2px;background:linear-gradient(90deg,transparent,#1a56db 30%,#38bdf8 60%,transparent)}
 .lm-body{padding:26px 22px 22px}
 .lm-icon{width:46px;height:46px;background:rgba(56,139,253,.07);border:1px solid rgba(56,139,253,.18);border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 18px}
@@ -230,8 +230,8 @@ body.view-mode .edit-only{display:none!important}
 .lm-dots{display:flex;justify-content:center;gap:14px;margin-bottom:18px}
 .lm-dot-inp{width:13px;height:13px;border-radius:50%;background:#0d1a28;border:2px solid #1e3050;transition:all .15s}
 .lm-dot-inp.filled{background:#388bfd;border-color:#388bfd;transform:scale(1.2)}
-.lm-numgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;width:100%;max-width:260px;margin:0 auto 18px}
-.lm-num{width:100%;min-height:56px;border-radius:12px;background:#080f1a;border:1px solid #152030;color:#c0d4ec;font-size:22px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:background .08s,transform .07s;user-select:none}
+.lm-numgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:100%;max-width:320px;margin:0 auto 18px}
+.lm-num{width:100%;min-height:72px;border-radius:14px;background:#080f1a;border:1px solid #152030;color:#c0d4ec;font-size:30px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:background .08s,transform .07s;user-select:none}
 .lm-num:active{background:#0d1e30;transform:scale(.88)}
 .lm-num-s{font-size:11px;font-weight:700;letter-spacing:.3px;color:#2d4a6a}
 .lm-err{font-size:11px;color:#dc6060;font-family:var(--m);min-height:16px;margin:0 0 14px;text-align:center}
