@@ -118,7 +118,7 @@ body.view-mode .view-badge{display:flex!important}
 
 /* INPUTS */
 .IG{display:flex;align-items:center;gap:6px}
-.PI{width:68px;background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--rs);color:var(--tx);font-family:var(--m);font-size:13px;font-weight:600;padding:5px 8px;text-align:center;transition:border-color .2s,box-shadow .2s;outline:none}
+.PI{width:68px;background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--rs);color:var(--tx);font-family:var(--m);font-size:13px;font-weight:600;padding:5px 8px;text-align:center;transition:border-color .2s,box-shadow .2s;outline:none;-webkit-appearance:none;appearance:none;touch-action:manipulation;min-height:36px}
 .PI:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(56,139,253,.12)}
 .PI::-webkit-inner-spin-button{-webkit-appearance:none}
 .Ps{font-size:12px;color:var(--tx2)}
@@ -174,7 +174,7 @@ body.view-mode .view-badge{display:flex!important}
 .DC-tgt{font-size:9px;color:var(--tx3);font-family:var(--m);margin-top:1px}
 .DC-sub{font-size:9px;color:var(--tx3);margin-top:4px;text-align:center}
 .DC-inp{margin-top:8px;width:100%;display:flex;align-items:center;justify-content:center;gap:5px}
-.DCI{width:58px;background:rgba(8,13,20,.8);border:1px solid var(--bdr);border-radius:6px;color:var(--tx);font-family:var(--m);font-size:12px;font-weight:600;padding:4px 6px;text-align:center;outline:none;transition:border-color .2s}
+.DCI{width:58px;background:rgba(8,13,20,.8);border:1px solid var(--bdr);border-radius:6px;color:var(--tx);font-family:var(--m);font-size:12px;font-weight:600;padding:4px 6px;text-align:center;outline:none;transition:border-color .2s;-webkit-appearance:none;appearance:none;touch-action:manipulation;min-height:34px}
 .DCI:focus{border-color:var(--blue);box-shadow:0 0 0 2px rgba(56,139,253,.12)}
 .DCI::-webkit-inner-spin-button{-webkit-appearance:none}
 .DC-info{margin-top:8px;width:100%}
@@ -443,7 +443,7 @@ body.view-mode .edit-only{display:none!important}
 <div class="G2" id="zone-s1s4">
 <div class="card">
   <div class="SH"><div class="SN">1</div><div class="ST">งานติดตั้งหลังคาเมทัลชีท</div><div class="Stg" style="margin-left:auto">เป้า 100%</div></div>
-  <div class="PW"><div class="PM"><span class="PL">ความคืบหน้ารวม</span><div class="IG"><input class="PI" type="number" min="0" max="100" id="s1" value="100" oninput="onS1()"><span class="Ps">%</span><span class="PP" id="s1p">100%</span></div></div><div class="PBG"><div class="PF g" id="s1b" style="width:100%"></div></div></div>
+  <div class="PW"><div class="PM"><span class="PL">ความคืบหน้ารวม</span><div class="IG"><input class="PI" type="number" inputmode="decimal" min="0" max="100" id="s1" value="100" oninput="onS1()"><span class="Ps">%</span><span class="PP" id="s1p">100%</span></div></div><div class="PBG"><div class="PF g" id="s1b" style="width:100%"></div></div></div>
   <div class="DIV"></div>
   <div style="font-size:11px;color:var(--tx2);margin-bottom:10px">ทิศทางการติดตั้ง (ขวา → ซ้าย)</div>
   <div style="display:flex;align-items:center;gap:8px">
@@ -456,13 +456,13 @@ body.view-mode .edit-only{display:none!important}
 </div>
 <div class="card">
   <div class="SH"><div class="SN" style="background:var(--orange)">4</div><div class="ST">งานก่ออิฐภายใน ชั้น 1</div><div class="Stg" style="margin-left:auto">เป้า 100%</div></div>
-  <div class="PW" style="margin-bottom:14px"><div class="PM"><span class="PL">รวมทั้งชั้น 1 (weighted avg)</span><div class="IG"><input class="PI" type="number" min="0" max="100" id="s4t" value="2" oninput="setBar('s4t','s4tb','s4tp');ra()"><span class="Ps">%</span><span class="PP" id="s4tp">2%</span></div></div><div class="PBG"><div class="PF r" id="s4tb" style="width:2%"></div></div></div>
+  <div class="PW" style="margin-bottom:14px"><div class="PM"><span class="PL">รวมทั้งชั้น 1 (weighted avg)</span><div class="IG"><input class="PI" type="number" inputmode="decimal" min="0" max="100" id="s4t" value="2" oninput="setBar('s4t','s4tb','s4tp');ra()"><span class="Ps">%</span><span class="PP" id="s4tp">2%</span></div></div><div class="PBG"><div class="PF r" id="s4tb" style="width:2%"></div></div></div>
   <div class="RG">
-    <div class="RC"><div class="RCT" style="background:var(--orange)"></div><div class="RN">ห้องพัก 101</div><div class="RW">น้ำหนัก 30%</div><div class="PBG" style="margin-bottom:7px"><div class="PF o" id="r41b" style="width:5%"></div></div><div class="IG"><input class="PI" style="width:54px" type="number" min="0" max="100" id="r41" value="5" oninput="setBar('r41','r41b','r41p');ra()"><span class="Ps">%</span><span class="PP" id="r41p" style="color:var(--orange)">5%</span></div></div>
-    <div class="RC"><div class="RCT" style="background:var(--orange)"></div><div class="RN">ห้องพัก 102</div><div class="RW">น้ำหนัก 25%</div><div class="PBG" style="margin-bottom:7px"><div class="PF o" id="r42b" style="width:5%"></div></div><div class="IG"><input class="PI" style="width:54px" type="number" min="0" max="100" id="r42" value="5" oninput="setBar('r42','r42b','r42p');ra()"><span class="Ps">%</span><span class="PP" id="r42p" style="color:var(--orange)">5%</span></div></div>
-    <div class="RC"><div class="RCT" style="background:var(--orange)"></div><div class="RN">ห้องพัก 103</div><div class="RW">น้ำหนัก 25%</div><div class="PBG" style="margin-bottom:7px"><div class="PF o" id="r43b" style="width:5%"></div></div><div class="IG"><input class="PI" style="width:54px" type="number" min="0" max="100" id="r43" value="5" oninput="setBar('r43','r43b','r43p');ra()"><span class="Ps">%</span><span class="PP" id="r43p" style="color:var(--orange)">5%</span></div></div>
-    <div class="RC"><div class="RCT" style="background:var(--red)"></div><div class="RN">ร้านค้า</div><div class="RW">น้ำหนัก 10%</div><div class="PBG" style="margin-bottom:7px"><div class="PF r" id="r44b" style="width:0%"></div></div><div class="IG"><input class="PI" style="width:54px" type="number" min="0" max="100" id="r44" value="0" oninput="setBar('r44','r44b','r44p');ra()"><span class="Ps">%</span><span class="PP" id="r44p" style="color:var(--red)">0%</span></div></div>
-    <div class="RC"><div class="RCT" style="background:var(--red)"></div><div class="RN">ห้องซักอบ</div><div class="RW">น้ำหนัก 10%</div><div class="PBG" style="margin-bottom:7px"><div class="PF r" id="r45b" style="width:0%"></div></div><div class="IG"><input class="PI" style="width:54px" type="number" min="0" max="100" id="r45" value="0" oninput="setBar('r45','r45b','r45p');ra()"><span class="Ps">%</span><span class="PP" id="r45p" style="color:var(--red)">0%</span></div></div>
+    <div class="RC"><div class="RCT" style="background:var(--orange)"></div><div class="RN">ห้องพัก 101</div><div class="RW">น้ำหนัก 30%</div><div class="PBG" style="margin-bottom:7px"><div class="PF o" id="r41b" style="width:5%"></div></div><div class="IG"><input class="PI" style="width:54px" type="number" inputmode="decimal" min="0" max="100" id="r41" value="5" oninput="setBar('r41','r41b','r41p');ra()"><span class="Ps">%</span><span class="PP" id="r41p" style="color:var(--orange)">5%</span></div></div>
+    <div class="RC"><div class="RCT" style="background:var(--orange)"></div><div class="RN">ห้องพัก 102</div><div class="RW">น้ำหนัก 25%</div><div class="PBG" style="margin-bottom:7px"><div class="PF o" id="r42b" style="width:5%"></div></div><div class="IG"><input class="PI" style="width:54px" type="number" inputmode="decimal" min="0" max="100" id="r42" value="5" oninput="setBar('r42','r42b','r42p');ra()"><span class="Ps">%</span><span class="PP" id="r42p" style="color:var(--orange)">5%</span></div></div>
+    <div class="RC"><div class="RCT" style="background:var(--orange)"></div><div class="RN">ห้องพัก 103</div><div class="RW">น้ำหนัก 25%</div><div class="PBG" style="margin-bottom:7px"><div class="PF o" id="r43b" style="width:5%"></div></div><div class="IG"><input class="PI" style="width:54px" type="number" inputmode="decimal" min="0" max="100" id="r43" value="5" oninput="setBar('r43','r43b','r43p');ra()"><span class="Ps">%</span><span class="PP" id="r43p" style="color:var(--orange)">5%</span></div></div>
+    <div class="RC"><div class="RCT" style="background:var(--red)"></div><div class="RN">ร้านค้า</div><div class="RW">น้ำหนัก 10%</div><div class="PBG" style="margin-bottom:7px"><div class="PF r" id="r44b" style="width:0%"></div></div><div class="IG"><input class="PI" style="width:54px" type="number" inputmode="decimal" min="0" max="100" id="r44" value="0" oninput="setBar('r44','r44b','r44p');ra()"><span class="Ps">%</span><span class="PP" id="r44p" style="color:var(--red)">0%</span></div></div>
+    <div class="RC"><div class="RCT" style="background:var(--red)"></div><div class="RN">ห้องซักอบ</div><div class="RW">น้ำหนัก 10%</div><div class="PBG" style="margin-bottom:7px"><div class="PF r" id="r45b" style="width:0%"></div></div><div class="IG"><input class="PI" style="width:54px" type="number" inputmode="decimal" min="0" max="100" id="r45" value="0" oninput="setBar('r45','r45b','r45p');ra()"><span class="Ps">%</span><span class="PP" id="r45p" style="color:var(--red)">0%</span></div></div>
   </div>
 </div>
 </div>
@@ -516,13 +516,13 @@ body.view-mode .edit-only{display:none!important}
 <div class="card">
   <div class="SH"><div class="SN" style="background:#9c27b0">5</div><div class="ST">งานไฟฟ้า กรีดผนัง+ฝังท่อ</div><div class="Stg" style="margin-left:auto">เป้า 80%</div></div>
   <div class="C2" style="margin-bottom:12px"><div class="MS"><span class="MSi">🔌</span><div><div class="MSl">ห้องทั้งหมด</div><div class="MSv">44 ห้อง</div></div></div><div class="MS"><span class="MSi">⚖️</span><div><div class="MSl">น้ำหนักต่อห้อง</div><div class="MSv">2.27%</div></div></div></div>
-  <div class="PW"><div class="PM"><span class="PL">ชั้น 2–5</span><div class="IG"><input class="PI" type="number" min="0" max="100" step=".1" id="s5" value="4.5" oninput="setBar('s5','s5b','s5p');ra()"><span class="Ps">%</span><span class="PP" id="s5p" style="color:var(--red)">4.5%</span></div></div><div class="PBG"><div class="PF r" id="s5b" style="width:4.5%"></div></div></div>
+  <div class="PW"><div class="PM"><span class="PL">ชั้น 2–5</span><div class="IG"><input class="PI" type="number" inputmode="decimal" min="0" max="100" step=".1" id="s5" value="4.5" oninput="setBar('s5','s5b','s5p');ra()"><span class="Ps">%</span><span class="PP" id="s5p" style="color:var(--red)">4.5%</span></div></div><div class="PBG"><div class="PF r" id="s5b" style="width:4.5%"></div></div></div>
   <div style="margin-top:10px;padding:9px 12px;background:var(--bg2);border-radius:7px;border:1px solid var(--bdr)"><div style="font-size:11px;color:var(--tx2)">ยังต้องทำ: <span style="color:var(--orange);font-weight:700;font-family:var(--m)" id="s5r">—</span></div><div style="font-size:11px;color:var(--tx2);margin-top:3px">ห้องที่ทำแล้ว: <span style="color:var(--tx);font-weight:700;font-family:var(--m)" id="s5rm">—</span></div></div>
 </div>
 <div class="card">
   <div class="SH"><div class="SN" style="background:#00838f">6</div><div class="ST">งานเดินท่อน้ำดี</div><div class="Stg" style="margin-left:auto">เป้า 50%</div></div>
   <div class="C2" style="margin-bottom:12px"><div class="MS"><span class="MSi">💧</span><div><div class="MSl">ห้องทั้งหมด</div><div class="MSv">26 ห้อง</div></div></div><div class="MS"><span class="MSi">⚖️</span><div><div class="MSl">น้ำหนักต่อห้อง</div><div class="MSv">3.85%</div></div></div></div>
-  <div class="PW"><div class="PM"><span class="PL">ชั้น 1–3</span><div class="IG"><input class="PI" type="number" min="0" max="100" step=".1" id="s6" value="0" oninput="setBar('s6','s6b','s6p');ra()"><span class="Ps">%</span><span class="PP" id="s6p" style="color:var(--red)">0%</span></div></div><div class="PBG"><div class="PF r" id="s6b" style="width:0%"></div></div></div>
+  <div class="PW"><div class="PM"><span class="PL">ชั้น 1–3</span><div class="IG"><input class="PI" type="number" inputmode="decimal" min="0" max="100" step=".1" id="s6" value="0" oninput="setBar('s6','s6b','s6p');ra()"><span class="Ps">%</span><span class="PP" id="s6p" style="color:var(--red)">0%</span></div></div><div class="PBG"><div class="PF r" id="s6b" style="width:0%"></div></div></div>
   <div style="margin-top:10px;padding:9px 12px;background:var(--bg2);border-radius:7px;border:1px solid var(--bdr)"><div style="font-size:11px;color:var(--tx2)">ยังต้องทำ: <span style="color:var(--orange);font-weight:700;font-family:var(--m)" id="s6r">—</span></div><div style="font-size:11px;color:var(--tx2);margin-top:3px">ห้องที่ทำแล้ว: <span style="color:var(--tx);font-weight:700;font-family:var(--m)" id="s6rm">—</span></div></div>
 </div>
 </div>
@@ -532,7 +532,7 @@ body.view-mode .edit-only{display:none!important}
   <div class="SH"><div class="SN" style="background:#f57c00">7</div><div class="ST">งานฉาบผนังภายใน (ชั้น 4 และ ชั้น 2)</div><div class="Stg" style="margin-left:auto">เป้า 40%</div><span style="font-size:10px;color:var(--tx3);background:var(--bg2);border:1px solid var(--bdr);padding:2px 7px;border-radius:4px">น้ำหนักห้องละ 4.55%</span></div>
   <div class="G2" style="gap:16px;align-items:stretch">
     <div style="display:flex;flex-direction:column">
-      <div class="PW"><div class="PM"><span class="PL">ความคืบหน้าฉาบผนัง</span><div class="IG"><input class="PI" type="number" min="0" max="100" step=".01" id="s7" value="18.2" oninput="setBar('s7','s7b','s7p');updPlaster();updS7Chart();ra()"><span class="Ps">%</span><span class="PP" id="s7p" style="color:var(--orange)">18.2%</span></div></div><div class="PBG"><div class="PF o" id="s7b" style="width:18.2%"></div></div></div>
+      <div class="PW"><div class="PM"><span class="PL">ความคืบหน้าฉาบผนัง</span><div class="IG"><input class="PI" type="number" inputmode="decimal" min="0" max="100" step=".01" id="s7" value="18.2" oninput="setBar('s7','s7b','s7p');updPlaster();updS7Chart();ra()"><span class="Ps">%</span><span class="PP" id="s7p" style="color:var(--orange)">18.2%</span></div></div><div class="PBG"><div class="PF o" id="s7b" style="width:18.2%"></div></div></div>
       <div style="margin-top:9px;padding:9px 12px;background:var(--bg2);border-radius:7px;border:1px solid var(--bdr)"><div style="display:flex;justify-content:space-between"><span style="font-size:11px;color:var(--tx2)">ทำแล้ว: <span style="color:var(--green);font-weight:700;font-family:var(--m)" id="s7dr">4 ห้อง</span></span><span style="font-size:11px;color:var(--tx2)">ยังต้องทำ: <span style="color:var(--orange);font-weight:700;font-family:var(--m)" id="s7r">21.8%</span></span></div></div>
       <!-- S7 Line Chart — flex:1 ยืดเต็มพื้นที่ที่เหลือ -->
       <div style="margin-top:6px;background:var(--bg2);border:1px solid var(--bdr);border-radius:9px;padding:12px 14px;flex:1;display:flex;flex-direction:column">
@@ -571,6 +571,7 @@ body.view-mode .edit-only{display:none!important}
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <button onclick="resetChecklist()" class="btn btn-r" style="font-size:11px">🔄 รีเซ็ต</button>
         <button onclick="exportChecklistPDF()" class="btn edit-only" style="background:rgba(220,38,38,.15);color:#ff4444;border:1px solid rgba(220,38,38,.4);font-size:11px">📄 Export PDF</button>
+        <button onclick="shareChecklistLine()" class="btn edit-only" style="background:rgba(0,185,0,.15);color:#00b900;border:1px solid rgba(0,185,0,.4);font-size:11px">💚 แชร์ไป Line</button>
       </div>
     </div>
     <!-- Progress summary -->
@@ -927,7 +928,7 @@ function buildS2(){
       <td><span class="FB">${f.rooms}</span></td>
       <td style="font-family:var(--m);font-weight:700;color:${col}">${done}/${f.rooms}</td>
       <td><div class="TP"><div class="TPB"><div class="TPF ${cl}" style="width:${pct}%"></div></div><span style="font-size:11px;font-weight:700;font-family:var(--m);color:${col}">${pct}%</span></div></td>
-      <td><div style="display:flex;align-items:center;gap:6px;justify-content:flex-end"><input class="PI" type="number" min="0" max="100" value="${pct}" oninput="updateFloor(${i},this.value)" style="width:62px"><span class="Ps">%</span></div></td>
+      <td><div style="display:flex;align-items:center;gap:6px;justify-content:flex-end"><input class="PI" type="number" inputmode="decimal" min="0" max="100" value="${pct}" oninput="updateFloor(${i},this.value)" style="width:62px"><span class="Ps">%</span></div></td>
     </tr>`;
     // mobile
     mc.innerHTML+=`<div class="mcrd"><div class="mcrd-acc" style="background:${col}"></div>
@@ -935,7 +936,7 @@ function buildS2(){
       <div class="PBG" style="height:7px;margin-bottom:10px"><div class="PF ${cl}" style="width:${pct}%"></div></div>
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
         <span style="font-size:11px;color:var(--tx2)">ทำแล้ว ${done}/${f.rooms} ห้อง</span>
-        <div style="margin-left:auto;display:flex;align-items:center;gap:5px"><input class="PI" type="number" min="0" max="100" value="${pct}" oninput="updateFloor(${i},this.value)" style="width:60px"><span class="Ps">%</span></div>
+        <div style="margin-left:auto;display:flex;align-items:center;gap:5px"><input class="PI" type="number" inputmode="decimal" min="0" max="100" value="${pct}" oninput="updateFloor(${i},this.value)" style="width:60px"><span class="Ps">%</span></div>
       </div>
     </div>`;
   });
@@ -957,7 +958,7 @@ function updOut(){
     const{ta,da,fp,wp}=calcOut(o);
     totalWp+=wp;totalDone+=da;totalAll+=ta;
     const col=gcol(fp/100),cl=gclass(fp/100);
-    const inpS=(field)=>`<input class="PI" type="number" min="0" max="${o[field.replace('d','a')]||o.fa}" step=".01" value="${o[field]}" oninput="updOutField('${o.id}','${field}',this.value)" style="width:62px">`;
+    const inpS=(field)=>`<input class="PI" type="number" inputmode="decimal" min="0" max="${o[field.replace('d','a')]||o.fa}" step=".01" value="${o[field]}" oninput="updOutField('${o.id}','${field}',this.value)" style="width:62px">`;
     tb.innerHTML+=`<tr class="FR">
       <td><strong>${o.label}</strong></td>
       <td style="text-align:center"><span class="FB">${o.wt}%</span></td>
@@ -1292,7 +1293,7 @@ const CIRC=2*Math.PI*44;
 function donutHTML(pct,tgt,col,lbl,sub,showInput,inputId){
   const ratio=pct/tgt,cl=gcol(ratio);
   const dash=(CIRC*Math.min(1,pct/100)).toFixed(2);
-  const inputHtml=showInput?`<div class="DC-inp"><input class="DCI" type="number" min="0" max="100" step="${pct%1===0?1:.1}" value="${pct}" oninput="${inputId}"><span style="font-size:9px;color:var(--tx3)">%</span></div>`:'';
+  const inputHtml=showInput?`<div class="DC-inp"><input class="DCI" type="number" inputmode="decimal" min="0" max="100" step="${pct%1===0?1:.1}" value="${pct}" oninput="${inputId}"><span style="font-size:9px;color:var(--tx3)">%</span></div>`:'';
   return`<div class="DC">
     <div class="DC-lbl">${lbl}</div>
     <div class="DW">
@@ -1707,6 +1708,37 @@ function exportChecklistPDF(){
   </body></html>`);
   win.document.close();
 }
+function shareChecklistLine(){
+  const today=new Date().toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'});
+  let total=0, done=0;
+  CHECKLIST_DATA.forEach(g=>g.items.forEach((_,i)=>{total++;if(_clState[g.id+'-'+i])done++;}));
+  const pct=total>0?Math.round(done/total*100):0;
+
+  // สร้างข้อความสรุปสำหรับ Line
+  let msg=`📋 Checklist ประสานงานหน้างาน\n`;
+  msg+=`📅 ${today}\n`;
+  msg+=`✅ ความคืบหน้า: ${done}/${total} รายการ (${pct}%)\n`;
+  msg+=`${'▓'.repeat(Math.round(pct/10))}${'░'.repeat(10-Math.round(pct/10))} ${pct}%\n\n`;
+
+  CHECKLIST_DATA.forEach(g=>{
+    const gDone=g.items.filter((_,i)=>_clState[g.id+'-'+i]).length;
+    const gTotal=g.items.length;
+    msg+=`${g.icon} ${g.title} (${gDone}/${gTotal})\n`;
+    g.items.forEach((item,i)=>{
+      const checked=!!_clState[g.id+'-'+i];
+      msg+=`  ${checked?'☑':'☐'} ${item}\n`;
+    });
+    msg+='\n';
+  });
+
+  msg+=`─────────────────\nConstruction Progress Dashboard`;
+
+  // เปิด Line URL scheme พร้อมข้อความ
+  const encoded=encodeURIComponent(msg);
+  const lineUrl=`https://line.me/R/msg/text/?${encoded}`;
+  window.open(lineUrl,'_blank');
+}
+
 let LABOR={
   mason_ext:2,mason_in:6,mason_plaster:7,
   elec_lead:2,elec_helper:3,
