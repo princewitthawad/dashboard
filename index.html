@@ -1271,7 +1271,7 @@ let _isLocked=false,_numBuf='',_lastTouch=0;
 function showLockModal(){document.getElementById('lock-modal').classList.add('show');}
 function closeLockModal(){document.getElementById('lock-modal').classList.remove('show');_numBuf='';_syncDots();}
 function applyViewMode(){document.body.classList.add('view-mode');_isLocked=true;const link=document.getElementById('lockin-link'),logout=document.getElementById('logout-btn');if(link)link.style.display='';if(logout)logout.style.display='none';}
-function applyEditMode(){document.body.classList.remove('view-mode');_isLocked=false;sessionStorage.setItem(SESSION_KEY,'1');const link=document.getElementById('lockin-link'),logout=document.getElementById('logout-btn');if(link)link.style.display='none';if(logout)logout.style.display='';showGreeting();}
+function applyEditMode(){document.body.classList.remove('view-mode');_isLocked=false;sessionStorage.setItem(SESSION_KEY,'1');const link=document.getElementById('lockin-link'),logout=document.getElementById('logout-btn');if(link)link.style.display='none';if(logout)logout.style.display='';showGreeting();setTimeout(()=>showUrgentPopup(),1400);}
 function showGreeting(){const d=document.createElement('div');d.style.cssText='position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;pointer-events:none';d.innerHTML=`<div style="background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:36px 72px;backdrop-filter:blur(20px);box-shadow:0 12px 60px rgba(0,0,0,.5);animation:greetIn .35s cubic-bezier(.34,1.56,.64,1) both"><span style="font-size:42px;font-weight:800;color:#e8f0fe;font-family:'Sarabun',sans-serif;letter-spacing:1px">สวัสดี ค่ะ</span></div>`;document.body.appendChild(d);setTimeout(()=>{d.firstElementChild.style.cssText+=';animation:greetOut .3s ease forwards';setTimeout(()=>d.remove(),300);},3000);}
 function doLogout(){sessionStorage.removeItem(SESSION_KEY);applyViewMode();showToast('ออกจากระบบแล้ว 🔒','ok');}
 function numPress(n){const now=Date.now();if(now-_lastTouch<80)return;_lastTouch=now;if(_numBuf.length>=6)return;_numBuf+=n;_syncDots();if(_numBuf.length===6){setTimeout(doUnlock,120);}}
@@ -2032,6 +2032,99 @@ function exportDataJSON(){
   a.click();
   setTimeout(()=>URL.revokeObjectURL(a.href),1000);
   showToast('✅ Export JSON สำเร็จ — วางไฟล์ใน Claude เพื่อวิเคราะห์','ok',4000);
+}
+
+function showUrgentPopup(){
+  const vals=getVals();
+  const vs=[vals.s1,vals.f25,vals.out,vals.s4,vals.s5,vals.s6,vals.s7];
+  const tgts=[100,100,50,100,80,50,40];
+  const deadline=new Date(2026,3,22);
+  const fastDeadline=new Date(2026,3,11);
+  const today=new Date();
+  const daysLeft=Math.ceil((deadline-today)/(1000*60*60*24));
+  const daysFast=Math.ceil((fastDeadline-today)/(1000*60*60*24));
+  const fmtDate=d=>d.toLocaleDateString('th-TH',{year:'numeric',month:'short',day:'numeric'});
+
+  // Unit helpers per work
+  const unitInfo=[
+    {type:'none',  total:1,    unit:''},           // S1 หลังคา
+    {type:'room',  total:44,   unit:'ห้อง', wt:100/44},  // S2 ก่ออิฐใน
+    {type:'sqm',   total:979.7,unit:'ตร.ม.',tgt_sqm:979.7*0.5}, // S3 ก่ออิฐนอก
+    {type:'room',  total:5,    unit:'ห้อง', wt:100/5},   // S4 ก่ออิฐชั้น1
+    {type:'room',  total:44,   unit:'ห้อง', wt:80/44},   // S5 ไฟฟ้า
+    {type:'room',  total:26,   unit:'ห้อง', wt:50/26},   // S6 ท่อน้ำดี
+    {type:'room',  total:22,   unit:'ห้อง', wt:40/22},   // S7 ฉาบผนัง (22 ห้อง เป้า 40%)
+  ];
+  function toUnit(ui,gapPct){
+    if(ui.type==='room'){
+      const n=gapPct/ui.wt;
+      if(n>=1) return n.toFixed(1)+' ห้อง/วัน';
+      else return '1 ห้อง/'+Math.ceil(1/n)+' วัน';
+    }
+    if(ui.type==='sqm') return (gapPct/100*ui.total).toFixed(1)+' ตร.ม./วัน';
+    return gapPct.toFixed(2)+'%/วัน';
+  }
+  // Filter only urgent: not yet reached target
+  const urgentItems=SUMDEF.map((d,i)=>({
+    lbl:d.lbl, col:d.col, pct:vs[i], tgt:tgts[i],
+    gap:tgts[i]-vs[i],
+    ui:unitInfo[i],
+    gapUnit:toUnit(unitInfo[i],tgts[i]-vs[i]),
+    perDayNorm:vs[i]<tgts[i]?toUnit(unitInfo[i],(tgts[i]-vs[i])/daysLeft):'-',
+    perDayFast:vs[i]<tgts[i]&&daysFast>0?toUnit(unitInfo[i],(tgts[i]-vs[i])/daysFast):'-',
+  })).filter(x=>x.pct<x.tgt&&x.gap>0);
+
+  if(urgentItems.length===0){showToast('✅ ทุกงานบรรลุเป้าหมายแล้ว!','ok');return;}
+
+  const rows=urgentItems.map(x=>`
+    <div style="background:rgba(255,255,255,.04);border:1px solid ${x.col}33;border-left:4px solid ${x.col};border-radius:8px;padding:12px 14px;margin-bottom:8px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px">
+        <span style="font-weight:800;font-size:13px;color:${x.col}">${x.lbl}</span>
+        <span style="font-family:var(--m);font-size:12px;color:#8899aa">${x.pct.toFixed(1)}% / เป้า ${x.tgt}%</span>
+      </div>
+      <div style="height:5px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;margin-bottom:10px">
+        <div style="height:100%;width:${Math.min(100,x.pct/x.tgt*100).toFixed(1)}%;background:${x.col};border-radius:99px"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+        <div style="background:rgba(255,255,255,.04);border-radius:7px;padding:8px;text-align:center">
+          <div style="font-size:9px;color:#6b7a8d;margin-bottom:3px">เหลืออีก</div>
+          <div style="font-size:14px;font-weight:800;font-family:var(--m);color:var(--orange)">${x.gapUnit}</div>
+          <div style="font-size:9px;color:#6b7a8d;margin-top:1px">${x.gap.toFixed(1)}%</div>
+        </div>
+        <div style="background:rgba(255,255,255,.04);border-radius:7px;padding:8px;text-align:center">
+          <div style="font-size:9px;color:#6b7a8d;margin-bottom:3px">ต้องทำ/วัน (ปกติ)</div>
+          <div style="font-size:14px;font-weight:800;font-family:var(--m);color:#ff4444">${x.perDayNorm}</div>
+        </div>
+        <div style="background:rgba(255,255,255,.04);border-radius:7px;padding:8px;text-align:center">
+          <div style="font-size:9px;color:#6b7a8d;margin-bottom:3px">ต้องทำ/วัน (เร่งรัด)</div>
+          <div style="font-size:14px;font-weight:800;font-family:var(--m);color:#ff4444">${x.perDayFast}</div>
+        </div>
+      </div>
+    </div>`).join('');
+
+  const popup=document.createElement('div');
+  popup.id='_urgent_popup';
+  popup.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px)';
+  popup.innerHTML=`
+    <div style="background:linear-gradient(135deg,#0d1525,#111d30);border:1px solid rgba(255,68,68,.35);border-radius:16px;max-width:640px;width:100%;max-height:85vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.6)">
+      <div style="padding:18px 22px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#0d1525;border-radius:16px 16px 0 0;z-index:1">
+        <div>
+          <div style="font-size:16px;font-weight:800;color:#ff4444">🚨 งานเร่งด่วน</div>
+          <div style="font-size:10px;color:#6b7a8d;margin-top:2px;font-family:var(--m)">
+            เร่งรัด: <strong style="color:var(--orange)">${fmtDate(fastDeadline)}</strong> (${daysFast} วัน) &nbsp;|&nbsp;
+            กำหนดส่ง: <strong style="color:#ff6b6b">${fmtDate(deadline)}</strong> (${daysLeft} วัน)
+          </div>
+        </div>
+        <button onclick="document.getElementById('_urgent_popup')?.remove()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#8899aa;border-radius:8px;padding:6px 12px;cursor:pointer;font-size:12px;font-family:var(--f)">✕ ปิด</button>
+      </div>
+      <div style="padding:16px 20px">
+        ${rows}
+        <div style="margin-top:6px;text-align:right">
+          <button onclick="document.getElementById('_urgent_popup')?.remove()" style="background:rgba(255,68,68,.12);border:1px solid rgba(255,68,68,.4);color:#ff6b6b;border-radius:8px;padding:8px 20px;cursor:pointer;font-size:12px;font-family:var(--f);font-weight:700">รับทราบ ✓</button>
+        </div>
+      </div>
+    </div>`;
+  document.body.appendChild(popup);
 }
 </script>
 </body>
