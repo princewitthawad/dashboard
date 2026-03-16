@@ -584,6 +584,7 @@ body.view-mode .edit-only{display:none!important}
       <div class="lm-dots" id="lm-dots">
         <div class="lm-dot-inp" id="d0"></div><div class="lm-dot-inp" id="d1"></div><div class="lm-dot-inp" id="d2"></div>
         <div class="lm-dot-inp" id="d3"></div><div class="lm-dot-inp" id="d4"></div><div class="lm-dot-inp" id="d5"></div>
+        <div class="lm-dot-inp" id="d6"></div><div class="lm-dot-inp" id="d7"></div>
       </div>
       <div style="display:none"><input id="lm-pw" type="password" maxlength="30" autocomplete="current-password" onkeydown="if(event.key==='Enter'){event.preventDefault();doUnlock();}"></div>
       <div class="lm-numgrid">
@@ -1283,10 +1284,21 @@ function applyViewMode(){document.body.classList.add('view-mode');_isLocked=true
 function applyEditMode(){document.body.classList.remove('view-mode');_isLocked=false;sessionStorage.setItem(SESSION_KEY,'1');const link=document.getElementById('lockin-link'),logout=document.getElementById('logout-btn');if(link)link.style.display='none';if(logout)logout.style.display='';showGreeting();setTimeout(()=>showUrgentPopup(),1400);}
 function showGreeting(){const d=document.createElement('div');d.style.cssText='position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;pointer-events:none';d.innerHTML=`<div style="background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:36px 72px;backdrop-filter:blur(20px);box-shadow:0 12px 60px rgba(0,0,0,.5);animation:greetIn .35s cubic-bezier(.34,1.56,.64,1) both"><span style="font-size:42px;font-weight:800;color:#e8f0fe;font-family:'Sarabun',sans-serif;letter-spacing:1px">สวัสดี ค่ะ</span></div>`;document.body.appendChild(d);setTimeout(()=>{d.firstElementChild.style.cssText+=';animation:greetOut .3s ease forwards';setTimeout(()=>d.remove(),300);},3000);}
 function doLogout(){sessionStorage.removeItem(SESSION_KEY);applyViewMode();showToast('ออกจากระบบแล้ว 🔒','ok');}
-function numPress(n){const now=Date.now();if(now-_lastTouch<80)return;_lastTouch=now;if(_numBuf.length>=6)return;_numBuf+=n;_syncDots();if(_numBuf.length===6){setTimeout(doUnlock,120);}}
+function numPress(n){
+  const now=Date.now();if(now-_lastTouch<80)return;_lastTouch=now;
+  if(_numBuf.length>=8)return;
+  _numBuf+=n;_syncDots();
+  // Auto-try at the correct password length
+  const correctLen=getPassHash()===getPassHash()?_numBuf.length:6;
+  // Try unlock at each length from 4-8 silently; shake only at max
+  setTimeout(()=>{
+    if(sha256(_numBuf)===getPassHash()){doUnlock();}
+    else if(_numBuf.length>=8){doUnlock();}
+  },120);
+}
 function numDel(){_numBuf=_numBuf.slice(0,-1);_syncDots();}
 function numClear(){_numBuf='';_syncDots();}
-function _syncDots(){for(let i=0;i<6;i++){const d=document.getElementById('d'+i);if(d)d.classList.toggle('filled',i<_numBuf.length);}}
+function _syncDots(){for(let i=0;i<8;i++){const d=document.getElementById('d'+i);if(d)d.classList.toggle('filled',i<_numBuf.length);}}
 function doUnlock(){
   const pw=_numBuf||document.getElementById('lm-pw')?.value||'';
   if(!pw){document.getElementById('lm-err').textContent='กรุณากรอกรหัสผ่าน';return;}
@@ -2137,21 +2149,35 @@ function showUrgentPopup(){
 const DEV_HASH='7e66b5dd3d158d14ba3300cad5702ee6d72befaec37890eed25c91687bb649df';
 const DEV_COLORS=['#00e676','#00d4ff','#00bcd4','#ff9500','#ce93d8','#388bfd','#ffd600','#ff5252','#69f0ae','#40c4ff','#ea80fc','#ffab40'];
 
+let _devBuf='',_devLastTouch=0;
+function devNumPress(n){
+  const now=Date.now();if(now-_devLastTouch<80)return;_devLastTouch=now;
+  if(_devBuf.length>=6)return;
+  _devBuf+=n;_devSyncDots();
+  // Auto-try unlock at 4 digits; if wrong, keep letting user type up to 6
+  if(_devBuf.length===4){setTimeout(()=>{
+    if(sha256(_devBuf)===DEV_HASH){doDevUnlock();}
+    // else: wrong, but don't shake yet — let user type up to 6
+  },120);}
+  else if(_devBuf.length===6){setTimeout(doDevUnlock,120);}
+}
+function devNumDel(){_devBuf=_devBuf.slice(0,-1);_devSyncDots();}
+function devNumClear(){_devBuf='';_devSyncDots();}
+function _devSyncDots(){for(let i=0;i<6;i++){const d=document.getElementById('dd'+i);if(d)d.classList.toggle('filled',i<_devBuf.length);}const inp=document.getElementById('dev-pw-inp');if(inp)inp.value=_devBuf;}
 function showDevLogin(){
   const m=document.getElementById('dev-modal');
-  if(!m){alert('dev-modal not found');return;}
+  if(!m)return;
   m.style.setProperty('display','flex','important');
-  const inp=document.getElementById('dev-pw-inp');
-  if(inp){inp.value='';setTimeout(()=>inp.focus(),100);}
+  _devBuf='';_devSyncDots();
   const err=document.getElementById('dev-err');if(err)err.textContent='';
 }
 function closeDevModal(){
   const dm=document.getElementById('dev-modal');
-  if(dm)dm.style.display='none';
+  if(dm)dm.style.setProperty('display','none','important');
+  _devBuf='';if(typeof _devSyncDots==='function')_devSyncDots();
 }
 function doDevUnlock(){
-  const inp=document.getElementById('dev-pw-inp');
-  const pw=inp?inp.value.trim():'';
+  const pw=_devBuf||(document.getElementById('dev-pw-inp')?.value.trim()||'');
   if(sha256(pw)===DEV_HASH){
     closeDevModal();
     openDevOverlay();
@@ -2159,7 +2185,9 @@ function doDevUnlock(){
   }else{
     const err=document.getElementById('dev-err');
     if(err)err.textContent='รหัสไม่ถูกต้อง';
-    if(inp)inp.value='';
+    _devBuf='';_devSyncDots();
+    const card=document.querySelector('#dev-modal .lm-card');
+    if(card){card.style.animation='none';card.offsetHeight;card.style.animation='shake .4s ease';}
   }
 }
 function getDevWorks(){
@@ -2306,19 +2334,45 @@ function devSaveAll(){
 
 </script>
 
-<div id="dev-modal" style="display:none;position:fixed;inset:0;z-index:99998;background:rgba(3,7,14,.92);backdrop-filter:blur(16px);align-items:center;justify-content:center;padding:16px;flex-direction:column">
-  <div style="background:linear-gradient(135deg,#0d1525,#111d30);border:1px solid rgba(120,80,255,.5);border-radius:16px;max-width:400px;width:100%;padding:28px 24px;box-shadow:0 24px 80px rgba(0,0,0,.7)">
-    <div style="text-align:center;margin-bottom:20px">
-      <div style="font-size:26px;margin-bottom:6px">⚙️</div>
-      <div style="font-size:16px;font-weight:800;color:#9b66ff">Developer Mode</div>
-      <div style="font-size:10px;color:#6b7a8d;margin-top:3px">รหัส 4 หลัก</div>
+<div id="dev-modal" style="display:none;position:fixed;inset:0;z-index:99998;background:rgba(3,7,14,.97);backdrop-filter:blur(24px);align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto">
+  <div class="lm-card" style="border-color:rgba(120,80,255,.3)">
+    <div class="lm-acc" style="background:linear-gradient(90deg,#6b21a8,#9b66ff,#6b21a8)"></div>
+    <div class="lm-body">
+      <div class="lm-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9b66ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+        </svg>
+      </div>
+      <div class="lm-h" style="color:#c4b5fd">Developer Mode</div>
+      <div class="lm-p" style="color:#4a3a6a">&nbsp;</div>
+      <div class="lm-dots" id="dev-dots">
+        <div class="lm-dot-inp" id="dd0"></div>
+        <div class="lm-dot-inp" id="dd1"></div>
+        <div class="lm-dot-inp" id="dd2"></div>
+        <div class="lm-dot-inp" id="dd3"></div>
+        <div class="lm-dot-inp" id="dd4"></div>
+        <div class="lm-dot-inp" id="dd5"></div>
+      </div>
+      <div style="display:none"><input id="dev-pw-inp" type="password" maxlength="20" autocomplete="off" onkeydown="if(event.key==='Enter'){event.preventDefault();doDevUnlock();}"></div>
+      <div class="lm-numgrid">
+        <button class="lm-num" style="border-color:rgba(120,80,255,.2)" ontouchstart="devNumPress('1')" onclick="devNumPress('1')">1</button>
+        <button class="lm-num" style="border-color:rgba(120,80,255,.2)" ontouchstart="devNumPress('2')" onclick="devNumPress('2')">2</button>
+        <button class="lm-num" style="border-color:rgba(120,80,255,.2)" ontouchstart="devNumPress('3')" onclick="devNumPress('3')">3</button>
+        <button class="lm-num" style="border-color:rgba(120,80,255,.2)" ontouchstart="devNumPress('4')" onclick="devNumPress('4')">4</button>
+        <button class="lm-num" style="border-color:rgba(120,80,255,.2)" ontouchstart="devNumPress('5')" onclick="devNumPress('5')">5</button>
+        <button class="lm-num" style="border-color:rgba(120,80,255,.2)" ontouchstart="devNumPress('6')" onclick="devNumPress('6')">6</button>
+        <button class="lm-num" style="border-color:rgba(120,80,255,.2)" ontouchstart="devNumPress('7')" onclick="devNumPress('7')">7</button>
+        <button class="lm-num" style="border-color:rgba(120,80,255,.2)" ontouchstart="devNumPress('8')" onclick="devNumPress('8')">8</button>
+        <button class="lm-num" style="border-color:rgba(120,80,255,.2)" ontouchstart="devNumPress('9')" onclick="devNumPress('9')">9</button>
+        <button class="lm-num lm-num-s" style="border-color:rgba(120,80,255,.2)" ontouchstart="devNumClear()" onclick="devNumClear()">ล้าง</button>
+        <button class="lm-num" style="border-color:rgba(120,80,255,.2)" ontouchstart="devNumPress('0')" onclick="devNumPress('0')">0</button>
+        <button class="lm-num lm-num-s" style="border-color:rgba(120,80,255,.2)" ontouchstart="devNumDel()" onclick="devNumDel()">&#x232B;</button>
+      </div>
+      <div class="lm-err" id="dev-err"></div>
+      <button class="lm-submit" style="background:linear-gradient(135deg,#6b21a8,#9b66ff);box-shadow:0 4px 24px rgba(120,80,255,.4)" onclick="doDevUnlock()">เข้าสู่ Dev Mode</button>
+      <button class="lm-ghost" onclick="closeDevModal()">ยกเลิก</button>
+      <div class="lm-foot"><div style="width:5px;height:5px;border-radius:50%;background:#1a0a2e"></div>Developer Access · Secured<div style="width:5px;height:5px;border-radius:50%;background:#1a0a2e"></div></div>
     </div>
-    <input id="dev-pw-inp" type="password" inputmode="numeric" maxlength="10" placeholder="รหัส Dev" autocomplete="off"
-      style="width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(120,80,255,.5);border-radius:10px;padding:14px 16px;color:#e8f0fe;font-size:20px;font-family:var(--m);text-align:center;letter-spacing:6px;outline:none;margin-bottom:8px"
-      onkeydown="if(event.key==='Enter')doDevUnlock()">
-    <div id="dev-err" style="font-size:11px;color:#ff6b6b;text-align:center;min-height:16px;margin-bottom:12px"></div>
-    <button onclick="doDevUnlock()" class="btn" style="width:100%;background:rgba(120,80,255,.25);border:1px solid rgba(120,80,255,.6);color:#9b66ff;border-radius:10px;padding:13px;font-size:14px;font-weight:800;margin-bottom:8px;justify-content:center">เข้าสู่ Dev Mode</button>
-    <button onclick="closeDevModal()" class="btn" style="width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#6b7a8d;border-radius:10px;padding:10px;font-size:12px;justify-content:center">ยกเลิก</button>
   </div>
 </div>
 
