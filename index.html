@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5">
 <title>Construction Progress Dashboard v2</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-3d@0.1.0/dist/chartjs-plugin-3d.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -37,6 +39,8 @@ header::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;back
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
 .view-badge{display:none;align-items:center;gap:6px;padding:5px 12px;background:rgba(255,149,0,.12);border:1px solid rgba(255,149,0,.35);border-radius:20px;font-size:11px;font-weight:600;color:var(--orange);font-family:var(--m)}
 body.view-mode .view-badge{display:flex!important}
+.view-only{display:none!important}
+body.view-mode .view-only{display:inline-flex!important}
 .btn{padding:7px 16px;border:none;border-radius:var(--rs);font-family:var(--f);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
 .btn-g{background:rgba(0,230,118,.15);color:var(--green);border:1px solid rgba(0,230,118,.4)}.btn-g:hover{background:rgba(0,230,118,.25);transform:translateY(-1px)}
 .btn-b{background:rgba(56,139,253,.15);color:var(--blue);border:1px solid rgba(56,139,253,.4)}.btn-b:hover{background:rgba(56,139,253,.25);transform:translateY(-1px)}
@@ -52,7 +56,7 @@ body.view-mode .view-badge{display:flex!important}
 #sv-msg{font-size:12px;color:var(--tx2);font-family:var(--m)}
 #sv-time{font-size:11px;color:var(--tx3);font-family:var(--m);margin-left:auto}
 .kg{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
-.kc{background:rgba(17,27,40,.6);border:1px solid var(--bdr);border-radius:var(--r);padding:18px 20px;position:relative;overflow:hidden;transition:border-color .2s,transform .2s;animation:fadein .4s ease both}
+.kc{background:var(--bgc);border:1px solid var(--bdr);border-radius:var(--r);padding:18px 20px;position:relative;overflow:hidden;transition:border-color .2s,transform .2s;animation:fadein .4s ease both}
 .kc:nth-child(1){animation-delay:.05s}.kc:nth-child(2){animation-delay:.1s}.kc:nth-child(3){animation-delay:.15s}.kc:nth-child(4){animation-delay:.2s}
 .kc:hover{border-color:var(--bdrh);transform:translateY(-2px)}
 .kc::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;border-radius:0 0 var(--r) var(--r)}
@@ -63,7 +67,7 @@ body.view-mode .view-badge{display:flex!important}
 .ks{font-size:11px;color:var(--tx3);margin-top:5px}
 .ki{position:absolute;right:16px;top:14px;font-size:26px;opacity:.13}
 @keyframes fadein{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-.pie-sec{background:rgba(17,27,40,.6);border:1px solid var(--bdr);border-radius:var(--r);padding:24px;margin-bottom:20px;position:relative;overflow:visible}
+.pie-sec{background:var(--bgc);border:1px solid var(--bdr);border-radius:var(--r);padding:24px;margin-bottom:20px;position:relative;overflow:visible}
 .pie-sec::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(56,139,253,.04),transparent 50%);pointer-events:none;border-radius:var(--r);overflow:hidden}
 .pie-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;gap:10px;flex-wrap:wrap}
 .pie-title{font-size:15px;font-weight:800}.pie-sub{font-size:11px;color:var(--tx2);margin-top:3px;font-family:var(--m)}
@@ -86,7 +90,7 @@ body.view-mode .view-badge{display:flex!important}
 .psi{text-align:center;padding:7px;background:var(--bgc);border-radius:6px}
 .psi-v{font-size:18px;font-weight:800;font-family:var(--m)}
 .psi-l{font-size:9px;color:var(--tx2);margin-top:2px}
-.card{background:rgba(17,27,40,.6);border:1px solid var(--bdr);border-radius:var(--r);padding:22px;margin-bottom:28px;transition:border-color .2s}
+.card{background:var(--bgc);border:1px solid var(--bdr);border-radius:var(--r);padding:22px;margin-bottom:28px;transition:border-color .2s}
 .card:hover{border-color:var(--bdrh)}
 .SH{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
 .SN{width:28px;height:28px;background:var(--blue);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;font-family:var(--m);flex-shrink:0}
@@ -131,7 +135,7 @@ body.view-mode .view-badge{display:flex!important}
 .RC:hover{border-color:var(--bdrh);transform:translateY(-2px)}
 .RCT{height:3px;border-radius:3px 3px 0 0;position:absolute;top:0;left:0;right:0}
 .RN{font-size:12px;font-weight:700;margin-bottom:3px}.RW{font-size:10px;color:var(--tx3);margin-bottom:9px}
-.DS{background:rgba(17,27,40,.6);border:1px solid var(--bdr);border-radius:var(--r);padding:24px;margin-bottom:20px;position:relative;overflow:hidden}
+.DS{background:var(--bgc);border:1px solid var(--bdr);border-radius:var(--r);padding:24px;margin-bottom:20px;position:relative;overflow:hidden}
 .DS::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(56,139,253,.04),transparent 50%);pointer-events:none}
 .TABS{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:20px}
 .TAB{padding:6px 14px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--bdr);background:transparent;color:var(--tx2);transition:all .2s;font-family:var(--f)}
@@ -160,7 +164,7 @@ body.view-mode .view-badge{display:flex!important}
 .DC-k{color:var(--tx3)}.DC-v{font-family:var(--m);font-weight:600}
 .G2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
 .C2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.SB{background:rgba(17,27,40,.6);border:1px solid var(--bdr);border-radius:var(--r);padding:20px 22px;margin-top:20px;position:relative;overflow:hidden}
+.SB{background:var(--bgc);border:1px solid var(--bdr);border-radius:var(--r);padding:20px 22px;margin-top:20px;position:relative;overflow:hidden}
 .SB::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(56,139,253,.05),transparent 60%);pointer-events:none}
 .SBt{font-size:12px;font-weight:700;margin-bottom:14px;color:var(--tx2);text-transform:uppercase;letter-spacing:1px}
 .SBg{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
@@ -230,8 +234,6 @@ body.view-mode .edit-only{display:none!important}
   .ov-inner{padding:16px}
 }
 @media(max-width:600px){
-  #zone-s7 [style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr!important}
-  #zone-s7 .PI{width:52px!important;font-size:15px!important}
   .W{padding:8px}
   header{padding:10px 12px;flex-wrap:wrap;gap:8px}
   .ht{font-size:15px}.hs{font-size:10px}.hi{width:36px;height:36px;font-size:17px}
@@ -262,7 +264,6 @@ body.view-mode .edit-only{display:none!important}
   #tab-all .DGrid{grid-template-columns:repeat(2,1fr)!important}
 }
 @media(min-width:768px) and (max-width:1024px){
-  #zone-s7 [style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr 1fr!important}
   .W{padding:16px}
   .pie-wrap{max-width:300px}
   .kg{grid-template-columns:repeat(4,1fr)}
@@ -277,6 +278,19 @@ body.view-mode .edit-only{display:none!important}
   .kg{gap:6px;margin-bottom:8px}.kv{font-size:20px}.kc{padding:9px 11px}
   .pie-sec,.DS,.card,.SB{padding:10px;margin-bottom:12px}
   .pie-layout{grid-template-columns:200px 1fr}.pie-wrap{max-width:200px}
+}
+@media print {
+  body { background: white !important; color: black !important; }
+  .orb, .o1, .o2 { display: none !important; }
+  body::before { display: none !important; }
+  .btn, button, input, .edit-only { display: none !important; }
+  .card, .pie-sec, .DS, .SB, .kg, .pie-layout, .G2, .C2 { page-break-inside: avoid; }
+  header { page-break-after: avoid; }
+  .save-bar, .live-badge, .view-badge { display: none !important; }
+  .W { padding: 10mm; max-width: none; }
+  @page { size: A4; margin: 10mm; }
+  .overlay, #lock-modal, #pwc-modal, #jpeg-modal { display: none !important; }
+  canvas { max-width: 100%; height: auto !important; }
 }
 </style>
 </head>
@@ -314,15 +328,16 @@ body.view-mode .edit-only{display:none!important}
     </div>
     <div>
       <div class="ht">Construction Progress Dashboard</div>
-      <div class="hs">รายงานความคืบหน้างานก่อสร้าง · v2.3</div>
+      <div class="hs">รายงานความคืบหน้างานก่อสร้าง · v2.0</div>
     </div>
   </div>
   <div class="hbtns">
     <div class="live-badge"><div class="ld"></div>LIVE</div>
     <div class="view-badge">👁️ โหมดดูอย่างเดียว</div>
     <button class="btn btn-g edit-only" onclick="saveData()">💾 บันทึก</button>
+    <button class="btn edit-only" onclick="printDashboard()" style="background:rgba(255,255,255,.08);color:#e8f0fe;border:1px solid rgba(255,255,255,.2)">🖨️ Print</button>
     <button class="btn edit-only" onclick="openExportJpegModal()" style="background:rgba(0,180,255,.15);color:#00d4ff;border:1px solid rgba(0,212,255,.4)">🖼️ Export JPEG</button>
-    <button class="btn btn-b" onclick="showFirebaseGuide()" style="font-size:11px">☁️ ลงทะเบียน</button>
+    <button class="btn btn-b view-only" onclick="showFirebaseGuide()">☁️ ลงทะเบียน</button>
     <button class="btn btn-gold edit-only" onclick="showPwChange()">🔑 รหัสผ่าน</button>
     <button class="btn btn-r edit-only" onclick="clearData()">🗑️ ล้าง</button>
     <a id="lockin-link" href="#" onclick="event.preventDefault();showLockModal()" style="font-size:11px;font-weight:600;color:var(--tx2);text-decoration:none;padding:5px 10px;border-radius:6px;transition:color .2s" onmouseover="this.style.color='var(--blue)'" onmouseout="this.style.color='var(--tx2)'">🔓 Login</a>
@@ -473,38 +488,36 @@ body.view-mode .edit-only{display:none!important}
 <div class="card">
   <div class="SH"><div class="SN" style="background:#9c27b0">5</div><div class="ST">งานไฟฟ้า กรีดผนัง+ฝังท่อ</div><div class="Stg" style="margin-left:auto">เป้า 80%</div></div>
   <div class="C2" style="margin-bottom:12px"><div class="MS"><span class="MSi">🔌</span><div><div class="MSl">ห้องทั้งหมด</div><div class="MSv">44 ห้อง</div></div></div><div class="MS"><span class="MSi">⚖️</span><div><div class="MSl">น้ำหนักต่อห้อง</div><div class="MSv">2.27%</div></div></div></div>
-  <input type="hidden" id="s5" value="4.5">
-  <div class="PW"><div class="PM"><span class="PL">ความคืบหน้ารวม</span><span class="PP" id="s5p" style="color:var(--red)">4.5%</span><span style="font-size:11px;color:var(--tx3);margin-left:4px">/80%</span></div><div class="PBG"><div class="PF r" id="s5b" style="width:4.5%"></div></div></div>
-  <div style="margin-top:9px;padding:9px 12px;background:var(--bg2);border-radius:7px;border:1px solid var(--bdr);margin-bottom:12px"><div style="font-size:11px;color:var(--tx2)">ยังต้องทำ: <span style="color:var(--orange);font-weight:700;font-family:var(--m)" id="s5r">—</span></div><div style="font-size:11px;color:var(--tx2);margin-top:3px">ห้องที่ทำแล้ว: <span style="color:var(--tx);font-weight:700;font-family:var(--m)" id="s5rm">—</span></div></div>
-  <div id="s5rooms" style="display:flex;flex-direction:column;gap:6px;max-height:300px;overflow-y:auto"></div>
+  <div class="PW"><div class="PM"><span class="PL">ชั้น 2–5</span><div class="IG"><input type="hidden" id="s5" value="4.5"><input class="PI" type="text" inputmode="decimal" pattern="[0-9.]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="s5r-inp" maxlength="4" value="2" oninput="updRooms('s5',this.value,44)" style="width:54px"><span class="Ps">ห้อง</span><span class="PP" id="s5p" style="color:var(--red);font-size:18px;font-weight:800">4.5%</span><span style="font-size:11px;color:var(--tx3);margin-left:3px">/80%</span></div></div><div class="PBG"><div class="PF r" id="s5b" style="width:4.5%"></div></div></div>
+  <div style="margin-top:10px;padding:9px 12px;background:var(--bg2);border-radius:7px;border:1px solid var(--bdr)"><div style="font-size:11px;color:var(--tx2)">ยังต้องทำ: <span style="color:var(--orange);font-weight:700;font-family:var(--m)" id="s5r">—</span></div><div style="font-size:11px;color:var(--tx2);margin-top:3px">ห้องที่ทำแล้ว: <span style="color:var(--tx);font-weight:700;font-family:var(--m)" id="s5rm">—</span></div></div>
 </div>
 <div class="card">
   <div class="SH"><div class="SN" style="background:#00838f">6</div><div class="ST">งานเดินท่อน้ำดี</div><div class="Stg" style="margin-left:auto">เป้า 50%</div></div>
   <div class="C2" style="margin-bottom:12px"><div class="MS"><span class="MSi">💧</span><div><div class="MSl">ห้องทั้งหมด</div><div class="MSv">26 ห้อง</div></div></div><div class="MS"><span class="MSi">⚖️</span><div><div class="MSl">น้ำหนักต่อห้อง</div><div class="MSv">3.85%</div></div></div></div>
-  <input type="hidden" id="s6" value="0">
-  <div class="PW"><div class="PM"><span class="PL">ความคืบหน้ารวม</span><span class="PP" id="s6p" style="color:var(--red)">0%</span><span style="font-size:11px;color:var(--tx3);margin-left:4px">/50%</span></div><div class="PBG"><div class="PF r" id="s6b" style="width:0%"></div></div></div>
-  <div style="margin-top:9px;padding:9px 12px;background:var(--bg2);border-radius:7px;border:1px solid var(--bdr);margin-bottom:12px"><div style="font-size:11px;color:var(--tx2)">ยังต้องทำ: <span style="color:var(--orange);font-weight:700;font-family:var(--m)" id="s6r">—</span></div><div style="font-size:11px;color:var(--tx2);margin-top:3px">ห้องที่ทำแล้ว: <span style="color:var(--tx);font-weight:700;font-family:var(--m)" id="s6rm">—</span></div></div>
-  <div id="s6rooms" style="display:flex;flex-direction:column;gap:6px;max-height:300px;overflow-y:auto"></div>
+  <div class="PW"><div class="PM"><span class="PL">ชั้น 1–3</span><div class="IG"><input type="hidden" id="s6" value="0"><input class="PI" type="text" inputmode="decimal" pattern="[0-9.]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="s6r-inp" maxlength="4" value="0" oninput="updRooms('s6',this.value,26)" style="width:54px"><span class="Ps">ห้อง</span><span class="PP" id="s6p" style="color:var(--red);font-size:18px;font-weight:800">0%</span><span style="font-size:11px;color:var(--tx3);margin-left:3px">/50%</span></div></div><div class="PBG"><div class="PF r" id="s6b" style="width:0%"></div></div></div>
+  <div style="margin-top:10px;padding:9px 12px;background:var(--bg2);border-radius:7px;border:1px solid var(--bdr)"><div style="font-size:11px;color:var(--tx2)">ยังต้องทำ: <span style="color:var(--orange);font-weight:700;font-family:var(--m)" id="s6r">—</span></div><div style="font-size:11px;color:var(--tx2);margin-top:3px">ห้องที่ทำแล้ว: <span style="color:var(--tx);font-weight:700;font-family:var(--m)" id="s6rm">—</span></div></div>
 </div>
 </div>
+
 <div class="card" id="zone-s7">
-  <div class="SH"><div class="SN" style="background:#f57c00">7</div><div class="ST">งานฉาบผนังภายใน (ชั้น 4 และ ชั้น 2)</div><div class="Stg" style="margin-left:auto">เป้า 40%</div><span style="font-size:10px;color:var(--tx3);background:var(--bg2);border:1px solid var(--bdr);padding:2px 7px;border-radius:4px">9 ห้อง · น้ำหนักห้องละ 4.44%</span></div>
-  <!-- summary bar + stats -->
-  <div class="PW"><div class="PM"><span class="PL">ความคืบหน้าฉาบผนัง (รวม)</span><span class="PP" id="s7p" style="color:var(--orange)">0%</span><span style="font-size:11px;color:var(--tx3);margin-left:4px">/40%</span></div><div class="PBG"><div class="PF o" id="s7b" style="width:0%"></div></div></div>
-  <input type="hidden" id="s7" value="0">
-  <div style="margin-top:9px;padding:9px 12px;background:var(--bg2);border-radius:7px;border:1px solid var(--bdr);margin-bottom:14px"><div style="display:flex;justify-content:space-between"><span style="font-size:11px;color:var(--tx2)">ทำแล้ว: <span style="color:var(--green);font-weight:700;font-family:var(--m)" id="s7dr">0 ห้อง</span></span><span style="font-size:11px;color:var(--tx2)">ยังต้องทำ: <span style="color:var(--orange);font-weight:700;font-family:var(--m)" id="s7r">40%</span></span></div></div>
-  <!-- rooms + chart: stack on mobile, side-by-side on desktop -->
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start">
-    <div>
-      <div style="font-size:11px;color:var(--tx2);margin-bottom:9px">กรอก % แต่ละห้อง (ห้องละ 4.44%)</div>
-      <div id="prooms" style="display:flex;flex-direction:column;gap:7px"></div>
+  <div class="SH"><div class="SN" style="background:#f57c00">7</div><div class="ST">งานฉาบผนังภายใน (ชั้น 4 และ ชั้น 2)</div><div class="Stg" style="margin-left:auto">เป้า 40%</div><span style="font-size:10px;color:var(--tx3);background:var(--bg2);border:1px solid var(--bdr);padding:2px 7px;border-radius:4px">น้ำหนักห้องละ 4.55%</span></div>
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;padding:10px 14px;background:rgba(255,149,0,.07);border:1px solid rgba(255,149,0,.25);border-radius:8px">
+    <span style="font-size:22px">🎯</span>
+    <div><div style="font-size:11px;color:var(--tx3);margin-bottom:2px">จำนวนเป้าหมาย</div><div style="font-size:20px;font-weight:800;font-family:var(--m);color:var(--orange)">9 ห้อง <span style="font-size:13px;font-weight:600;color:var(--tx3)">(40% ของ 22 ห้อง)</span></div></div>
+  </div>
+  <div class="G2" style="gap:16px;align-items:stretch">
+    <div style="display:flex;flex-direction:column">
+      <div class="PW"><div class="PM"><span class="PL">ความคืบหน้าฉาบผนัง</span><div class="IG"><input type="hidden" id="s7" value="18.2"><input class="PI" type="text" inputmode="decimal" pattern="[0-9.]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="s7r-inp" maxlength="4" value="4" oninput="updRooms('s7',this.value,22)" style="width:54px"><span class="Ps">ห้อง</span><span class="PP" id="s7p" style="color:var(--orange);font-size:18px;font-weight:800">18.2%</span><span style="font-size:11px;color:var(--tx3);margin-left:3px">/40%</span></div></div><div class="PBG"><div class="PF o" id="s7b" style="width:18.2%"></div></div></div>
+      <div style="margin-top:9px;padding:9px 12px;background:var(--bg2);border-radius:7px;border:1px solid var(--bdr)"><div style="display:flex;justify-content:space-between"><span style="font-size:11px;color:var(--tx2)">ทำแล้ว: <span style="color:var(--green);font-weight:700;font-family:var(--m)" id="s7dr">4 ห้อง</span></span><span style="font-size:11px;color:var(--tx2)">ยังต้องทำ: <span style="color:var(--orange);font-weight:700;font-family:var(--m)" id="s7r">21.8%</span></span></div></div>
+      <div style="margin-top:6px;background:var(--bg2);border:1px solid var(--bdr);border-radius:9px;padding:12px 14px;flex:1;display:flex;flex-direction:column">
+        <div style="font-size:11px;font-weight:700;color:var(--orange);margin-bottom:8px;flex-shrink:0">📈 กราฟความคืบหน้า vs เป้าหมาย</div>
+        <div style="position:relative;flex:1"><canvas id="s7LineChart"></canvas></div>
+      </div>
     </div>
-    <div style="background:var(--bg2);border:1px solid var(--bdr);border-radius:9px;padding:12px 14px">
-      <div style="font-size:11px;font-weight:700;color:var(--orange);margin-bottom:8px">📈 กราฟความคืบหน้าแต่ละห้อง vs เป้าหมาย</div>
-      <div style="position:relative;height:260px"><canvas id="s7LineChart"></canvas></div>
-    </div>
+    <div><div style="font-size:11px;color:var(--tx2);margin-bottom:9px">สถานะห้อง (แต่ละช่อง = 4.55%)</div><div class="PR" id="prooms"></div></div>
   </div>
 </div>
+
 <div class="SB" id="zone-summary">
   <div class="SBt">สรุปภาพรวมโครงการ</div>
   <div class="SBg" id="sbg"></div>
@@ -615,25 +628,6 @@ body.view-mode .edit-only{display:none!important}
   </div>
 </div>
 
-<!-- FIREBASE URL MODAL -->
-<div id="fb-modal" style="display:none;position:fixed;inset:0;z-index:99997;background:rgba(4,8,16,.95);backdrop-filter:blur(16px);align-items:center;justify-content:center;padding:16px">
-  <div style="background:#08111e;border:1px solid rgba(56,139,253,.25);border-radius:14px;padding:24px 22px;width:100%;max-width:420px;box-shadow:0 8px 40px rgba(0,0,0,.7)">
-    <div style="font-size:16px;font-weight:800;color:#dce8fb;margin-bottom:6px">&#9729;&#65039; ลงทะเบียน Firebase</div>
-    <div style="font-size:11px;color:var(--tx3);font-family:var(--m);margin-bottom:16px">วาง Firebase Realtime Database URL</div>
-    <div style="font-size:10px;color:var(--tx3);margin-bottom:6px">ตัวอย่าง: https://your-project.firebaseio.com</div>
-    <input id="fb-url-inp" type="text" inputmode="url" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false"
-      placeholder="https://your-project.firebaseio.com"
-      style="width:100%;background:#040b14;border:1.5px solid #101e2e;border-radius:8px;padding:12px;color:#c0d4ec;font-size:16px;font-family:var(--m);outline:none;transition:border .2s;-webkit-user-select:text;user-select:text;box-sizing:border-box;touch-action:manipulation;min-height:48px;cursor:text;-webkit-appearance:none;appearance:none"
-      oninput="onFbUrlInput(this.value)"
-      onkeydown="if(event.key==='Enter')doFbSave()">
-    <div id="fb-url-hint" style="font-size:10px;min-height:14px;margin-top:5px;font-family:var(--m)"></div>
-    <div style="display:flex;gap:8px;margin-top:16px">
-      <button id="fb-ok-btn" onclick="doFbSave()" style="flex:1;padding:10px;border:none;border-radius:8px;background:linear-gradient(135deg,#1740b8,#1e90d4);color:#fff;font-size:13px;font-weight:700;cursor:pointer">OK</button>
-      <button onclick="closeFbModal()" style="padding:10px 16px;border:1px solid #101e2e;border-radius:8px;background:transparent;color:#445566;font-size:13px;cursor:pointer">ยกเลิก</button>
-    </div>
-    <button onclick="clearFbUrl()" style="width:100%;margin-top:8px;padding:8px;border:1px solid #101e2e;border-radius:8px;background:transparent;color:#445566;font-size:11px;cursor:pointer">ลบ URL ที่บันทึกไว้</button>
-  </div>
-</div>
 </div>
 <script>
 const FD=[
@@ -725,11 +719,7 @@ function doChangePw(){
   showToast('เปลี่ยนรหัสผ่านสำเร็จ 🔑','ok');
 }
 
-let _fbUrl=(()=>{
-  const preset='https://apartment-phase1-default-rtdb.firebaseio.com';
-  if(!localStorage.getItem('cp_fb_url'))localStorage.setItem('cp_fb_url',preset);
-  return localStorage.getItem('cp_fb_url')||preset;
-})();
+let _fbUrl=localStorage.getItem('cp_fb_url')||'';
 let _saveTimer=null,_lastSavedAt='';
 function fbPath(){return _fbUrl.replace(/\/+$/,'')+'/construction_progress.json';}
 function isFirebaseReady(){return _fbUrl&&_fbUrl.startsWith('https://');}
@@ -747,14 +737,14 @@ function setSvStatus(st,msg,time=''){
 }
 
 function collectState(){
-  return{s1:gv('s1'),s4t:gv('s4t'),s5:gv('s5'),s6:gv('s6'),s7:gv('s7'),s5rooms:Array.from({length:44},(_,i)=>parseFloat(document.getElementById('s5r'+i)?.value||0)||0),s6rooms:Array.from({length:26},(_,i)=>parseFloat(document.getElementById('s6r'+i)?.value||0)||0),s7rooms:Array.from({length:9},(_,i)=>parseFloat(document.getElementById('s7r'+i)?.value||0)||0),s7cors:Array.from({length:9},(_,i)=>parseFloat(document.getElementById('s7c'+i)?.value||0)||0),s5r:parseFloat(document.getElementById('s5r-inp')?.value||0),s6r:parseFloat(document.getElementById('s6r-inp')?.value||0),s7r:parseFloat(document.getElementById('s7r-inp')?.value||0),
+  return{s1:gv('s1'),s4t:gv('s4t'),s5:gv('s5'),s6:gv('s6'),s7:gv('s7'),s5r:parseFloat(document.getElementById('s5r-inp')?.value||0),s6r:parseFloat(document.getElementById('s6r-inp')?.value||0),s7r:parseFloat(document.getElementById('s7r-inp')?.value||0),
     r41:gv('r41'),r42:gv('r42'),r43:gv('r43'),r44:gv('r44'),r45:gv('r45'),
     fd:FD.map(f=>f.pct),od:OD.map(o=>({fd:o.fd,bd:o.bd,sld:o.sld,srd:o.srd})),savedAt:new Date().toISOString()};
 }
 function applyState(s){
   if(!s)return;
   const sv=(id,v)=>{const e=document.getElementById(id);if(e)e.value=v;};
-  sv('s1',s.s1);sv('s4t',s.s4t);sv('s5',s.s5);sv('s6',s.s6);sv('s7',s.s7);if(s.s5rooms)s.s5rooms.forEach((v,i)=>{const e=document.getElementById('s5r'+i);if(e)e.value=v;});if(s.s6rooms)s.s6rooms.forEach((v,i)=>{const e=document.getElementById('s6r'+i);if(e)e.value=v;});if(s.s7rooms)s.s7rooms.forEach((v,i)=>{const e=document.getElementById('s7r'+i);if(e)e.value=v;});if(s.s7cors)s.s7cors.forEach((v,i)=>{const e=document.getElementById('s7c'+i);if(e)e.value=v;});
+  sv('s1',s.s1);sv('s4t',s.s4t);sv('s5',s.s5);sv('s6',s.s6);sv('s7',s.s7);
   // restore room-based visible inputs
   if(s.s5r!==undefined){const e=document.getElementById('s5r-inp');if(e)e.value=s.s5r;}else{const e=document.getElementById('s5r-inp');if(e)e.value=Math.round(gv('s5')/100*44);}
   if(s.s6r!==undefined){const e=document.getElementById('s6r-inp');if(e)e.value=s.s6r;}else{const e=document.getElementById('s6r-inp');if(e)e.value=Math.round(gv('s6')/100*26);}
@@ -765,7 +755,7 @@ function applyState(s){
   buildS2(true);buildS3();
   ['s1','s4t','s5','s6','s7'].forEach(id=>setBar(id,id+'b',id+'p'));
   ['r41','r42','r43','r44','r45'].forEach(id=>setBar(id,id+'b',id+'p'));
-  buildS5S6UI(true);updS5S6Rooms('s5');updS5S6Rooms('s6');buildPlasterUI(true);updPlaster();buildDonuts();updS7Chart();ra();
+  updPlaster();buildDonuts();updS7Chart();ra();
 }
 async function saveData(){
   if(!isFirebaseReady()){showFirebaseGuide();return;}
@@ -802,12 +792,10 @@ async function loadData(){
   }
 }
 function scheduleAutoSave(){
-  // บันทึก localStorage ทันทีเสมอ (ป้องกันข้อมูลหายเมื่อ refresh)
-  try{localStorage.setItem('cp_backup',JSON.stringify(collectState()));}catch(e){}
-  if(!isFirebaseReady()){setSvStatus('saved','💾 บันทึกท้องถิ่น');return;}
+  if(!isFirebaseReady())return;
   clearTimeout(_saveTimer);
   setSvStatus('unsaved','● มีการเปลี่ยนแปลง...');
-  _saveTimer=setTimeout(saveData,1500);
+  _saveTimer=setTimeout(saveData,2500);
 }
 function clearData(){
   if(!confirm('ล้างข้อมูลทั้งหมด (รีเซ็ตเป็นค่าเริ่มต้น)?'))return;
@@ -819,44 +807,20 @@ function clearData(){
   updPlaster();buildDonuts();ra();scheduleAutoSave();showToast('ล้างข้อมูลแล้ว','info');
 }
 function showFirebaseGuide(){
-  const inp=document.getElementById('fb-url-inp');
-  if(inp)inp.value=_fbUrl||'';
-  document.getElementById('fb-url-hint').textContent='';
-  const m=document.getElementById('fb-modal');
-  if(m){m.style.display='flex';setTimeout(()=>{if(inp){inp.blur();inp.focus();inp.click();}},200);}
-}
-function onFbUrlInput(v){
-  const hint=document.getElementById('fb-url-hint');
-  if(!hint)return;
-  if(!v){hint.textContent='';return;}
-  if(v.startsWith('https://')){hint.textContent='✅ URL ถูกต้อง';hint.style.color='var(--green)';
-  }else{hint.textContent='❌ ต้องขึ้นต้นด้วย https://';hint.style.color='var(--red)';}
-}
-function doFbSave(){
-  const v=(document.getElementById('fb-url-inp')?.value||'').trim();
-  if(v&&v.startsWith('https://')){
-    _fbUrl=v;localStorage.setItem('cp_fb_url',_fbUrl);
-    closeFbModal();showToast('ตั้งค่า Firebase สำเร็จ! ☁️','ok',5000);
-  }else if(!v){closeFbModal();}
+  const cur=_fbUrl;
+  const url=prompt('วาง Firebase Realtime Database URL ของคุณ\n(ตัวอย่าง: https://your-project.firebaseio.com)\n\nURL ปัจจุบัน: '+(cur||'(ยังไม่ได้ตั้งค่า)'),cur);
+  if(url===null)return;
+  if(url&&url.startsWith('https://')){_fbUrl=url.trim();localStorage.setItem('cp_fb_url',_fbUrl);showToast('ตั้งค่า Firebase สำเร็จ! กด 📂 โหลดข้อมูล','ok',5000);}
+  else if(url===''){_fbUrl='';localStorage.removeItem('cp_fb_url');showToast('ลบ Firebase URL แล้ว','info');}
   else{showToast('URL ไม่ถูกต้อง ต้องขึ้นต้นด้วย https://','err');}
-}
-function clearFbUrl(){
-  _fbUrl='';localStorage.removeItem('cp_fb_url');
-  closeFbModal();showToast('ลบ Firebase URL แล้ว','info');
-}
-function closeFbModal(){
-  const m=document.getElementById('fb-modal');if(m)m.style.display='none';
 }
 function showRealtimeGuide(){alert('📡 คู่มือแชร์ Realtime\n\n1. ไปที่ firebase.google.com → สร้าง Project ฟรี\n2. Realtime Database → สร้าง Database → โหมด Test\n3. คัดลอก URL (https://...firebaseio.com)\n4. กดปุ่ม ⚙️ Cloud → วาง URL\n5. กด 💾 บันทึก เพื่ออัพโหลดข้อมูล\n\n🔒 ทุกเครื่องที่ใส่ URL เดียวกัน\nจะแชร์ข้อมูลกัน Realtime!');}
 
 let _autoRefTimer=null;
-let _lastUserInput=0;
 function startAutoRefresh(){
   clearInterval(_autoRefTimer);
   _autoRefTimer=setInterval(async()=>{
     if(!isFirebaseReady())return;
-    // ถ้า user พิมพ์ภายใน 5 วินาทีที่ผ่านมา ข้ามไปก่อน
-    if(Date.now()-_lastUserInput<5000)return;
     try{const res=await fetch(fbPath());if(!res.ok)return;const s=await res.json();if(!s)return;
       if(s.savedAt&&s.savedAt!==_lastSavedAt){_lastSavedAt=s.savedAt;applyState(s);setSvStatus('saved','🔄 รีเฟรชอัตโนมัติ',new Date(s.savedAt).toLocaleString('th-TH'));}
     }catch(e){}
@@ -1057,95 +1021,14 @@ function updS3Area(){
 }
 function toggleS3Line(i){if(!_s3Chart)return;const meta=_s3Chart.getDatasetMeta(i);meta.hidden=!meta.hidden;_s3Chart.update();const el=document.getElementById('s3-leg-'+i);if(el)el.style.opacity=meta.hidden?'0.3':'1';}
 
-function buildPlasterUI(force=false){
-  const ROOMS=9,WTP=40/ROOMS;
-  const isView=document.body.classList.contains('view-mode');
-  const cont=document.getElementById('prooms');if(!cont)return;
-  if(isView){
-    const vals=Array.from({length:ROOMS},(_,i)=>({
-      r:parseFloat(document.getElementById('s7r'+i)?.value||0)||0,
-      c:parseFloat(document.getElementById('s7c'+i)?.value||0)||0
-    }));
-    let h='<div style="display:flex;flex-wrap:wrap;gap:8px">';
-    vals.forEach(({r,c},i)=>{
-      const contrib=Math.min(WTP,(r*0.8+c*0.2)*WTP/100);
-      const col=contrib>=WTP*0.9?'var(--green)':contrib>=WTP*0.5?'var(--blue)':contrib>=WTP*0.3?'var(--orange)':'var(--red)';
-      h+=`<div id="s7card${i}" style="width:84px;padding:10px 6px;border-radius:var(--rs);text-align:center;border:1px solid;background:${contrib>=WTP*0.9?'var(--dg)':'rgba(255,255,255,.03)'};border-color:${contrib>=WTP*0.9?'rgba(0,230,118,.4)':'var(--bdr)'}">
-        <div style="font-size:10px;font-weight:700;color:var(--tx2);margin-bottom:3px">ห้อง ${i+1}</div>
-        <div id="s7cv${i}" style="font-size:18px;font-weight:800;font-family:var(--m);color:${col};line-height:1.1">${contrib.toFixed(2)}<span style="font-size:9px">%</span></div>
-        <div style="font-size:9px;color:var(--tx3);margin-top:2px">ใน:${r.toFixed(0)}% เดิน:${c.toFixed(0)}%</div>
-        <div style="height:3px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;margin-top:4px"><div id="s7cb${i}" style="height:100%;width:${Math.min(100,contrib/WTP*100)}%;background:${col};border-radius:99px"></div></div>
-        <input type="hidden" id="s7r${i}" value="${r}">
-        <input type="hidden" id="s7c${i}" value="${c}">
-      </div>`;
-    });
-    h+='</div>';
-    cont.innerHTML=h;
-  }else{
-    if(!force&&cont.querySelector('#s7r0'))return;
-    let h='';
-    for(let i=0;i<ROOMS;i++){
-      const r=parseFloat(document.getElementById('s7r'+i)?.value||0)||0;
-      const c=parseFloat(document.getElementById('s7c'+i)?.value||0)||0;
-      const clr=r>=90?'g':r>=50?'b':r>=30?'o':'r';
-      const clc=c>=90?'g':c>=50?'b':c>=30?'o':'r';
-      const contrib=Math.min(WTP,(r*0.8+c*0.2)*WTP/100);
-      const checked=r>=100&&c>=100;
-      h+=`<div id="s7row${i}" style="background:var(--bg2);border:1px solid ${checked?'rgba(0,230,118,.4)':'var(--bdr)'};border-radius:var(--rs);padding:8px 10px;margin-bottom:2px">
-        <div style="display:flex;align-items:center;gap:8px">
-          <div id="s7chk${i}" style="width:20px;height:20px;border-radius:4px;border:2px solid ${checked?'var(--green)':'var(--tx3)'};background:${checked?'var(--green)':'transparent'};flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s">${checked?'<svg width="11" height="11" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2" stroke="#000" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>':''}</div>
-          <div style="font-size:11px;font-weight:700;color:var(--tx);min-width:56px">ห้องที่ ${i+1}</div>
-          <div style="flex:1"><div class="PBG" style="height:5px"><div id="s7pb${i}" class="PF ${clr}" style="width:${Math.min(100,r)}%"></div></div></div>
-          <input class="PI" type="text" inputmode="decimal" pattern="[0-9.]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="s7r${i}" value="${r}" oninput="updPlaster();updS7Chart();ra();scheduleAutoSave()" style="width:48px;min-width:0;flex-shrink:0;-webkit-user-select:text;user-select:text;font-size:14px">
-          <span class="Ps">%</span>
-          <span id="s7pct${i}" style="font-size:10px;font-family:var(--m);color:var(--tx3);min-width:38px;text-align:right">${contrib.toFixed(2)}%</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;margin-top:5px;padding-left:28px">
-          <div style="font-size:10px;color:var(--tx3);min-width:56px">↳ ทางเดิน</div>
-          <div style="flex:1"><div class="PBG" style="height:4px"><div id="s7cpb${i}" class="PF ${clc}" style="width:${Math.min(100,c)}%"></div></div></div>
-          <input class="PI" type="text" inputmode="decimal" pattern="[0-9.]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="s7c${i}" value="${c}" oninput="updPlaster();updS7Chart();ra();scheduleAutoSave()" style="width:48px;min-width:0;flex-shrink:0;-webkit-user-select:text;user-select:text;font-size:14px">
-          <span class="Ps">%</span>
-        </div>
-      </div>`;
-    }
-    cont.innerHTML=h;
-  }
-}
 function updPlaster(){
-  const ROOMS=9,WTP=40/ROOMS;
-  const isView=document.body.classList.contains('view-mode');
-  let totalPct=0,doneCount=0;
-  for(let i=0;i<ROOMS;i++){
-    const r=parseFloat(document.getElementById('s7r'+i)?.value||0)||0;
-    const c=parseFloat(document.getElementById('s7c'+i)?.value||0)||0;
-    const contrib=Math.min(WTP,(r*0.8+c*0.2)*WTP/100);
-    totalPct+=contrib;
-    const checked=r>=100&&c>=100;if(checked)doneCount++;
-    const col=contrib>=WTP*0.9?'var(--green)':contrib>=WTP*0.5?'var(--blue)':contrib>=WTP*0.3?'var(--orange)':'var(--red)';
-    const clr=r>=90?'g':r>=50?'b':r>=30?'o':'r';
-    const clc=c>=90?'g':c>=50?'b':c>=30?'o':'r';
-    if(isView){
-      const card=document.getElementById('s7card'+i);
-      if(card){card.style.background=contrib>=WTP*0.9?'var(--dg)':'rgba(255,255,255,.03)';card.style.borderColor=contrib>=WTP*0.9?'rgba(0,230,118,.4)':'var(--bdr)';}
-      const cv=document.getElementById('s7cv'+i);if(cv){cv.style.color=col;cv.innerHTML=contrib.toFixed(2)+'<span style="font-size:9px">%</span>';}
-      const cb=document.getElementById('s7cb'+i);if(cb){cb.style.width=Math.min(100,contrib/WTP*100)+'%';cb.style.background=col;}
-    }else{
-      const row=document.getElementById('s7row'+i);if(row)row.style.borderColor=checked?'rgba(0,230,118,.4)':'var(--bdr)';
-      const chk=document.getElementById('s7chk'+i);
-      if(chk){chk.style.background=checked?'var(--green)':'transparent';chk.style.borderColor=checked?'var(--green)':'var(--tx3)';chk.innerHTML=checked?'<svg width="11" height="11" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2" stroke="#000" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>':'';}
-      const pb=document.getElementById('s7pb'+i);if(pb){pb.style.width=Math.min(100,r)+'%';pb.className='PF '+clr;}
-      const cpb=document.getElementById('s7cpb'+i);if(cpb){cpb.style.width=Math.min(100,c)+'%';cpb.className='PF '+clc;}
-      const pct=document.getElementById('s7pct'+i);if(pct){pct.textContent=contrib.toFixed(2)+'%';pct.style.color=col;}
-    }
-  }
-  totalPct=Math.min(40,totalPct);
-  const hid=document.getElementById('s7');if(hid)hid.value=totalPct.toFixed(4);
-  setBar('s7','s7b','s7p');
+  const v=gv('s7'),rooms=22,wt=4.545,done=Math.round(v/wt);
   const dr=document.getElementById('s7dr'),r=document.getElementById('s7r');
-  if(dr)dr.textContent=doneCount+' ห้อง';
-  if(r)r.textContent=(40-totalPct).toFixed(2)+'%';
-  const s7p=document.getElementById('s7p');
-  if(s7p){s7p.textContent=totalPct.toFixed(2)+'%';s7p.style.color=totalPct>=40?'var(--green)':totalPct>=20?'var(--orange)':'var(--red)';}
+  if(dr)dr.textContent=done+' ห้อง';if(r)r.textContent=(100-v).toFixed(2)+'%';
+  const c=document.getElementById('prooms');if(!c)return;
+  let h='';
+  for(let i=0;i<rooms;i++){const dn=i<done;h+=`<div class="PB ${dn?'dn':'pd'}"><div class="pn">${i+1}</div><div class="pl">${dn?'✅':'⬜'}</div><div class="pp">${ceilTo2(wt*(i+1))}%</div></div>`;}
+  c.innerHTML=h;
 }
 function updPlaster2(rooms,total){
   const wt=parseFloat((100/total).toFixed(4)),done=rooms;
@@ -1271,55 +1154,14 @@ function updRooms(key,v,total){
   if(key==='s7'){updPlaster2(rooms,total);updS7Chart();}
   ra();scheduleAutoSave();
 }
-function buildS5S6UI(force=false){
-  [{key:'s5',total:44},{key:'s6',total:26}].forEach(({key,total})=>{
-    const c=document.getElementById(key+'rooms');if(!c)return;
-    if(!force&&c.querySelector('#'+key+'r0'))return;
-    let h='';
-    for(let i=0;i<total;i++){
-      const val=parseFloat(document.getElementById(key+'r'+i)?.value||0)||0;
-      const cl=val>=90?'g':val>=50?'b':val>=30?'o':'r';
-      const checked=val>=100;
-      h+=`<div id="${key}row${i}" style="background:var(--bg2);border:1px solid ${checked?'rgba(0,230,118,.4)':'var(--bdr)'};border-radius:var(--rs);padding:7px 10px;display:flex;align-items:center;gap:8px;transition:border-color .2s">
-        <div id="${key}chk${i}" style="width:20px;height:20px;border-radius:4px;border:2px solid ${checked?'var(--green)':'var(--tx3)'};background:${checked?'var(--green)':'transparent'};flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s">${checked?'<svg width="11" height="11" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2" stroke="#000" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>':''}</div>
-        <div style="font-size:11px;font-weight:700;min-width:52px;color:var(--tx2)">ห้องที่ ${i+1}</div>
-        <div style="flex:1"><div class="PBG" style="height:5px"><div id="${key}pb${i}" class="PF ${cl}" style="width:${Math.min(100,val)}%"></div></div></div>
-        <input class="PI" type="text" inputmode="decimal" pattern="[0-9.]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="${key}r${i}" value="${val}" oninput="updS5S6Rooms('${key}');ra();scheduleAutoSave()" style="width:50px;min-width:0;flex-shrink:0;-webkit-user-select:text;user-select:text;font-size:14px">
-        <span class="Ps">%</span>
-      </div>`;
-    }
-    c.innerHTML=h;
-  });
-}
-function updS5S6Rooms(key){
-  const cfg={s5:{total:44,tgt:80},s6:{total:26,tgt:50}};
-  const {total,tgt}=cfg[key];
-  let sum=0,done=0;
-  for(let i=0;i<total;i++){
-    const val=parseFloat(document.getElementById(key+'r'+i)?.value||0)||0;
-    sum+=val; if(val>=100)done++;
-    const cl=val>=90?'g':val>=50?'b':val>=30?'o':'r';
-    const checked=val>=100;
-    const row=document.getElementById(key+'row'+i);if(row)row.style.borderColor=checked?'rgba(0,230,118,.4)':'var(--bdr)';
-    const chk=document.getElementById(key+'chk'+i);
-    if(chk){chk.style.background=checked?'var(--green)':'transparent';chk.style.borderColor=checked?'var(--green)':'var(--tx3)';chk.innerHTML=checked?'<svg width="11" height="11" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2" stroke="#000" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>':'';}
-    const pb=document.getElementById(key+'pb'+i);if(pb){pb.style.width=Math.min(100,val)+'%';pb.className='PF '+cl;}
-  }
-  const pct=parseFloat((sum/total).toFixed(4));
-  const hid=document.getElementById(key);if(hid)hid.value=pct;
-  setBar(key,key+'b',key+'p');
-  updS5S6();
-}
 function updS5S6(){
   const s5v=gv('s5'),s6v=gv('s6');
-  const s5done=Array.from({length:44},(_,i)=>parseFloat(document.getElementById('s5r'+i)?.value||0)||0).filter(v=>v>=100).length;
-  const s6done=Array.from({length:26},(_,i)=>parseFloat(document.getElementById('s6r'+i)?.value||0)||0).filter(v=>v>=100).length;
   const s5r=document.getElementById('s5r'),s5rm=document.getElementById('s5rm');
   const s6r=document.getElementById('s6r'),s6rm=document.getElementById('s6rm');
-  if(s5r)s5r.textContent=ceilTo2(80-s5v)+'% (เป้า 80%)';
-  if(s5rm)s5rm.textContent=s5done+'/44 ห้อง (='+ceilTo2(s5v)+'%)';
-  if(s6r)s6r.textContent=ceilTo2(50-s6v)+'% (เป้า 50%)';
-  if(s6rm)s6rm.textContent=s6done+'/26 ห้อง (='+ceilTo2(s6v)+'%)';
+  const s5rooms=parseFloat(document.getElementById('s5r-inp')?.value||0);
+  const s6rooms=parseFloat(document.getElementById('s6r-inp')?.value||0);
+  if(s5r)s5r.textContent=ceilTo2(80-s5v)+'% (เป้า 80%)';if(s5rm)s5rm.textContent=s5rooms+'/44 ห้อง (='+ceilTo2(s5v)+'%)';
+  if(s6r)s6r.textContent=ceilTo2(50-s6v)+'% (เป้า 50%)';if(s6rm)s6rm.textContent=s6rooms+'/26 ห้อง (='+ceilTo2(s6v)+'%)';
 }
 
 function ra(){
@@ -1332,11 +1174,11 @@ const SESSION_KEY='cp_edit_session';
 let _isLocked=false,_numBuf='',_lastTouch=0;
 function showLockModal(){document.getElementById('lock-modal').classList.add('show');}
 function closeLockModal(){document.getElementById('lock-modal').classList.remove('show');_numBuf='';_syncDots();}
-function applyViewMode(){document.body.classList.add('view-mode');setTimeout(()=>{buildS5S6UI();buildPlasterUI();updPlaster();},50);_isLocked=true;const link=document.getElementById('lockin-link'),logout=document.getElementById('logout-btn');if(link)link.style.display='';if(logout)logout.style.display='none';}
-function applyEditMode(){document.body.classList.remove('view-mode');setTimeout(()=>{document.getElementById('prooms').innerHTML='';buildS5S6UI();buildPlasterUI();updPlaster();},50);_isLocked=false;sessionStorage.setItem(SESSION_KEY,'1');const link=document.getElementById('lockin-link'),logout=document.getElementById('logout-btn');if(link)link.style.display='none';if(logout)logout.style.display='';showGreeting();}
+function applyViewMode(){document.body.classList.add('view-mode');_isLocked=true;const link=document.getElementById('lockin-link'),logout=document.getElementById('logout-btn');if(link)link.style.display='';if(logout)logout.style.display='none';}
+function applyEditMode(){document.body.classList.remove('view-mode');_isLocked=false;sessionStorage.setItem(SESSION_KEY,'1');const link=document.getElementById('lockin-link'),logout=document.getElementById('logout-btn');if(link)link.style.display='none';if(logout)logout.style.display='';showGreeting();}
 function showGreeting(){const d=document.createElement('div');d.style.cssText='position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;pointer-events:none';d.innerHTML=`<div style="background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:36px 72px;backdrop-filter:blur(20px);box-shadow:0 12px 60px rgba(0,0,0,.5);animation:greetIn .35s cubic-bezier(.34,1.56,.64,1) both"><span style="font-size:42px;font-weight:800;color:#e8f0fe;font-family:'Sarabun',sans-serif;letter-spacing:1px">สวัสดี ค่ะ</span></div>`;document.body.appendChild(d);setTimeout(()=>{d.firstElementChild.style.cssText+=';animation:greetOut .3s ease forwards';setTimeout(()=>d.remove(),300);},3000);}
 function doLogout(){sessionStorage.removeItem(SESSION_KEY);applyViewMode();showToast('ออกจากระบบแล้ว 🔒','ok');}
-function numPress(n){const now=Date.now();if(now-_lastTouch<300)return;_lastTouch=now;if(_numBuf.length>=6)return;_numBuf+=n;_syncDots();if(_numBuf.length===6){setTimeout(doUnlock,120);}}
+function numPress(n){const now=Date.now();if(now-_lastTouch<80)return;_lastTouch=now;if(_numBuf.length>=6)return;_numBuf+=n;_syncDots();if(_numBuf.length===6){setTimeout(doUnlock,120);}}
 function numDel(){_numBuf=_numBuf.slice(0,-1);_syncDots();}
 function numClear(){_numBuf='';_syncDots();}
 function _syncDots(){for(let i=0;i<6;i++){const d=document.getElementById('d'+i);if(d)d.classList.toggle('filled',i<_numBuf.length);}}
@@ -1350,32 +1192,16 @@ function doUnlock(){
 let _s7Chart=null;
 function buildS7Chart(){
   const ctx=document.getElementById('s7LineChart')?.getContext('2d');if(!ctx)return;if(_s7Chart)_s7Chart.destroy();
-  const ROOMS=9,WTP=40/ROOMS,cols=['#00e676','#00d4ff','#ff9500','#ff4444','#ce93d8','#388bfd','#ffd600','#00bcd4','#f48fb1'];
-  const labels=Array.from({length:ROOMS},(_,i)=>'ห้องที่ '+(i+1));
-  // dataset แต่ละห้อง = % สมทบของห้องนั้น (0 ถึง WTP)
-  const datasets=Array.from({length:ROOMS},(_,i)=>{
-    const val=parseFloat(document.getElementById('s7r'+i)?.value||0)||0;
-    const contrib=Math.min(WTP,val*WTP/100);
-    const data=labels.map((_,j)=>j===i?contrib:null);
-    return{label:'ห้องที่ '+(i+1),data,borderColor:cols[i],backgroundColor:cols[i]+'44',
-      pointRadius:8,pointHoverRadius:10,pointBackgroundColor:cols[i],pointBorderColor:'#080d14',pointBorderWidth:2,
-      borderWidth:2,spanGaps:false,showLine:false};
-  });
-  // เส้นเป้าหมาย WTP ต่อห้อง
-  datasets.push({label:'เป้า/ห้อง',data:labels.map(()=>WTP),
-    borderColor:'rgba(56,139,253,.6)',backgroundColor:'transparent',fill:false,
-    tension:0,pointRadius:0,borderWidth:1.5,borderDash:[6,4],showLine:true});
-  _s7Chart=new Chart(ctx,{type:'line',data:{labels,datasets},
-    options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},
-        tooltip:{backgroundColor:'rgba(8,13,20,.95)',borderColor:'rgba(56,139,253,.3)',borderWidth:1,
-          titleColor:'#e8f0fe',bodyColor:'#8899aa',padding:9,
-          callbacks:{label:c=>c.parsed.y!=null?` ${c.dataset.label}: ${c.parsed.y.toFixed(2)}%`:null}}},
-      scales:{
-        x:{ticks:{color:'#8899aa',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'},border:{color:'rgba(56,139,253,.1)'}},
-        y:{min:0,max:Math.ceil(WTP*1.3),ticks:{color:'#8899aa',font:{size:9},callback:v=>v.toFixed(1)+'%'},
-          grid:{color:'rgba(255,255,255,.04)'},border:{color:'rgba(56,139,253,.1)'}}
-      },animation:{duration:600}}});
+  const logs=getDailyLog(),DAYS=25,tgt=40;
+  const dayLabels=Array.from({length:DAYS},(_,i)=>'วัน '+(i+1));
+  const targetLine=dayLabels.map((_,i)=>parseFloat(((tgt/(DAYS-1))*i).toFixed(2)));
+  const actualPoints=logs.slice(-DAYS).map(l=>parseFloat((l.vals?.[6]||0).toFixed(1)));
+  const actualLine=dayLabels.map((_,i)=>i<actualPoints.length?actualPoints[i]:null);
+  const curVal=gv('s7');if(actualLine.every(v=>v===null)||actualPoints.length===0)actualLine[0]=curVal;
+  _s7Chart=new Chart(ctx,{type:'line',data:{labels:dayLabels,datasets:[
+    {label:'ที่ควรทำได้ (เป้า)',data:targetLine,borderColor:'rgba(56,139,253,.7)',backgroundColor:'rgba(56,139,253,.08)',fill:true,tension:.4,pointRadius:0,borderWidth:2,borderDash:[6,4]},
+    {label:'ที่ทำได้จริง',data:actualLine,borderColor:'#ff9500',backgroundColor:'rgba(255,149,0,.15)',fill:true,tension:.4,pointRadius:(ctx)=>ctx.dataIndex===actualPoints.length-1||actualPoints.length===0?5:2,pointBackgroundColor:'#ff9500',borderWidth:2.5,spanGaps:false}
+  ]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:true,position:'top',labels:{color:'#8899aa',font:{size:10},boxWidth:20,padding:8}},tooltip:{backgroundColor:'rgba(8,13,20,.95)',borderColor:'rgba(56,139,253,.3)',borderWidth:1,titleColor:'#e8f0fe',bodyColor:'#8899aa',padding:9,callbacks:{label:c=>` ${c.dataset.label}: ${c.parsed.y!=null?c.parsed.y.toFixed(1):''}%`}}},scales:{x:{ticks:{color:'#8899aa',font:{size:9},maxTicksLimit:8},grid:{color:'rgba(255,255,255,.03)'},border:{color:'rgba(56,139,253,.1)'}},y:{min:0,max:45,ticks:{color:'#8899aa',font:{size:9},callback:v=>v+'%'},grid:{color:'rgba(255,255,255,.04)'},border:{color:'rgba(56,139,253,.1)'}}},animation:{duration:600}}});
 }
 function updS7Chart(){setTimeout(()=>{buildS7Chart();},50);}
 
@@ -1426,7 +1252,6 @@ function exportChecklistPDF(){
   const p1=CHECKLIST_DATA.filter(g=>['A','B','D'].includes(g.id)).map(buildSec).join('');
   const p2=CHECKLIST_DATA.filter(g=>['C','E'].includes(g.id)).map(buildSec).join('');
   const win=window.open('','_blank','width=800,height=1100');
-  if(!win){alert('กรุณาอนุญาต Popup ในเบราว์เซอร์');return;}
   win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Checklist — ${today}</title>
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Sarabun',sans-serif;background:#fff;color:#1a1a2e;font-size:13px}.page{padding:18mm 16mm;min-height:277mm;display:flex;flex-direction:column;page-break-after:always}.page:last-child{page-break-after:avoid}h1{font-size:18px;font-weight:800;margin-bottom:4px}.sub{color:#666;font-size:11px;margin-bottom:16px}.prog{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding:10px 14px;background:#f8f9ff;border:1px solid #c7d2fe;border-radius:8px}.prog-bar{flex:1;height:8px;background:#e2e8f0;border-radius:99px;overflow:hidden}.prog-fill{height:100%;background:linear-gradient(90deg,#059669,#34d399);border-radius:99px}.section{margin-bottom:14px;border:1px solid #e2e8f0;border-left:4px solid;border-radius:0 8px 8px 0;padding:13px 14px}.sec-title{font-weight:700;font-size:13px;margin-bottom:9px}.item{display:flex;align-items:flex-start;gap:9px;margin-bottom:7px;padding:5px 7px;border-radius:5px}.item.done{background:#f0fdf4}.box{width:14px;height:14px;border-radius:3px;border:2px solid #cbd5e1;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center}.box.done{background:#059669;border-color:#059669;color:#fff;font-size:9px;font-weight:700}.item-text{font-size:12px;color:#374151;line-height:1.6}.item.done .item-text{text-decoration:line-through;opacity:.6}.rpt-box{margin-top:16px;padding:14px 16px;background:#f8f9ff;border:1px solid #c7d2fe;border-left:4px solid #1565c0;border-radius:0 8px 8px 0}.rpt-title{font-size:13px;font-weight:700;color:#1565c0;margin-bottom:8px}.rpt-body{font-size:13px;color:#374151;line-height:1.8;white-space:pre-wrap}.footer{margin-top:auto;padding-top:12px;border-top:1px solid #e2e8f0;font-size:10px;color:#9ca3af;text-align:center}@media print{body{font-size:12px}.page{padding:12mm 12mm}}</style>
@@ -1628,11 +1453,13 @@ function init(){
   updPlaster();
   setTimeout(()=>{
     buildPieChart();buildDonuts();buildS7Chart();ra();
-    // Auto-load with preset URL
-    setSvStatus('saving','☁️ กำลังโหลดข้อมูล...');
-    loadData().catch(()=>{
+    if(isFirebaseReady()){
+      setSvStatus('saving','☁️ กำลังซิงค์ข้อมูล...');
+      loadData().catch(()=>{});
+    }else{
       try{const bk=localStorage.getItem('cp_backup');if(bk){applyState(JSON.parse(bk));setSvStatus('saved','💾 โหลดจาก Backup ท้องถิ่น');}}catch(e){}
-    });
+      setSvStatus('','💡 กด ⚙️ Cloud เพื่อตั้งค่า Firebase');
+    }
     startAutoRefresh();
     setTimeout(()=>{
       if(sessionStorage.getItem(SESSION_KEY)==='1'){applyEditMode();}
@@ -1651,11 +1478,11 @@ window.addEventListener('resize',()=>setTimeout(forcePieSquare,50));
 document.addEventListener('input',function(e){
   const el=e.target;
   if(!(el.classList.contains('PI')||el.classList.contains('DCI')))return;
-  _lastUserInput=Date.now(); // บันทึกเวลา user พิมพ์
-  // ไม่แตะ cursor / selection เลย — ป้องกัน keyboard หายบน iPad/iPhone
-  const v=el.value,clean=v.replace(/[^0-9.]/g,'').replace(/\.(?=.*\.)/g,'');
-  if(clean!==v)el.value=clean;
-},true);
+  // iPad: ไม่แตะ cursor ระหว่างพิมพ์ — sanitize เฉพาะ char ที่ไม่ใช่ตัวเลข/จุดเท่านั้น
+  const v=el.value;
+  const clean=v.replace(/[^0-9.]/g,'').replace(/^(\d*\.?\d*).*$/,'$1');
+  if(clean!==v) el.value=clean;
+});
 document.addEventListener('blur',function(e){
   const el=e.target;
   if(!(el.classList.contains('PI')||el.classList.contains('DCI')))return;
@@ -1664,7 +1491,8 @@ document.addEventListener('blur',function(e){
   el.value=Math.min(100,Math.max(0,v));
 },true);
 
-function openExportJpegModal(){
+// Export Full Dashboard as JPEG
+function exportZoneJpeg(){
   const overlay=document.createElement('div');
   overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-family:var(--f);gap:14px';
   overlay.innerHTML='<div style="font-size:18px;font-weight:700">🖼️ กำลัง Export JPEG...</div><div id="_exp_msg" style="font-size:13px;color:#8899aa">กำลังโหลด...</div><div style="width:240px;height:5px;background:rgba(255,255,255,.1);border-radius:99px;overflow:hidden"><div id="_exp_bar" style="height:100%;width:0%;background:#00d4ff;transition:width .4s;border-radius:99px"></div></div>';
@@ -1672,75 +1500,108 @@ function openExportJpegModal(){
   const msg=document.getElementById('_exp_msg');
   const bar=document.getElementById('_exp_bar');
 
-  function loadH2C(cb){
-    if(window.html2canvas)return cb();
-    const s=document.createElement('script');
-    s.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
-    s.onload=cb;document.head.appendChild(s);
-  }
+  const A4W=1200;
 
-  const A4W=794;
-  const pages=[
-    {title:'หน้า 1/2',ids:['zone-kpi','zone-pie','zone-donut','zone-s1s4','zone-s2'],file:'dashboard_page1.jpg'},
-    {title:'หน้า 2/2',ids:['zone-s3','zone-s5s6','zone-s7','zone-summary'],file:'dashboard_page2.jpg'}
-  ];
+  // Ensure charts are rendered
+  try{buildPieChart();}catch(e){}
+  try{buildDonuts();}catch(e){}
+  try{buildS7Chart();}catch(e){}
 
-  loadH2C(async()=>{
-    try{
-      const now=new Date().toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'});
+  try{
+    const now=new Date().toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'});
 
-      for(let pi=0;pi<pages.length;pi++){
-        const pg=pages[pi];
-        msg.textContent=`กำลัง render ${pg.title}...`;
-        bar.style.width=((pi+1)/pages.length*80)+'%';
+    msg.textContent='กำลัง render...';
+    bar.style.width='30%';
 
-        // Clone zones into offscreen wrapper
-        const wrap=document.createElement('div');
-        wrap.style.cssText=`position:fixed;left:-9999px;top:0;width:${A4W}px;padding:24px 28px;background:#0a0f1a;box-sizing:border-box;font-family:'Sarabun',sans-serif`;
-        const hdr=document.createElement('div');
-        hdr.style.cssText='display:flex;align-items:center;justify-content:space-between;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.15);margin-bottom:16px';
-        hdr.innerHTML=`<div style="font-size:15px;font-weight:800;color:#e8f0fe">📋 Construction Progress Dashboard</div><div style="font-size:10px;color:#6b7a8d">${pg.title} · ${now}</div>`;
-        wrap.appendChild(hdr);
-        pg.ids.forEach(id=>{
-          const el=document.getElementById(id);
-          if(!el)return;
-          const cl=el.cloneNode(true);
-          cl.style.marginBottom='14px';
-          cl.style.maxWidth='100%';
-          cl.style.boxSizing='border-box';
-          wrap.appendChild(cl);
-        });
-        document.body.appendChild(wrap);
-        await new Promise(r=>setTimeout(r,300));
+    const wrap=document.createElement('div');
+    wrap.style.cssText=`position:fixed;left:-9999px;top:0;width:${A4W}px;padding:24px 28px;background:#0a0f1a;box-sizing:border-box;font-family:'Sarabun',sans-serif`;
+    const hdr=document.createElement('div');
+    hdr.style.cssText='display:flex;align-items:center;justify-content:space-between;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.15);margin-bottom:16px';
+    hdr.innerHTML=`<div style="font-size:15px;font-weight:800;color:#e8f0fe">📋 Construction Progress Dashboard</div><div style="font-size:10px;color:#6b7a8d">${now}</div>`;
+    wrap.appendChild(hdr);
+
+    // Include all zones
+    const zones=['zone-kpi','zone-pie','zone-donut','zone-s1s4','zone-s2','zone-s3','zone-s5s6','zone-s7','zone-summary'];
+    zones.forEach(id=>{
+      const el=document.getElementById(id);
+      if(!el)return;
+      const cl=el.cloneNode(true);
+      cl.style.marginBottom='14px';
+      cl.style.maxWidth='100%';
+      cl.style.boxSizing='border-box';
+      
+      // Ensure donut tab-all visible
+      if(id==='zone-donut'){
+        cl.querySelectorAll('.DP').forEach(dp=>{dp.style.display='none';});
+        const ta=cl.querySelector('#tab-all');
+        if(ta){ta.style.display='block';}
+        const tabs=cl.querySelector('.TABS');
+        if(tabs)tabs.style.display='none';
+      }
+      
+      wrap.appendChild(cl);
+    });
+
+    document.body.appendChild(wrap);
+    bar.style.width='60%';
+    msg.textContent='กำลัง capture...';
+
+    setTimeout(async ()=>{
+      try{
         const cv=await html2canvas(wrap,{
           scale:2,useCORS:true,
           backgroundColor:'#0a0f1a',
           logging:false,
           width:A4W,
-          windowWidth:A4W
+          windowWidth:A4W,
+          onclone: (clonedDoc) => {
+            try { buildPieChart(); } catch(e) {}
+            try { buildDonuts(); } catch(e) {}
+            try { buildS7Chart(); } catch(e) {}
+          }
         });
         document.body.removeChild(wrap);
 
-        // Download
+        bar.style.width='90%';
+        msg.textContent='กำลัง download...';
+
         const a=document.createElement('a');
         a.href=cv.toDataURL('image/jpeg',.92);
-        a.download=pg.file;
+        a.download='dashboard_full.jpg';
         a.click();
-        await new Promise(r=>setTimeout(r,600));
+
+        bar.style.width='100%';
+        msg.textContent='✅ ดาวน์โหลดสำเร็จ';
+        setTimeout(()=>document.body.removeChild(overlay),1500);
+      }catch(e){
+        msg.textContent='เกิดข้อผิดพลาด: '+e.message;
+        console.error(e);
+        setTimeout(()=>document.body.removeChild(overlay),4000);
       }
-
-      bar.style.width='100%';
-      msg.textContent='✅ ดาวน์โหลดสำเร็จ 2 ไฟล์';
-      setTimeout(()=>document.body.removeChild(overlay),1500);
-
-    }catch(e){
-      msg.textContent='เกิดข้อผิดพลาด: '+e.message;
-      console.error(e);
-      setTimeout(()=>document.body.removeChild(overlay),4000);
-    }
-  });
+    },500);
+  }catch(e){
+    msg.textContent='เกิดข้อผิดพลาด: '+e.message;
+    console.error(e);
+    setTimeout(()=>document.body.removeChild(overlay),4000);
+  }
 }
 
+// Initialize on page load
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded',()=>{
+    setTimeout(()=>{
+      try{buildPieChart();}catch(e){}
+      try{buildDonuts();}catch(e){}
+      try{buildS7Chart();}catch(e){}
+    },500);
+  });
+}else{
+  setTimeout(()=>{
+    try{buildPieChart();}catch(e){}
+    try{buildDonuts();}catch(e){}
+    try{buildS7Chart();}catch(e){}
+  },500);
+}
 </script>
 </body>
 </html>
