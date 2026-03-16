@@ -621,9 +621,9 @@ body.view-mode .edit-only{display:none!important}
     <div style="font-size:16px;font-weight:800;color:#dce8fb;margin-bottom:6px">&#9729;&#65039; ลงทะเบียน Firebase</div>
     <div style="font-size:11px;color:var(--tx3);font-family:var(--m);margin-bottom:16px">วาง Firebase Realtime Database URL</div>
     <div style="font-size:10px;color:var(--tx3);margin-bottom:6px">ตัวอย่าง: https://your-project.firebaseio.com</div>
-    <input id="fb-url-inp" type="text" inputmode="url" autocomplete="url" autocorrect="off" autocapitalize="off" spellcheck="false"
+    <input id="fb-url-inp" type="text" inputmode="url" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false"
       placeholder="https://your-project.firebaseio.com"
-      style="width:100%;background:#040b14;border:1.5px solid #101e2e;border-radius:8px;padding:12px;color:#c0d4ec;font-size:14px;font-family:var(--m);outline:none;transition:border .2s;-webkit-user-select:text;user-select:text;box-sizing:border-box;touch-action:manipulation;min-height:48px;cursor:text"
+      style="width:100%;background:#040b14;border:1.5px solid #101e2e;border-radius:8px;padding:12px;color:#c0d4ec;font-size:16px;font-family:var(--m);outline:none;transition:border .2s;-webkit-user-select:text;user-select:text;box-sizing:border-box;touch-action:manipulation;min-height:48px;cursor:text;-webkit-appearance:none;appearance:none"
       oninput="onFbUrlInput(this.value)"
       onkeydown="if(event.key==='Enter')doFbSave()">
     <div id="fb-url-hint" style="font-size:10px;min-height:14px;margin-top:5px;font-family:var(--m)"></div>
@@ -821,7 +821,7 @@ function showFirebaseGuide(){
   if(inp)inp.value=_fbUrl||'';
   document.getElementById('fb-url-hint').textContent='';
   const m=document.getElementById('fb-modal');
-  if(m){m.style.display='flex';setTimeout(()=>inp?.focus(),80);}
+  if(m){m.style.display='flex';setTimeout(()=>{if(inp){inp.blur();inp.focus();inp.click();}},200);}
 }
 function onFbUrlInput(v){
   const hint=document.getElementById('fb-url-hint');
