@@ -321,7 +321,6 @@ body.view-mode .edit-only{display:none!important}
     <div class="live-badge"><div class="ld"></div>LIVE</div>
     <div class="view-badge">👁️ โหมดดูอย่างเดียว</div>
     <button class="btn btn-g edit-only" onclick="saveData()">💾 บันทึก</button>
-    <button class="btn edit-only" onclick="printDashboard()" style="background:rgba(255,255,255,.08);color:#e8f0fe;border:1px solid rgba(255,255,255,.2)">🖨️ Print</button>
     <button class="btn edit-only" onclick="openExportJpegModal()" style="background:rgba(0,180,255,.15);color:#00d4ff;border:1px solid rgba(0,212,255,.4)">🖼️ Export JPEG</button>
     <button class="btn btn-b" onclick="showFirebaseGuide()" style="font-size:11px">☁️ ลงทะเบียน</button>
     <button class="btn btn-gold edit-only" onclick="showPwChange()">🔑 รหัสผ่าน</button>
@@ -763,7 +762,7 @@ function applyState(s){
   buildS2(true);buildS3();
   ['s1','s4t','s5','s6','s7'].forEach(id=>setBar(id,id+'b',id+'p'));
   ['r41','r42','r43','r44','r45'].forEach(id=>setBar(id,id+'b',id+'p'));
-  buildPlasterUI();updPlaster();buildDonuts();updS7Chart();ra();
+  buildPlasterUI(true);updPlaster();buildDonuts();updS7Chart();ra();
 }
 async function saveData(){
   if(!isFirebaseReady()){showFirebaseGuide();return;}
@@ -1052,7 +1051,7 @@ function updS3Area(){
 }
 function toggleS3Line(i){if(!_s3Chart)return;const meta=_s3Chart.getDatasetMeta(i);meta.hidden=!meta.hidden;_s3Chart.update();const el=document.getElementById('s3-leg-'+i);if(el)el.style.opacity=meta.hidden?'0.3':'1';}
 
-function buildPlasterUI(){
+function buildPlasterUI(force=false){
   // สร้าง DOM ครั้งแรก — เรียกตอน init และ toggle view/edit เท่านั้น
   const ROOMS=9,WTP=40/ROOMS;
   const isView=document.body.classList.contains('view-mode');
@@ -1076,7 +1075,7 @@ function buildPlasterUI(){
     cont.innerHTML=h;
   }else{
     // edit mode: input rows — สร้างแค่ครั้งแรก ต้องไม่ rebuild ขณะพิมพ์
-    if(cont.querySelector('#s7r0'))return; // มีอยู่แล้ว ไม่ rebuild
+    if(!force&&cont.querySelector('#s7r0'))return; // มีอยู่แล้ว ไม่ rebuild
     let h='';
     for(let i=0;i<ROOMS;i++){
       h+=`<div id="s7row${i}" style="background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--rs);padding:9px 12px;display:flex;align-items:center;gap:10px;transition:border-color .2s">
@@ -1602,155 +1601,6 @@ document.addEventListener('blur',function(e){
   if(isNaN(v))v=0;
   el.value=Math.min(100,Math.max(0,v));
 },true);
-
-function printDashboard(){
-  const overlay=document.createElement('div');
-  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-family:var(--f);gap:14px';
-  overlay.innerHTML='<div style="font-size:18px;font-weight:700">🖨️ กำลังเตรียมปริ้นท์...</div><div id="_pr_msg" style="font-size:13px;color:#8899aa">กำลังโหลด...</div><div style="width:240px;height:5px;background:rgba(255,255,255,.1);border-radius:99px;overflow:hidden"><div id="_pr_bar" style="height:100%;width:0%;background:#00e676;transition:width .4s;border-radius:99px"></div></div>';
-  document.body.appendChild(overlay);
-  const msg=document.getElementById('_pr_msg');
-  const bar=document.getElementById('_pr_bar');
-
-  function loadH2C(cb){
-    if(window.html2canvas)return cb();
-    const s=document.createElement('script');
-    s.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
-    s.onload=cb;document.head.appendChild(s);
-  }
-
-  const A4W=794;
-
-  // Ensure S3 detail open for print
-  const s3det=document.getElementById('s3-detail');
-  const s3wasOpen=s3det?.classList.contains('open');
-  if(s3det&&!s3wasOpen){s3det.classList.add('open');try{updS3Area();}catch(e){}}
-
-  // Ensure tab-all visible for donut
-  const tabAll=document.getElementById('tab-all');
-  if(tabAll)tabAll.style.display='block';
-
-  // Ensure S7 chart rendered
-  try{buildS7Chart();}catch(e){}
-
-  // Pages definition
-  const pages=[
-    {title:'หน้า 1/4', ids:['zone-pie','zone-donut']},
-    {title:'หน้า 2/4', ids:['zone-s1s4','zone-s2','zone-s5s6']},
-    {title:'หน้า 3/4', ids:['zone-s3']},
-    {title:'หน้า 4/4', ids:['zone-s7','zone-summary']},
-  ];
-
-  loadH2C(async()=>{
-    try{
-      const now=new Date().toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'});
-      const canvases=[];
-
-      for(let pi=0;pi<pages.length;pi++){
-        const pg=pages[pi];
-        msg.textContent=`กำลัง render ${pg.title}...`;
-        bar.style.width=((pi+1)/pages.length*80)+'%';
-
-        const wrap=document.createElement('div');
-        wrap.style.cssText=`position:fixed;left:-9999px;top:0;width:${A4W}px;padding:20px 24px;background:#0a0f1a;box-sizing:border-box;font-family:'Sarabun',sans-serif`;
-
-        // Header
-        const hdr=document.createElement('div');
-        hdr.style.cssText='display:flex;align-items:center;justify-content:space-between;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.15);margin-bottom:12px';
-        hdr.innerHTML=`<div style="font-size:14px;font-weight:800;color:#e8f0fe">📋 Construction Progress Dashboard</div><div style="font-size:10px;color:#6b7a8d">${pg.title} · ${now}</div>`;
-        wrap.appendChild(hdr);
-
-        // Special: page 1 — show donut tab-all, shrink S7 chart
-        pg.ids.forEach(id=>{
-          const el=document.getElementById(id);
-          if(!el)return;
-          const cl=el.cloneNode(true);
-          cl.style.marginBottom='12px';
-          cl.style.maxWidth='100%';
-          cl.style.boxSizing='border-box';
-
-          // Page 1: ensure donut tab-all visible, hide other tabs
-          if(id==='zone-donut'){
-            cl.querySelectorAll('.DP').forEach(dp=>{dp.style.display='none';});
-            const ta=cl.querySelector('#tab-all');
-            if(ta){ta.style.display='block';}
-            // Hide tab buttons to save space
-            const tabs=cl.querySelector('.TABs,.DS-tabs');
-            if(tabs)tabs.style.display='none';
-          }
-
-          // Page 2: S1S4 — make room cards inline
-          if(id==='zone-s1s4'){
-            cl.style.display='grid';
-            cl.style.gridTemplateColumns='1fr 1fr';
-            cl.style.gap='12px';
-          }
-
-          // Page 3: S3 — open detail
-          if(id==='zone-s3'){
-            const det=cl.querySelector('#s3-detail');
-            if(det){det.classList.add('open');det.style.display='block';}
-          }
-
-          // Page 4: S7 — shrink chart area
-          if(id==='zone-s7'){
-            const chartWrap=cl.querySelector('canvas#s7LineChart')?.parentElement;
-            if(chartWrap){chartWrap.style.height='120px';chartWrap.style.maxHeight='120px';}
-          }
-
-          wrap.appendChild(cl);
-        });
-
-        document.body.appendChild(wrap);
-
-        // For page 4: copy S7 chart image into clone canvas
-        if(pg.ids.includes('zone-s7')){
-          const origCv=document.getElementById('s7LineChart');
-          const cloneCv=wrap.querySelector('canvas#s7LineChart');
-          if(origCv&&cloneCv){
-            cloneCv.width=origCv.width;
-            cloneCv.height=origCv.height;
-            cloneCv.style.height='120px';
-            const ctx2=cloneCv.getContext('2d');
-            if(ctx2)ctx2.drawImage(origCv,0,0,cloneCv.width,cloneCv.height);
-          }
-        }
-
-        await new Promise(r=>setTimeout(r,300));
-        const cv=await html2canvas(wrap,{
-          scale:2,useCORS:true,
-          backgroundColor:'#0a0f1a',
-          logging:false,
-          width:A4W,windowWidth:A4W
-        });
-        document.body.removeChild(wrap);
-        canvases.push(cv);
-      }
-
-      // Restore S3 detail
-      if(s3det&&!s3wasOpen)s3det.classList.remove('open');
-
-      bar.style.width='85%';
-      msg.textContent='กำลังเปิดหน้าปริ้นท์...';
-
-      const w=window.open('','_blank','width=900,height=800');
-      if(!w){alert('กรุณาอนุญาต Popup ในเบราว์เซอร์');document.body.removeChild(overlay);return;}
-
-      const imgs=canvases.map(cv=>`<div class="page"><img src="${cv.toDataURL('image/jpeg',.95)}" style="width:100%;display:block"></div>`).join('');
-      w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Construction Progress Report</title>
-      <style>*{margin:0;padding:0;box-sizing:border-box}body{background:#fff}.page{width:210mm;page-break-after:always}.page:last-child{page-break-after:avoid}img{width:210mm;display:block}@media print{@page{size:A4;margin:0}.page{page-break-after:always;width:210mm}.page:last-child{page-break-after:avoid}}</style>
-      </head><body>${imgs}<script>window.onload=function(){setTimeout(function(){window.print();},500);};<\/script></body></html>`);
-      w.document.close();
-
-      bar.style.width='100%';
-      setTimeout(()=>document.body.removeChild(overlay),1000);
-
-    }catch(e){
-      msg.textContent='เกิดข้อผิดพลาด: '+e.message;
-      console.error(e);
-      setTimeout(()=>document.body.removeChild(overlay),4000);
-    }
-  });
-}
 
 function openExportJpegModal(){
   const overlay=document.createElement('div');
