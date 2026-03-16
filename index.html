@@ -771,7 +771,7 @@ async function saveData(){
     const res=await fetch(fbPath(),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(state)});
     if(!res.ok){const tx=await res.text().catch(()=>'');throw new Error(`HTTP ${res.status}: ${tx.slice(0,60)}`);}
     try{localStorage.setItem('cp_backup',JSON.stringify(state));}catch(e){}
-    setSvStatus('saved','☁️ บันทึกสำเร็จ ✓',new Date().toLocaleString('th-TH'));
+    setSvStatus('saved','☁️ บันทึกสำเร็จ ✓',new Date().toLocaleDateString('th-TH',{year:'numeric',month:'short',day:'numeric'}));
     showToast('บันทึก Cloud สำเร็จ 💾','ok');
   }catch(e){
     let m=e.message;if(m.includes('Failed to fetch')||m.includes('NetworkError'))m='เชื่อมต่อ Firebase ไม่ได้';
@@ -789,7 +789,7 @@ async function loadData(){
     applyState(s);
     try{localStorage.setItem('cp_backup',JSON.stringify(s));}catch(e){}
     _lastSavedAt=s.savedAt||'';
-    setSvStatus('saved','☁️ โหลดสำเร็จ ✓',s.savedAt?new Date(s.savedAt).toLocaleString('th-TH'):'—');
+    setSvStatus('saved','☁️ โหลดสำเร็จ ✓',s.savedAt?new Date(s.savedAt).toLocaleDateString('th-TH',{year:'numeric',month:'short',day:'numeric'}):'—');
     showToast('โหลดข้อมูล Cloud สำเร็จ 📂','ok');
   }catch(e){
     let m=e.message;if(m.includes('Failed to fetch'))m='เชื่อมต่อ Firebase ไม่ได้';
@@ -828,7 +828,7 @@ function startAutoRefresh(){
   _autoRefTimer=setInterval(async()=>{
     if(!isFirebaseReady())return;
     try{const res=await fetch(fbPath());if(!res.ok)return;const s=await res.json();if(!s)return;
-      if(s.savedAt&&s.savedAt!==_lastSavedAt){_lastSavedAt=s.savedAt;applyState(s);setSvStatus('saved','🔄 รีเฟรชอัตโนมัติ',new Date(s.savedAt).toLocaleString('th-TH'));}
+      if(s.savedAt&&s.savedAt!==_lastSavedAt){_lastSavedAt=s.savedAt;applyState(s);setSvStatus('saved','🔄 รีเฟรชอัตโนมัติ',new Date(s.savedAt).toLocaleDateString('th-TH',{year:'numeric',month:'short',day:'numeric'}));}
     }catch(e){}
   },15000);
 }
@@ -1237,7 +1237,7 @@ function updSummary(){
   const c=document.getElementById('sbg');if(!c)return;
   c.innerHTML=SUMDEF.map((d,i)=>{const v=vs[i],ratio=v/d.tgt,col=gcol(ratio),barH=Math.max(4,Math.round(56*(v/100)));
     return`<div class="SBi"><div class="SBl">${d.lbl}</div><div class="SBbw"><div class="SBb" style="height:${barH}px;background:${d.col}"></div></div><div class="SBv" style="color:${col}">${ceilTo2(v)}%</div><div style="font-size:9px;color:var(--tx3);margin-top:3px">เป้า ${d.tgt}%</div></div>`;}).join('');
-  const lu=document.getElementById('lu');if(lu)lu.textContent='อัพเดท: '+new Date().toLocaleString('th-TH');
+  const lu=document.getElementById('lu');if(lu)lu.textContent='อัพเดท: '+new Date().toLocaleDateString('th-TH',{year:'numeric',month:'short',day:'numeric'});
 }
 function updRooms(key,v,total){
   const raw=parseFloat(v);
@@ -1476,7 +1476,7 @@ function getLaborCfg(){try{const s=localStorage.getItem('cp_labor');return s?{..
 function saveLaborCfg(cfg){try{localStorage.setItem('cp_labor',JSON.stringify(cfg));}catch(e){}}
 
 function openJupiterPage(){
-  const v=getVals(),vs=[v.s1,v.f25,v.out,v.s4,v.s5,v.s6,v.s7],tgts=[100,100,50,100,80,50,40],today=new Date(),DAYS=Math.ceil((new Date(2026,3,20)-today)/(1000*60*60*24));
+  const v=getVals(),vs=[v.s1,v.f25,v.out,v.s4,v.s5,v.s6,v.s7],tgts=[100,100,50,100,80,50,40],today=new Date(),DAYS=Math.ceil((new Date(2026,3,22)-today)/(1000*60*60*24));
   let doneCount=0,urgentCount=0,sumRatio=0;
   vs.forEach((x,i)=>{const r=x/tgts[i];sumRatio+=Math.min(1,r);if(r>=1)doneCount++;else if(x>0)urgentCount++;});
   const overallPct=(sumRatio/vs.length*100).toFixed(1);
@@ -1538,10 +1538,13 @@ function saveLogEntry(){
 }
 function renderPlan(){
   const c=document.getElementById('an-plan');if(!c)return;
-  const vals=getVals(),vs=[vals.s1,vals.f25,vals.out,vals.s4,vals.s5,vals.s6,vals.s7],DAYS=25,today=new Date();
-  const deadline=new Date(today.getTime()+DAYS*86400000),lc=getLaborCfg();
+  const vals=getVals(),vs=[vals.s1,vals.f25,vals.out,vals.s4,vals.s5,vals.s6,vals.s7];
+  const startDate=new Date(2026,2,17),deadline=new Date(2026,3,22),fastDeadline=new Date(2026,3,11),today=new Date(),lc=getLaborCfg();
+  const DAYS=Math.ceil((deadline-today)/(1000*60*60*24));
+  const DAYS_FAST=Math.ceil((fastDeadline-today)/(1000*60*60*24));
+  const fmtDate=d=>d.toLocaleDateString('th-TH',{year:'numeric',month:'short',day:'numeric'});
   const totalPct=(vs.reduce((a,v,i)=>a+Math.min(1,v/SUMDEF[i].tgt),0)/vs.length*100).toFixed(1);
-  c.innerHTML=`<div style="margin-bottom:18px"><div style="font-size:15px;font-weight:800;margin-bottom:4px">📅 แผนการทำงาน 25 วัน</div><div style="font-size:11px;color:var(--tx2);font-family:var(--m)">วันที่เริ่ม: ${today.toLocaleDateString('th-TH')} &nbsp;|&nbsp; กำหนดเสร็จ: ${deadline.toLocaleDateString('th-TH')} &nbsp;|&nbsp; เหลือ: ${DAYS} วัน</div></div>
+  c.innerHTML=`<div style="margin-bottom:18px"><div style="font-size:15px;font-weight:800;margin-bottom:6px">📅 แผนการทำงาน</div><div style="display:flex;gap:12px;flex-wrap:wrap;font-size:11px;font-family:var(--m);color:var(--tx2)"><span>📌 เริ่ม: <strong>${fmtDate(startDate)}</strong></span><span>🎯 แผนเร่งรัด: <strong style="color:var(--orange)">${fmtDate(fastDeadline)}</strong> (เหลือ ${DAYS_FAST} วัน)</span><span>📅 กำหนดส่ง: <strong style="color:var(--red)">${fmtDate(deadline)}</strong> (เหลือ ${DAYS} วัน)</span></div></div>
   <div style="background:var(--bg2);border:1px solid var(--bdr);border-radius:10px;padding:14px 16px;margin-bottom:16px"><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--tx2);margin-bottom:8px"><span>ความคืบหน้าโดยรวม</span><span style="font-family:var(--m);font-weight:700;color:${gcol(parseFloat(totalPct)/100)}">${totalPct}%</span></div><div class="PBG" style="height:12px"><div class="PF ${gclass(parseFloat(totalPct)/100)}" style="width:${totalPct}%"></div></div></div>
   <div style="display:grid;gap:10px;margin-bottom:20px">${SUMDEF.map((d,i)=>{const v=vs[i],tgt=d.tgt,gap=Math.max(0,tgt-v),ratio=v/tgt,pctPerDay=gap>0?(gap/DAYS).toFixed(2):0;const status=ratio>=1?'✅ บรรลุเป้า':v>0?'🔄 ดำเนินการ':'⬜ ยังไม่เริ่ม',statusCol=ratio>=1?'var(--green)':v>0?'var(--orange)':'var(--red)';return`<div style="background:var(--bg2);border:1px solid ${d.col}33;border-left:4px solid ${d.col};border-radius:9px;padding:14px 16px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:6px"><span style="font-weight:700;font-size:14px;color:${d.col}">${d.lbl}</span><span style="font-size:11px;font-weight:700;color:${statusCol}">${status}</span></div><div style="height:6px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;margin-bottom:10px"><div style="height:100%;background:${d.col};width:${Math.min(100,v/tgt*100)}%;border-radius:99px"></div></div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px"><div style="background:var(--bgc);border-radius:7px;padding:8px;text-align:center"><div style="font-size:9px;color:var(--tx3);margin-bottom:4px">คืบหน้าแล้ว</div><div style="font-size:17px;font-weight:800;font-family:var(--m);color:${d.col}">${ceilTo2(v)}%</div></div><div style="background:var(--bgc);border-radius:7px;padding:8px;text-align:center"><div style="font-size:9px;color:var(--tx3);margin-bottom:4px">เป้าหมาย</div><div style="font-size:17px;font-weight:800;font-family:var(--m);color:var(--tx2)">${tgt}%</div></div><div style="background:var(--bgc);border-radius:7px;padding:8px;text-align:center"><div style="font-size:9px;color:var(--tx3);margin-bottom:4px">เหลืออีก</div><div style="font-size:17px;font-weight:800;font-family:var(--m);color:${gap>0?'var(--orange)':'var(--green)'}">${ceilTo2(gap)}%</div></div><div style="background:var(--bgc);border-radius:7px;padding:8px;text-align:center"><div style="font-size:9px;color:var(--tx3);margin-bottom:4px">ต้องทำ/วัน</div><div style="font-size:17px;font-weight:800;font-family:var(--m);color:${pctPerDay>0?d.col:'var(--green)'}">${pctPerDay>0?pctPerDay+'%':'—'}</div></div></div></div>`;}).join('')}</div>`;
 }
@@ -1822,7 +1825,7 @@ function openJupiterPageAI(isLoginPopup){
     return `${n}: ${pct.toFixed(1)}% / เป้า ${tgt}% (เหลือ ${gap.toFixed(1)}%, ${ratio>=1?'บรรลุเป้าแล้ว':ratio<0.3?'ล่าช้ามาก':ratio<0.6?'ล่าช้า':'กำลังดี'})`;
   }).join('\n');
 
-  const deadline=new Date(2026,3,20); // 20 เมษายน 2569 (ค.ศ.2026)
+  const deadline=new Date(2026,3,22); // 22 เมษายน 2569 (ค.ศ.2026)
   const daysLeft=Math.ceil((deadline-new Date())/(1000*60*60*24));
   const prompt=`คุณคือ Jupiter ที่ปรึกษาก่อสร้างอาวุโส มีประสบการณ์ 20 ปี
 
@@ -1831,7 +1834,7 @@ function openJupiterPageAI(isLoginPopup){
 - ชั้น 2-5: ชั้นละ 11 ห้อง (รวม 44 ห้อง)
 - ชั้น 1: 3 ห้อง
 - วันนี้: ${today}
-- กำหนดส่งงาน: 20 เมษายน 2569
+- กำหนดส่งงาน: 22 เมษายน 2569
 - เหลือเวลา: ${daysLeft} วัน
 
 📊 ความคืบหน้าทุกงาน ณ วันนี้:
@@ -1965,9 +1968,9 @@ function runJupiterAI(){
   const tgts=[100,100,50,100,80,50,40];
   const today=new Date().toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'});
   const dataSummary=names.map((n,i)=>`${n}: ${vs[i].toFixed(1)}% / เป้า ${tgts[i]}% (${vs[i]>=tgts[i]?'บรรลุเป้า':vs[i]/tgts[i]<0.3?'ล่าช้ามาก':vs[i]/tgts[i]<0.6?'ล่าช้า':'กำลังดี'})`).join('\n');
-  const deadline2=new Date(2026,3,20);
+  const deadline2=new Date(2026,3,22);
   const daysLeft2=Math.ceil((deadline2-new Date())/(1000*60*60*24));
-  const prompt=`คุณคือ Jupiter ที่ปรึกษาก่อสร้างอาวุโส มีประสบการณ์ 20 ปี\n\n📋 โครงการ: อาคารอพาร์ตเมนต์ 5 ชั้น (ชั้น 2-5 ชั้นละ 11 ห้อง, ชั้น 1 มี 3 ห้อง)\nวันนี้: ${today} | กำหนดส่งงาน: 20 เมษายน 2569 | เหลือ: ${daysLeft2} วัน\n\n📊 ความคืบหน้า:\n${dataSummary}\n\n🎯 เป้าหมาย: S1 100%, S2 100%, S3 50%, S4 100%, S5 80%, S6 50%, S7 40%, ทำความสะอาดทุกวัน\n\nวิเคราะห์:\n1. สถานะโดยรวม — ส่งงานทันหรือไม่?\n2. งานวิกฤตและวิธีแก้ไขเร่งด่วน\n3. แผนงาน ${daysLeft2} วัน (ต้องทำ%/วัน ของแต่ละงาน)\n4. การจัดช่างและทีม\n5. ความเสี่ยงและการป้องกัน\n\nตอบภาษาไทย กระชับ ปฏิบัติได้จริง`;
+  const prompt=`คุณคือ Jupiter ที่ปรึกษาก่อสร้างอาวุโส มีประสบการณ์ 20 ปี\n\n📋 โครงการ: อาคารอพาร์ตเมนต์ 5 ชั้น (ชั้น 2-5 ชั้นละ 11 ห้อง, ชั้น 1 มี 3 ห้อง)\nวันนี้: ${today} | กำหนดส่งงาน: 22 เมษายน 2569 | เหลือ: ${daysLeft2} วัน\n\n📊 ความคืบหน้า:\n${dataSummary}\n\n🎯 เป้าหมาย: S1 100%, S2 100%, S3 50%, S4 100%, S5 80%, S6 50%, S7 40%, ทำความสะอาดทุกวัน\n\nวิเคราะห์:\n1. สถานะโดยรวม — ส่งงานทันหรือไม่?\n2. งานวิกฤตและวิธีแก้ไขเร่งด่วน\n3. แผนงาน ${daysLeft2} วัน (ต้องทำ%/วัน ของแต่ละงาน)\n4. การจัดช่างและทีม\n5. ความเสี่ยงและการป้องกัน\n\nตอบภาษาไทย กระชับ ปฏิบัติได้จริง`;
   fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})})
   .then(r=>r.json())
   .then(data=>{
@@ -2006,8 +2009,8 @@ function exportDataJSON(){
   const data={
     exportedAt: now.toLocaleString('th-TH'),
     project: 'อาคารอพาร์ตเมนต์ 5 ชั้น',
-    deadline: '20 เมษายน 2569',
-    daysLeft: Math.ceil((new Date(2026,3,20)-now)/(1000*60*60*24)),
+    deadline: '22 เมษายน 2569',
+    daysLeft: Math.ceil((new Date(2026,3,22)-now)/(1000*60*60*24)),
     progress:{
       's1_หลังคา':          {pct: parseFloat(v.s1.toFixed(2)),  target:100},
       's2_ก่ออิฐใน':        {pct: parseFloat(v.f25.toFixed(2)), target:100},
