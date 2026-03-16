@@ -1480,55 +1480,91 @@ document.addEventListener('blur',function(e){
 function printDashboard(){
   const now=new Date().toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'});
 
-  function getHTML(ids){
-    return ids.map(id=>{
-      const el=document.getElementById(id);
-      if(!el)return '';
-      return el.outerHTML;
-    }).join('');
+  // Clone element with inline computed styles stripped to essentials
+  function cloneZone(id){
+    const el=document.getElementById(id);
+    if(!el)return '';
+    return el.outerHTML;
   }
 
-  const pg1=getHTML(['zone-kpi','zone-pie','zone-donut','zone-s1s4','zone-s2']);
-  const pg2=getHTML(['zone-s3','zone-s5s6','zone-s7','zone-summary']);
-
-  // Collect all styles
+  // Collect all CSS from page
   const styles=Array.from(document.styleSheets).map(ss=>{
     try{return Array.from(ss.cssRules).map(r=>r.cssText).join('\n');}catch(e){return '';}
   }).join('\n');
 
-  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8">
-  <title>Construction Progress Report</title>
-  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700;800&family=IBM+Plex+Mono:wght@600&display=swap" rel="stylesheet">
-  <style>
-    ${styles}
-    *{box-sizing:border-box}
-    body{background:#0a0f1a;color:#e8f0fe;font-family:'Sarabun',sans-serif;margin:0;padding:0}
-    .print-page{padding:18px 20px;min-height:277mm;page-break-after:always}
-    .print-page:last-child{page-break-after:avoid}
-    .print-header{display:flex;align-items:center;justify-content:space-between;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:18px}
-    .print-header h2{font-size:16px;font-weight:800;color:#e8f0fe;margin:0}
-    .print-date{font-size:10px;color:#6b7a8d}
-    header,nav,#pnav,#toast,.save-bar,.edit-only,[id^="lock"],[id^="jpeg"],[id^="checklist-overlay"]{display:none!important}
-    .pg{display:block!important}
-    @media print{
-      body{background:#0a0f1a!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-      .print-page{padding:10mm 12mm;page-break-after:always}
-      .print-page:last-child{page-break-after:avoid}
-    }
-  </style></head><body>
-  <div class="print-page">
-    <div class="print-header"><h2>📋 Construction Progress Dashboard</h2><span class="print-date">หน้า 1 · ${now}</span></div>
-    ${pg1}
-  </div>
-  <div class="print-page">
-    <div class="print-header"><h2>📋 รายละเอียดงานทุกประเภท</h2><span class="print-date">หน้า 2 · ${now}</span></div>
-    ${pg2}
-  </div>
-  <script>window.onload=()=>setTimeout(()=>window.print(),600);<\/script>
-  </body></html>`;
+  const pg1=[cloneZone('zone-kpi'),cloneZone('zone-pie'),cloneZone('zone-donut'),cloneZone('zone-s1s4'),cloneZone('zone-s2')].join('');
+  const pg2=[cloneZone('zone-s3'),cloneZone('zone-s5s6'),cloneZone('zone-s7'),cloneZone('zone-summary')].join('');
 
-  const w=window.open('','_blank','width=1000,height=800');
-  if(!w){alert('กรุณาอนุญาต Popup ในเบราว์เซอร์แล้วลองใหม่\n(คลิก Allow Popups สำหรับหน้านี้)');return;}
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8">
+<title>Construction Progress Report</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700;800&family=IBM+Plex+Mono:wght@600&display=swap" rel="stylesheet">
+<style>
+${styles}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:#0a0f1a;color:#e8f0fe;font-family:'Sarabun',sans-serif}
+.print-page{
+  width:210mm;
+  min-height:297mm;
+  padding:10mm 12mm;
+  box-sizing:border-box;
+  page-break-after:always;
+  overflow:hidden;
+}
+.print-page:last-child{page-break-after:avoid;}
+.print-page.last-page{
+  display:flex;
+  flex-direction:column;
+}
+.print-page.last-page .zone-summary-wrap{
+  margin-top:auto;
+}
+.ph{display:flex;align-items:center;justify-content:space-between;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.12);margin-bottom:14px}
+.ph h2{font-size:15px;font-weight:800;color:#e8f0fe;margin:0}
+.ph span{font-size:10px;color:#6b7a8d}
+header,nav,#pnav,.save-bar,#toast,.edit-only,
+[id^="lock"],[id^="jpeg"],[id^="checklist"]{display:none!important}
+.pg{display:block!important}
+@media print{
+  html,body{background:#0a0f1a!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  @page{size:A4;margin:0}
+  .print-page{page-break-after:always;width:210mm;padding:10mm 12mm}
+  .print-page:last-child{page-break-after:avoid}
+}
+</style></head><body>
+
+<div class="print-page">
+  <div class="ph"><h2>📋 Construction Progress Dashboard</h2><span>หน้า 1/2 · ${now}</span></div>
+  ${pg1}
+</div>
+
+<div class="print-page last-page">
+  <div class="ph"><h2>📋 รายละเอียดงานทุกประเภท</h2><span>หน้า 2/2 · ${now}</span></div>
+  ${pg2}
+</div>
+
+<script>
+window.onload=function(){
+  // Shrink last card to fit page
+  var pages=document.querySelectorAll('.print-page');
+  var lastPage=pages[pages.length-1];
+  if(lastPage){
+    var A4H=297*3.7795; // mm to px at 96dpi
+    var used=lastPage.scrollHeight;
+    if(used>A4H){
+      var scale=Math.max(0.7,(A4H-20)/used);
+      var inner=lastPage.querySelector('.SB')||lastPage.lastElementChild;
+      if(inner)inner.style.transform='scale('+scale+')';
+      inner.style.transformOrigin='top left';
+      inner.style.width=(100/scale)+'%';
+    }
+  }
+  setTimeout(function(){window.print();},700);
+};
+<\/script>
+</body></html>`;
+
+  const w=window.open('','_blank','width=900,height=800');
+  if(!w){alert('กรุณาอนุญาต Popup ในเบราว์เซอร์แล้วลองใหม่');return;}
   w.document.write(html);
   w.document.close();
 }
