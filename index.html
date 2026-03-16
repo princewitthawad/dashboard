@@ -802,10 +802,12 @@ async function loadData(){
   }
 }
 function scheduleAutoSave(){
-  if(!isFirebaseReady())return;
+  // บันทึก localStorage ทันทีเสมอ (ป้องกันข้อมูลหายเมื่อ refresh)
+  try{localStorage.setItem('cp_backup',JSON.stringify(collectState()));}catch(e){}
+  if(!isFirebaseReady()){setSvStatus('saved','💾 บันทึกท้องถิ่น');return;}
   clearTimeout(_saveTimer);
   setSvStatus('unsaved','● มีการเปลี่ยนแปลง...');
-  _saveTimer=setTimeout(saveData,5000);
+  _saveTimer=setTimeout(saveData,1500);
 }
 function clearData(){
   if(!confirm('ล้างข้อมูลทั้งหมด (รีเซ็ตเป็นค่าเริ่มต้น)?'))return;
