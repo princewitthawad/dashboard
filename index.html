@@ -765,7 +765,7 @@ function applyState(s){
   buildS2(true);buildS3();
   ['s1','s4t','s5','s6','s7'].forEach(id=>setBar(id,id+'b',id+'p'));
   ['r41','r42','r43','r44','r45'].forEach(id=>setBar(id,id+'b',id+'p'));
-  buildS5S6UI(true);updS5S6Rooms('s5');updS5S6Rooms('s6');buildS5S6UI();buildPlasterUI();updPlaster();buildDonuts();updS7Chart();ra();
+  buildS5S6UI(true);updS5S6Rooms('s5');updS5S6Rooms('s6');buildPlasterUI(true);updPlaster();buildDonuts();updS7Chart();ra();
 }
 async function saveData(){
   if(!isFirebaseReady()){showFirebaseGuide();return;}
