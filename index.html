@@ -336,6 +336,8 @@ body.view-mode .edit-only{display:none!important}
     <div class="view-badge">👁️ โหมดดูอย่างเดียว</div>
     <button class="btn btn-g edit-only" onclick="saveData()">💾 บันทึก</button>
     <button class="btn edit-only" onclick="openExportJpegModal()" style="background:rgba(0,180,255,.15);color:#00d4ff;border:1px solid rgba(0,212,255,.4)">🖼️ Export JPEG</button>
+    <button class="btn edit-only" onclick="downloadCurrentState()" style="background:rgba(0,230,118,.12);color:#00e676;border:1px solid rgba(0,230,118,.4)">💾 บันทึกไฟล์</button>
+    <button class="btn edit-only" onclick="exportDataJSON()" style="background:rgba(56,139,253,.12);color:#388bfd;border:1px solid rgba(56,139,253,.4)">📤 Export JSON</button>
     <button class="btn btn-b view-only" onclick="showFirebaseGuide()">☁️ ลงทะเบียน</button>
     <button class="btn btn-gold edit-only" onclick="showPwChange()">🔑 รหัสผ่าน</button>
     <a id="lockin-link" href="#" onclick="event.preventDefault();showLockModal()" style="font-size:11px;font-weight:600;color:var(--tx2);text-decoration:none;padding:5px 10px;border-radius:6px;transition:color .2s" onmouseover="this.style.color='var(--blue)'" onmouseout="this.style.color='var(--tx2)'">🔓 Login</a>
@@ -529,7 +531,9 @@ body.view-mode .edit-only{display:none!important}
 <div style="display:flex;justify-content:center;gap:12px;padding:16px 0 6px;flex-wrap:wrap">
   <button onclick="showRealtimeGuide()" class="btn btn-b edit-only" style="padding:9px 20px;font-size:12px">🌐 คู่มือแชร์ Realtime</button>
   <button onclick="openChecklistPage()" class="edit-only" style="background:linear-gradient(135deg,rgba(0,60,120,.6),rgba(56,139,253,.2));color:var(--blue);border:1px solid rgba(56,139,253,.5);border-radius:10px;padding:12px 28px;font-size:14px;cursor:pointer;font-family:var(--f);font-weight:700;display:inline-flex;align-items:center;gap:8px;transition:all .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">📋 Checklist ประสานงานหน้างาน ↗</button>
-  <button onclick="openJupiterPageAI(false)" class="edit-only" style="background:linear-gradient(135deg,rgba(26,35,126,.6),rgba(255,214,0,.2));color:var(--gold);border:1px solid rgba(255,214,0,.5);border-radius:10px;padding:12px 28px;font-size:14px;cursor:pointer;font-family:var(--f);font-weight:700;display:inline-flex;align-items:center;gap:8px;transition:all .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">🪐 Jupiter — คำแนะนำบริหารงาน ↗</button>
+  <div class="edit-only">
+    <button onclick="openJupiterWithAI()" style="background:linear-gradient(135deg,rgba(26,35,126,.6),rgba(255,214,0,.2));color:var(--gold);border:1px solid rgba(255,214,0,.5);border-radius:10px;padding:12px 28px;font-size:14px;cursor:pointer;font-family:var(--f);font-weight:700;display:inline-flex;align-items:center;gap:8px;transition:all .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">🪐 Jupiter — คำแนะนำบริหารงาน ↗</button>
+  </div>
   <button onclick="openAnalysisPage()" class="edit-only" style="background:linear-gradient(135deg,rgba(0,100,60,.6),rgba(0,230,118,.2));color:var(--green);border:1px solid rgba(0,230,118,.4);border-radius:10px;padding:12px 28px;font-size:14px;cursor:pointer;font-family:var(--f);font-weight:700;display:inline-flex;align-items:center;gap:8px;transition:all .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">📈 วิเคราะห์ — กราฟ & แผนรายวัน ↗</button>
 </div>
 
@@ -1267,7 +1271,7 @@ let _isLocked=false,_numBuf='',_lastTouch=0;
 function showLockModal(){document.getElementById('lock-modal').classList.add('show');}
 function closeLockModal(){document.getElementById('lock-modal').classList.remove('show');_numBuf='';_syncDots();}
 function applyViewMode(){document.body.classList.add('view-mode');_isLocked=true;const link=document.getElementById('lockin-link'),logout=document.getElementById('logout-btn');if(link)link.style.display='';if(logout)logout.style.display='none';}
-function applyEditMode(){document.body.classList.remove('view-mode');_isLocked=false;sessionStorage.setItem(SESSION_KEY,'1');const link=document.getElementById('lockin-link'),logout=document.getElementById('logout-btn');if(link)link.style.display='none';if(logout)logout.style.display='';showGreeting();setTimeout(()=>openJupiterPageAI(true),1200);}
+function applyEditMode(){document.body.classList.remove('view-mode');_isLocked=false;sessionStorage.setItem(SESSION_KEY,'1');const link=document.getElementById('lockin-link'),logout=document.getElementById('logout-btn');if(link)link.style.display='none';if(logout)logout.style.display='';showGreeting();}
 function showGreeting(){const d=document.createElement('div');d.style.cssText='position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;pointer-events:none';d.innerHTML=`<div style="background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:36px 72px;backdrop-filter:blur(20px);box-shadow:0 12px 60px rgba(0,0,0,.5);animation:greetIn .35s cubic-bezier(.34,1.56,.64,1) both"><span style="font-size:42px;font-weight:800;color:#e8f0fe;font-family:'Sarabun',sans-serif;letter-spacing:1px">สวัสดี ค่ะ</span></div>`;document.body.appendChild(d);setTimeout(()=>{d.firstElementChild.style.cssText+=';animation:greetOut .3s ease forwards';setTimeout(()=>d.remove(),300);},3000);}
 function doLogout(){sessionStorage.removeItem(SESSION_KEY);applyViewMode();showToast('ออกจากระบบแล้ว 🔒','ok');}
 function numPress(n){const now=Date.now();if(now-_lastTouch<80)return;_lastTouch=now;if(_numBuf.length>=6)return;_numBuf+=n;_syncDots();if(_numBuf.length===6){setTimeout(doUnlock,120);}}
@@ -1472,7 +1476,7 @@ function getLaborCfg(){try{const s=localStorage.getItem('cp_labor');return s?{..
 function saveLaborCfg(cfg){try{localStorage.setItem('cp_labor',JSON.stringify(cfg));}catch(e){}}
 
 function openJupiterPage(){
-  const v=getVals(),vs=[v.s1,v.f25,v.out,v.s4,v.s5,v.s6,v.s7],tgts=[100,100,50,100,80,50,40],today=new Date(),DAYS=25;
+  const v=getVals(),vs=[v.s1,v.f25,v.out,v.s4,v.s5,v.s6,v.s7],tgts=[100,100,50,100,80,50,40],today=new Date(),DAYS=Math.ceil((new Date(2026,3,20)-today)/(1000*60*60*24));
   let doneCount=0,urgentCount=0,sumRatio=0;
   vs.forEach((x,i)=>{const r=x/tgts[i];sumRatio+=Math.min(1,r);if(r>=1)doneCount++;else if(x>0)urgentCount++;});
   const overallPct=(sumRatio/vs.length*100).toFixed(1);
@@ -1818,19 +1822,39 @@ function openJupiterPageAI(isLoginPopup){
     return `${n}: ${pct.toFixed(1)}% / เป้า ${tgt}% (เหลือ ${gap.toFixed(1)}%, ${ratio>=1?'บรรลุเป้าแล้ว':ratio<0.3?'ล่าช้ามาก':ratio<0.6?'ล่าช้า':'กำลังดี'})`;
   }).join('\n');
 
-  const prompt=`คุณคือ Jupiter ที่ปรึกษาก่อสร้างอาวุโส มีประสบการณ์ 20 ปี วิเคราะห์ข้อมูลโครงการก่อสร้างอพาร์ตเมนต์ 6 ชั้น ณ วันที่ ${today}
+  const deadline=new Date(2026,3,20); // 20 เมษายน 2569 (ค.ศ.2026)
+  const daysLeft=Math.ceil((deadline-new Date())/(1000*60*60*24));
+  const prompt=`คุณคือ Jupiter ที่ปรึกษาก่อสร้างอาวุโส มีประสบการณ์ 20 ปี
 
-ข้อมูลความคืบหน้าปัจจุบัน:
+📋 ข้อมูลโครงการ:
+- อาคารอพาร์ตเมนต์ 5 ชั้น
+- ชั้น 2-5: ชั้นละ 11 ห้อง (รวม 44 ห้อง)
+- ชั้น 1: 3 ห้อง
+- วันนี้: ${today}
+- กำหนดส่งงาน: 20 เมษายน 2569
+- เหลือเวลา: ${daysLeft} วัน
+
+📊 ความคืบหน้าทุกงาน ณ วันนี้:
 ${dataSummary}
 
-กรุณาวิเคราะห์และให้คำแนะนำ:
-1. ประเมินสถานะโครงการโดยรวม (2-3 ประโยค)
-2. งานที่น่าเป็นห่วงที่สุด และวิธีแก้ไขเร่งด่วน
-3. ลำดับความสำคัญงานที่ควรเร่ง 3 อันดับแรก
-4. คำแนะนำการจัดสรรช่างและแรงงาน
-5. ความเสี่ยงที่อาจเกิดขึ้นและการป้องกัน
+🎯 เป้าหมายที่ต้องเสร็จก่อนส่งงาน:
+- S1 หลังคา: 100%
+- S2 ก่ออิฐภายใน ชั้น 2-5 (44 ห้อง): 100%
+- S3 ก่ออิฐภายนอก: 50%
+- S4 ก่ออิฐชั้น 1 (3 ห้อง): 100%
+- S5 งานไฟฟ้า (กรีดผนัง+ฝังท่อ): 80%
+- S6 งานท่อน้ำดี: 50%
+- S7 ฉาบผนัง: 40%
+- ทำความสะอาด เคลียร์ขยะหลังเลิกงานทุกวัน
 
-ตอบเป็นภาษาไทย กระชับ ตรงประเด็น เน้นปฏิบัติได้จริง`;
+กรุณาวิเคราะห์และให้คำแนะนำ:
+1. **ประเมินสถานะโดยรวม** — สามารถส่งงานทันกำหนดได้หรือไม่? มีความเสี่ยงระดับไหน?
+2. **งานวิกฤต** — งานไหนน่าเป็นห่วงที่สุด ทำไม และต้องแก้อย่างไร?
+3. **แผนงาน ${daysLeft} วัน** — แต่ละงานควรทำเสร็จกี่%/วัน เพื่อให้ทันกำหนด?
+4. **การจัดสรรช่างและแรงงาน** — ควรจัดทีมอย่างไร งานไหนควรทำคู่ขนาน?
+5. **ความเสี่ยงและการป้องกัน** — สิ่งที่อาจทำให้ล่าช้าและวิธีป้องกัน
+
+ตอบภาษาไทย กระชับ ตรงประเด็น เน้นปฏิบัติได้จริงในหน้างาน`;
 
   // Create popup
   const popup=document.createElement('div');
@@ -1848,6 +1872,9 @@ ${dataSummary}
         </div>
         <button onclick="document.getElementById('_jupiter_popup')?.remove()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#8899aa;border-radius:8px;padding:6px 12px;cursor:pointer;font-size:12px;font-family:var(--f)">✕ ปิด</button>
       </div>
+      <div style="padding:8px 20px;background:rgba(255,214,0,.06);border-bottom:1px solid rgba(255,214,0,.1);font-size:10px;color:#8899aa">
+          ⚠️ <em>หมายเหตุ: ทุกครั้งที่เรียกใช้ Jupiter AI มีค่าใช้จ่ายขั้นต่ำ <strong style="color:#ffd600">~$0.009 (ประมาณ 30 สตางค์)</strong> ต่อครั้ง</em>
+        </div>
       <div id="_jupiter_ai_content" style="padding:20px 24px">
         <div style="display:flex;align-items:center;gap:12px;color:#8899aa;font-size:13px">
           <div style="width:20px;height:20px;border:2px solid #ffd600;border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;flex-shrink:0"></div>
@@ -1897,6 +1924,104 @@ ${dataSummary}
     const content=document.getElementById('_jupiter_ai_content');
     if(content)content.innerHTML=`<div style="color:#ff6666;font-size:12px">เกิดข้อผิดพลาด: ${e.message}<br><br><button onclick="openJupiterPage();document.getElementById('_jupiter_popup')?.remove()" style="background:rgba(255,214,0,.12);border:1px solid rgba(255,214,0,.4);color:#ffd600;border-radius:8px;padding:8px 16px;cursor:pointer;font-size:12px;font-family:var(--f)">🪐 เปิด Jupiter แบบ Offline</button></div>`;
   });
+}
+
+function openJupiterWithAI(){
+  // Open full overlay first
+  openJupiterPage();
+  // Then inject AI section at top of body
+  const body=document.getElementById('jupiter-body');
+  if(!body)return;
+  const aiBox=document.createElement('div');
+  aiBox.id='_jupiter_ai_box';
+  aiBox.style.cssText='background:linear-gradient(135deg,rgba(255,214,0,.08),rgba(26,35,126,.12));border:1px solid rgba(255,214,0,.25);border-radius:12px;padding:16px 18px;margin-bottom:20px';
+  aiBox.innerHTML=`
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:18px">🤖</span>
+        <span style="font-size:13px;font-weight:800;color:#ffd600">Jupiter AI — วิเคราะห์ข้อมูลเรียลไทม์</span>
+      </div>
+      <span style="font-size:10px;color:#6b7a8d">⚠️ ~$0.009/ครั้ง (~30 สตางค์)</span>
+    </div>
+    <div id="_jupiter_ai_result" style="font-size:12px;color:#8899aa">
+      <button onclick="runJupiterAI()" style="background:rgba(255,214,0,.12);border:1px solid rgba(255,214,0,.4);color:#ffd600;border-radius:8px;padding:8px 18px;cursor:pointer;font-size:12px;font-family:var(--f);font-weight:700">▶ วิเคราะห์ด้วย AI</button>
+    </div>`;
+  body.insertBefore(aiBox,body.firstChild);
+}
+function runJupiterAI(){
+  const result=document.getElementById('_jupiter_ai_result');
+  if(!result)return;
+  result.innerHTML='<div style="display:flex;align-items:center;gap:10px;color:#8899aa;font-size:12px"><div style="width:16px;height:16px;border:2px solid #ffd600;border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;flex-shrink:0"></div>Jupiter กำลังวิเคราะห์...</div>';
+  if(!document.getElementById('_spin_style')){const st=document.createElement('style');st.id='_spin_style';st.textContent='@keyframes spin{to{transform:rotate(360deg)}}';document.head.appendChild(st);}
+  const v=getVals(),vs=[v.s1,v.f25,v.out,v.s4,v.s5,v.s6,v.s7];
+  const names=['S1 หลังคา','S2 ก่ออิฐใน','S3 ก่ออิฐนอก','S4 ก่ออิฐชั้น 1','S5 งานไฟฟ้า','S6 ท่อน้ำดี','S7 ฉาบผนัง'];
+  const tgts=[100,100,50,100,80,50,40];
+  const today=new Date().toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'});
+  const dataSummary=names.map((n,i)=>`${n}: ${vs[i].toFixed(1)}% / เป้า ${tgts[i]}% (${vs[i]>=tgts[i]?'บรรลุเป้า':vs[i]/tgts[i]<0.3?'ล่าช้ามาก':vs[i]/tgts[i]<0.6?'ล่าช้า':'กำลังดี'})`).join('\n');
+  const deadline2=new Date(2026,3,20);
+  const daysLeft2=Math.ceil((deadline2-new Date())/(1000*60*60*24));
+  const prompt=`คุณคือ Jupiter ที่ปรึกษาก่อสร้างอาวุโส มีประสบการณ์ 20 ปี\n\n📋 โครงการ: อาคารอพาร์ตเมนต์ 5 ชั้น (ชั้น 2-5 ชั้นละ 11 ห้อง, ชั้น 1 มี 3 ห้อง)\nวันนี้: ${today} | กำหนดส่งงาน: 20 เมษายน 2569 | เหลือ: ${daysLeft2} วัน\n\n📊 ความคืบหน้า:\n${dataSummary}\n\n🎯 เป้าหมาย: S1 100%, S2 100%, S3 50%, S4 100%, S5 80%, S6 50%, S7 40%, ทำความสะอาดทุกวัน\n\nวิเคราะห์:\n1. สถานะโดยรวม — ส่งงานทันหรือไม่?\n2. งานวิกฤตและวิธีแก้ไขเร่งด่วน\n3. แผนงาน ${daysLeft2} วัน (ต้องทำ%/วัน ของแต่ละงาน)\n4. การจัดช่างและทีม\n5. ความเสี่ยงและการป้องกัน\n\nตอบภาษาไทย กระชับ ปฏิบัติได้จริง`;
+  fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})})
+  .then(r=>r.json())
+  .then(data=>{
+    const text=data.content?.[0]?.text||'ไม่สามารถรับข้อมูลได้';
+    const fmt=text.replace(/\*\*(.*?)\*\*/g,'<strong style="color:#ffd600">$1</strong>').replace(/^(\d+\.\s)/gm,'<br><span style="color:#ffd600;font-weight:700">$1</span>').replace(/\n/g,'<br>');
+    result.innerHTML=`<div style="font-size:12px;color:#c8d8e8;line-height:1.8">${fmt}</div><div style="margin-top:10px"><button onclick="runJupiterAI()" style="background:rgba(255,214,0,.08);border:1px solid rgba(255,214,0,.3);color:#ffd600;border-radius:6px;padding:5px 12px;cursor:pointer;font-size:11px;font-family:var(--f)">🔄 วิเคราะห์ใหม่</button></div>`;
+  })
+  .catch(e=>{result.innerHTML=`<div style="color:#ff6666;font-size:11px">เกิดข้อผิดพลาด: ${e.message}</div><div style="margin-top:8px"><button onclick="runJupiterAI()" style="background:rgba(255,214,0,.08);border:1px solid rgba(255,214,0,.3);color:#ffd600;border-radius:6px;padding:5px 12px;cursor:pointer;font-size:11px;font-family:var(--f)">🔄 ลองใหม่</button></div>`;});
+}
+
+function downloadCurrentState(){
+  const state=collectState();
+  const now=new Date();
+  const dateStr=now.toLocaleDateString('th-TH',{year:'numeric',month:'2-digit',day:'2-digit'}).replace(/\//g,'-');
+  const timeStr=now.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'}).replace(/:/g,'-');
+
+  // Build HTML with pre-filled values
+  const html=document.documentElement.outerHTML;
+  // Inject state as default values via script at end
+  const stateScript=`\n<script>\n(function(){\n  var _preload=${JSON.stringify(state)};\n  window.addEventListener('load',function(){\n    if(typeof applyState==='function'){applyState(_preload);buildPlasterUI(true);updPlaster();buildDonuts();ra();}\n  },false);\n})();\n<\/script>`;
+  const finalHtml=html.replace('</body>',stateScript+'</body>');
+
+  const blob=new Blob([finalHtml],{type:'text/html;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='dashboard_'+dateStr+'_'+timeStr+'.html';
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  showToast('✅ ดาวน์โหลดไฟล์พร้อมข้อมูลปัจจุบัน','ok');
+}
+
+function exportDataJSON(){
+  const state=collectState();
+  const v=getVals();
+  const now=new Date();
+  const data={
+    exportedAt: now.toLocaleString('th-TH'),
+    project: 'อาคารอพาร์ตเมนต์ 5 ชั้น',
+    deadline: '20 เมษายน 2569',
+    daysLeft: Math.ceil((new Date(2026,3,20)-now)/(1000*60*60*24)),
+    progress:{
+      's1_หลังคา':          {pct: parseFloat(v.s1.toFixed(2)),  target:100},
+      's2_ก่ออิฐใน':        {pct: parseFloat(v.f25.toFixed(2)), target:100},
+      's3_ก่ออิฐนอก':       {pct: parseFloat(v.out.toFixed(2)), target:50},
+      's4_ก่ออิฐชั้น1':     {pct: parseFloat(v.s4.toFixed(2)),  target:100},
+      's5_ไฟฟ้า':           {pct: parseFloat(v.s5.toFixed(2)),  target:80},
+      's6_ท่อน้ำดี':        {pct: parseFloat(v.s6.toFixed(2)),  target:50},
+      's7_ฉาบผนัง':         {pct: parseFloat(v.s7.toFixed(2)),  target:40},
+    },
+    overall: parseFloat((Object.values({s1:v.s1/100,s2:v.f25/100,s3:v.out/50,s4:v.s4/100,s5:v.s5/80,s6:v.s6/50,s7:v.s7/40}).reduce((a,v)=>a+Math.min(1,v),0)/7*100).toFixed(2)),
+    rawState: state
+  };
+  const json=JSON.stringify(data,null,2);
+  const blob=new Blob([json],{type:'application/json'});
+  const a=document.createElement('a');
+  const dateStr=now.toLocaleDateString('th-TH',{year:'numeric',month:'2-digit',day:'2-digit'}).replace(/\//g,'-');
+  a.href=URL.createObjectURL(blob);
+  a.download='progress_data_'+dateStr+'.json';
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  showToast('✅ Export JSON สำเร็จ — วางไฟล์ใน Claude เพื่อวิเคราะห์','ok',4000);
 }
 </script>
 </body>
