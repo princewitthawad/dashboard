@@ -335,7 +335,6 @@ body.view-mode .edit-only{display:none!important}
     <div class="live-badge"><div class="ld"></div>LIVE</div>
     <div class="view-badge">👁️ โหมดดูอย่างเดียว</div>
     <button class="btn btn-g edit-only" onclick="saveData()">💾 บันทึก</button>
-    <button class="btn edit-only" onclick="printDashboard()" style="background:rgba(255,255,255,.08);color:#e8f0fe;border:1px solid rgba(255,255,255,.2)">🖨️ Print</button>
     <button class="btn edit-only" onclick="openExportJpegModal()" style="background:rgba(0,180,255,.15);color:#00d4ff;border:1px solid rgba(0,212,255,.4)">🖼️ Export JPEG</button>
     <button class="btn btn-b view-only" onclick="showFirebaseGuide()">☁️ ลงทะเบียน</button>
     <button class="btn btn-gold edit-only" onclick="showPwChange()">🔑 รหัสผ่าน</button>
@@ -795,7 +794,7 @@ function scheduleAutoSave(){
   if(!isFirebaseReady())return;
   clearTimeout(_saveTimer);
   setSvStatus('unsaved','● มีการเปลี่ยนแปลง...');
-  _saveTimer=setTimeout(saveData,2500);
+  _saveTimer=setTimeout(saveData,5000);
 }
 function clearData(){
   if(!confirm('ล้างข้อมูลทั้งหมด (รีเซ็ตเป็นค่าเริ่มต้น)?'))return;
@@ -1263,17 +1262,49 @@ function doUnlock(){
 
 let _s7Chart=null;
 function buildS7Chart(){
-  const ctx=document.getElementById('s7LineChart')?.getContext('2d');if(!ctx)return;if(_s7Chart)_s7Chart.destroy();
-  const logs=getDailyLog(),DAYS=25,tgt=40;
-  const dayLabels=Array.from({length:DAYS},(_,i)=>'วัน '+(i+1));
-  const targetLine=dayLabels.map((_,i)=>parseFloat(((tgt/(DAYS-1))*i).toFixed(2)));
-  const actualPoints=logs.slice(-DAYS).map(l=>parseFloat((l.vals?.[6]||0).toFixed(1)));
-  const actualLine=dayLabels.map((_,i)=>i<actualPoints.length?actualPoints[i]:null);
-  const curVal=gv('s7');if(actualLine.every(v=>v===null)||actualPoints.length===0)actualLine[0]=curVal;
-  _s7Chart=new Chart(ctx,{type:'line',data:{labels:dayLabels,datasets:[
-    {label:'ที่ควรทำได้ (เป้า)',data:targetLine,borderColor:'rgba(56,139,253,.7)',backgroundColor:'rgba(56,139,253,.08)',fill:true,tension:.4,pointRadius:0,borderWidth:2,borderDash:[6,4]},
-    {label:'ที่ทำได้จริง',data:actualLine,borderColor:'#ff9500',backgroundColor:'rgba(255,149,0,.15)',fill:true,tension:.4,pointRadius:(ctx)=>ctx.dataIndex===actualPoints.length-1||actualPoints.length===0?5:2,pointBackgroundColor:'#ff9500',borderWidth:2.5,spanGaps:false}
-  ]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:true,position:'top',labels:{color:'#8899aa',font:{size:10},boxWidth:20,padding:8}},tooltip:{backgroundColor:'rgba(8,13,20,.95)',borderColor:'rgba(56,139,253,.3)',borderWidth:1,titleColor:'#e8f0fe',bodyColor:'#8899aa',padding:9,callbacks:{label:c=>` ${c.dataset.label}: ${c.parsed.y!=null?c.parsed.y.toFixed(1):''}%`}}},scales:{x:{ticks:{color:'#8899aa',font:{size:9},maxTicksLimit:8},grid:{color:'rgba(255,255,255,.03)'},border:{color:'rgba(56,139,253,.1)'}},y:{min:0,max:45,ticks:{color:'#8899aa',font:{size:9},callback:v=>v+'%'},grid:{color:'rgba(255,255,255,.04)'},border:{color:'rgba(56,139,253,.1)'}}},animation:{duration:600}}});
+  const ctx=document.getElementById('s7LineChart')?.getContext('2d');if(!ctx)return;
+  if(_s7Chart)_s7Chart.destroy();
+  // จำนวนห้องเป้าหมายปัจจุบัน
+  const target=Math.min(22,Math.max(1,parseInt(document.getElementById('s7r-inp')?.value||9)||9));
+  const WTP_C=40*0.2;
+  const WTP_R=(40-WTP_C)/target;
+  // แกน X: ก่อนเริ่ม + ห้อง 1..target + ทางเดิน
+  const labels=['ก่อนเริ่ม'];
+  for(let i=1;i<=target;i++)labels.push('ห้อง '+i);
+  labels.push('ทางเดิน');
+  // actual: ค่าจริงแต่ละห้อง
+  const actual=[0];
+  let cumActual=0;
+  for(let i=0;i<target;i++){
+    const v=parseFloat(document.getElementById('s7r'+i)?.value||0)||0;
+    cumActual+=Math.min(WTP_R,v*WTP_R/100);
+    actual.push(parseFloat(cumActual.toFixed(2)));
+  }
+  const cor=parseFloat(document.getElementById('s7cor')?.value||0)||0;
+  cumActual+=Math.min(WTP_C,cor*WTP_C/100);
+  actual.push(parseFloat(Math.min(40,cumActual).toFixed(2)));
+  // target line: linear 0 → 40 across all points
+  const total=labels.length;
+  const targetLine=labels.map((_,i)=>parseFloat((40/(total-1)*i).toFixed(2)));
+  // gradient
+  const g=ctx.createLinearGradient(0,0,0,200);
+  g.addColorStop(0,'rgba(255,149,0,.4)');g.addColorStop(1,'rgba(255,149,0,.02)');
+  _s7Chart=new Chart(ctx,{type:'line',data:{labels,datasets:[
+    {label:'เป้าหมาย 40%',data:targetLine,borderColor:'rgba(56,139,253,.6)',backgroundColor:'rgba(56,139,253,.06)',fill:true,tension:.4,pointRadius:0,borderWidth:1.5,borderDash:[6,4]},
+    {label:'ทำได้จริง',data:actual,borderColor:'#ff9500',backgroundColor:g,fill:true,tension:.35,
+     pointRadius:actual.map((_,i)=>i===0||i===actual.length-1?5:4),
+     pointHoverRadius:8,pointBackgroundColor:'#ff9500',pointBorderColor:'#080d14',pointBorderWidth:2,borderWidth:2.5}
+  ]},options:{responsive:true,maintainAspectRatio:false,
+    interaction:{mode:'index',intersect:false},
+    plugins:{
+      legend:{display:true,position:'top',labels:{color:'#8899aa',font:{size:9},boxWidth:16,padding:8,usePointStyle:true,pointStyle:'circle'}},
+      tooltip:{backgroundColor:'rgba(4,8,18,.97)',borderColor:'rgba(255,149,0,.3)',borderWidth:1,
+        titleColor:'#e8f0fe',bodyColor:'#8899aa',padding:10,cornerRadius:8,
+        callbacks:{label:ct=>{if(ct.parsed.y==null)return null;return' '+ct.dataset.label+': '+ct.parsed.y.toFixed(2)+'%';}}}},
+    scales:{
+      x:{ticks:{color:'#8899aa',font:{size:9,weight:'600'},maxRotation:0},grid:{color:'rgba(255,255,255,.03)'},border:{color:'rgba(56,139,253,.1)'}},
+      y:{min:0,max:45,ticks:{color:'#8899aa',font:{size:9},callback:v=>v+'%',stepSize:10},grid:{color:'rgba(255,255,255,.04)'},border:{color:'rgba(56,139,253,.1)'}}
+    },animation:{duration:600}}});
 }
 function updS7Chart(){setTimeout(()=>{buildS7Chart();},50);}
 
@@ -1673,6 +1704,77 @@ if(document.readyState==='loading'){
     try{buildDonuts();}catch(e){}
     try{buildS7Chart();}catch(e){}
   },500);
+}
+
+function openExportJpegModal(){
+  const overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-family:var(--f);gap:14px';
+  overlay.innerHTML='<div style="font-size:18px;font-weight:700">🖼️ กำลัง Export JPEG...</div><div id="_exp_msg" style="font-size:13px;color:#8899aa">กำลังโหลด...</div><div style="width:240px;height:5px;background:rgba(255,255,255,.1);border-radius:99px;overflow:hidden"><div id="_exp_bar" style="height:100%;width:0%;background:#00d4ff;transition:width .4s;border-radius:99px"></div></div>';
+  document.body.appendChild(overlay);
+  const msg=document.getElementById('_exp_msg');
+  const bar=document.getElementById('_exp_bar');
+  function loadH2C(cb){
+    if(window.html2canvas)return cb();
+    const s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+    s.onload=cb;document.head.appendChild(s);
+  }
+  const A4W=794;
+  const now=new Date().toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'});
+  const pages=[
+    {title:'หน้า 1/2',ids:['zone-kpi','zone-pie','zone-donut','zone-s1s4','zone-s2'],file:'dashboard_page1.jpg'},
+    {title:'หน้า 2/2',ids:['zone-s3','zone-s5s6','zone-s7','zone-summary'],file:'dashboard_page2.jpg'}
+  ];
+  loadH2C(async()=>{
+    try{
+      for(let pi=0;pi<pages.length;pi++){
+        const pg=pages[pi];
+        msg.textContent='กำลัง render '+pg.title+'...';
+        bar.style.width=((pi+1)/pages.length*80)+'%';
+        const wrap=document.createElement('div');
+        wrap.style.cssText='position:fixed;left:-9999px;top:0;width:'+A4W+'px;padding:24px 28px;background:#0a0f1a;box-sizing:border-box;font-family:Sarabun,sans-serif';
+        const hdr=document.createElement('div');
+        hdr.style.cssText='display:flex;align-items:center;justify-content:space-between;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.15);margin-bottom:16px';
+        hdr.innerHTML='<div style="font-size:14px;font-weight:800;color:#e8f0fe">📋 Construction Progress Dashboard</div><div style="font-size:10px;color:#6b7a8d">'+pg.title+' · '+now+'</div>';
+        wrap.appendChild(hdr);
+        pg.ids.forEach(function(id){
+          const el=document.getElementById(id);if(!el)return;
+          const cl=el.cloneNode(true);
+          cl.style.marginBottom='14px';cl.style.maxWidth='100%';cl.style.boxSizing='border-box';
+          // Copy S7 chart canvas
+          if(id==='zone-s7'){
+            const orig=document.getElementById('s7LineChart');
+            const clcv=cl.querySelector('canvas');
+            if(orig&&clcv){
+              clcv.width=orig.width;clcv.height=orig.height;
+              const ctx2=clcv.getContext('2d');
+              if(ctx2)ctx2.drawImage(orig,0,0);
+            }
+          }
+          // Show donut tab-all
+          if(id==='zone-donut'){
+            cl.querySelectorAll('.DP').forEach(function(dp){dp.style.display='none';});
+            const ta=cl.querySelector('#tab-all');if(ta)ta.style.display='block';
+          }
+          wrap.appendChild(cl);
+        });
+        document.body.appendChild(wrap);
+        await new Promise(function(r){setTimeout(r,300);});
+        const cv=await html2canvas(wrap,{scale:2,useCORS:true,backgroundColor:'#0a0f1a',logging:false,width:A4W,windowWidth:A4W});
+        document.body.removeChild(wrap);
+        const a=document.createElement('a');
+        a.href=cv.toDataURL('image/jpeg',.92);
+        a.download=pg.file;a.click();
+        await new Promise(function(r){setTimeout(r,700);});
+      }
+      bar.style.width='100%';
+      msg.textContent='✅ ดาวน์โหลดสำเร็จ 2 ไฟล์';
+      setTimeout(function(){document.body.removeChild(overlay);},1500);
+    }catch(e){
+      msg.textContent='เกิดข้อผิดพลาด: '+e.message;
+      setTimeout(function(){document.body.removeChild(overlay);},4000);
+    }
+  });
 }
 </script>
 </body>
