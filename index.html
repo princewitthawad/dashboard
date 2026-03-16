@@ -311,7 +311,7 @@ body.view-mode .edit-only{display:none!important}
     </div>
     <div>
       <div class="ht">Construction Progress Dashboard</div>
-      <div class="hs">รายงานความคืบหน้างานก่อสร้าง · v2.0</div>
+      <div class="hs">รายงานความคืบหน้างานก่อสร้าง · v2.3</div>
     </div>
   </div>
   <div class="hbtns">
@@ -320,7 +320,7 @@ body.view-mode .edit-only{display:none!important}
     <button class="btn btn-g edit-only" onclick="saveData()">💾 บันทึก</button>
     <button class="btn edit-only" onclick="printDashboard()" style="background:rgba(255,255,255,.08);color:#e8f0fe;border:1px solid rgba(255,255,255,.2)">🖨️ Print</button>
     <button class="btn edit-only" onclick="openExportJpegModal()" style="background:rgba(0,180,255,.15);color:#00d4ff;border:1px solid rgba(0,212,255,.4)">🖼️ Export JPEG</button>
-    <button class="btn btn-b edit-only" onclick="showFirebaseGuide()">⚙️ Cloud</button>
+    <button class="btn btn-b" onclick="showFirebaseGuide()" style="font-size:11px">☁️ ลงทะเบียน</button>
     <button class="btn btn-gold edit-only" onclick="showPwChange()">🔑 รหัสผ่าน</button>
     <button class="btn btn-r edit-only" onclick="clearData()">🗑️ ล้าง</button>
     <a id="lockin-link" href="#" onclick="event.preventDefault();showLockModal()" style="font-size:11px;font-weight:600;color:var(--tx2);text-decoration:none;padding:5px 10px;border-radius:6px;transition:color .2s" onmouseover="this.style.color='var(--blue)'" onmouseout="this.style.color='var(--tx2)'">🔓 Login</a>
@@ -702,7 +702,11 @@ function doChangePw(){
   showToast('เปลี่ยนรหัสผ่านสำเร็จ 🔑','ok');
 }
 
-let _fbUrl=localStorage.getItem('cp_fb_url')||'';
+let _fbUrl=(()=>{
+  const preset='https://apartment-phase1-default-rtdb.firebaseio.com';
+  if(!localStorage.getItem('cp_fb_url'))localStorage.setItem('cp_fb_url',preset);
+  return localStorage.getItem('cp_fb_url')||preset;
+})();
 let _saveTimer=null,_lastSavedAt='';
 function fbPath(){return _fbUrl.replace(/\/+$/,'')+'/construction_progress.json';}
 function isFirebaseReady(){return _fbUrl&&_fbUrl.startsWith('https://');}
@@ -1436,13 +1440,11 @@ function init(){
   updPlaster();
   setTimeout(()=>{
     buildPieChart();buildDonuts();buildS7Chart();ra();
-    if(isFirebaseReady()){
-      setSvStatus('saving','☁️ กำลังซิงค์ข้อมูล...');
-      loadData().catch(()=>{});
-    }else{
+    // Auto-load with preset URL
+    setSvStatus('saving','☁️ กำลังโหลดข้อมูล...');
+    loadData().catch(()=>{
       try{const bk=localStorage.getItem('cp_backup');if(bk){applyState(JSON.parse(bk));setSvStatus('saved','💾 โหลดจาก Backup ท้องถิ่น');}}catch(e){}
-      setSvStatus('','💡 กด ⚙️ Cloud เพื่อตั้งค่า Firebase');
-    }
+    });
     startAutoRefresh();
     setTimeout(()=>{
       if(sessionStorage.getItem(SESSION_KEY)==='1'){applyEditMode();}
