@@ -1511,38 +1511,36 @@ function printDashboard(){
         msg.textContent=`กำลัง render ${pg.title}...`;
         bar.style.width=((pi+1)/pages.length*70)+'%';
 
-        // Build wrapper at exact A4 width
-        const wrap=document.createElement('div');
-        wrap.style.cssText=`position:fixed;left:-9999px;top:0;width:${A4W}px;padding:24px 28px;background:#0a0f1a;box-sizing:border-box;font-family:'Sarabun',sans-serif`;
-
-        // Header
-        const hdr=document.createElement('div');
-        hdr.style.cssText='display:flex;align-items:center;justify-content:space-between;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.15);margin-bottom:16px';
-        hdr.innerHTML=`<div style="font-size:15px;font-weight:800;color:#e8f0fe">📋 Construction Progress Dashboard</div><div style="font-size:10px;color:#6b7a8d">${pg.title} · ${now}</div>`;
-        wrap.appendChild(hdr);
-
-        // Clone each zone
-        pg.ids.forEach(id=>{
+        // Capture real DOM (preserves canvas/charts)
+        const allZones=['zone-kpi','zone-pie','zone-donut','zone-s1s4','zone-s2','zone-s3','zone-s5s6','zone-s7','zone-summary'];
+        const targetIds=pg.ids;
+        allZones.forEach(id=>{
           const el=document.getElementById(id);
-          if(!el)return;
-          const cl=el.cloneNode(true);
-          cl.style.marginBottom='14px';
-          cl.style.maxWidth='100%';
-          cl.style.boxSizing='border-box';
-          wrap.appendChild(cl);
+          if(el)el.style.display=targetIds.includes(id)?'':'none';
         });
-
-        document.body.appendChild(wrap);
-        await new Promise(r=>setTimeout(r,300));
-
-        const cv=await html2canvas(wrap,{
+        const hideEls=document.querySelectorAll('header,nav,#pnav,.save-bar,#toast,.edit-only,[id^="lock"],[id^="jpeg-modal"]');
+        const prevDisplay=[];
+        hideEls.forEach(el=>{prevDisplay.push(el.style.display);el.style.display='none';});
+        const hdr=document.createElement('div');
+        hdr.id='_print_hdr';
+        hdr.style.cssText='padding:12px 24px 10px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.15);margin-bottom:8px;background:#0a0f1a';
+        hdr.innerHTML=`<div style="font-size:15px;font-weight:800;color:#e8f0fe">📋 Construction Progress Dashboard</div><div style="font-size:10px;color:#6b7a8d">${pg.title} · ${now}</div>`;
+        document.body.insertBefore(hdr,document.body.firstChild);
+        window.scrollTo(0,0);
+        await new Promise(r=>setTimeout(r,400));
+        const cv=await html2canvas(document.body,{
           scale:2,useCORS:true,
           backgroundColor:'#0a0f1a',
           logging:false,
-          width:A4W,
-          windowWidth:A4W
+          width:Math.min(document.body.scrollWidth,A4W+56),
+          windowWidth:Math.min(document.body.scrollWidth,A4W+56)
         });
-        document.body.removeChild(wrap);
+        document.body.removeChild(hdr);
+        allZones.forEach(id=>{
+          const el=document.getElementById(id);
+          if(el)el.style.display='';
+        });
+        hideEls.forEach((el,i)=>{el.style.display=prevDisplay[i];});
         canvases.push(cv);
       }
 
@@ -1609,35 +1607,47 @@ function openExportJpegModal(){
         msg.textContent=`กำลัง render ${pg.title}...`;
         bar.style.width=((pi+1)/pages.length*80)+'%';
 
-        const wrap=document.createElement('div');
-        wrap.style.cssText=`position:fixed;left:-9999px;top:0;width:${A4W}px;padding:24px 28px;background:#0a0f1a;box-sizing:border-box;font-family:'Sarabun',sans-serif`;
+        // Capture real DOM: temporarily show only target zones
+        const allZones=['zone-kpi','zone-pie','zone-donut','zone-s1s4','zone-s2','zone-s3','zone-s5s6','zone-s7','zone-summary'];
+        const targetIds=pg.ids;
 
-        const hdr=document.createElement('div');
-        hdr.style.cssText='display:flex;align-items:center;justify-content:space-between;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.15);margin-bottom:16px';
-        hdr.innerHTML=`<div style="font-size:15px;font-weight:800;color:#e8f0fe">📋 Construction Progress Dashboard</div><div style="font-size:10px;color:#6b7a8d">${pg.title} · ${now}</div>`;
-        wrap.appendChild(hdr);
-
-        pg.ids.forEach(id=>{
+        // Hide non-target zones
+        allZones.forEach(id=>{
           const el=document.getElementById(id);
-          if(!el)return;
-          const cl=el.cloneNode(true);
-          cl.style.marginBottom='14px';
-          cl.style.maxWidth='100%';
-          cl.style.boxSizing='border-box';
-          wrap.appendChild(cl);
+          if(el)el.style.display=targetIds.includes(id)?'':'none';
         });
 
-        document.body.appendChild(wrap);
-        await new Promise(r=>setTimeout(r,300));
+        // Hide UI chrome
+        const hideEls=document.querySelectorAll('header,nav,#pnav,.save-bar,#toast,.edit-only,[id^="lock"],[id^="jpeg-modal"]');
+        const prevDisplay=[];
+        hideEls.forEach(el=>{prevDisplay.push(el.style.display);el.style.display='none';});
 
-        const cv=await html2canvas(wrap,{
+        // Add temp header
+        const hdr=document.createElement('div');
+        hdr.id='_print_hdr';
+        hdr.style.cssText='padding:12px 24px 10px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.15);margin-bottom:8px;background:#0a0f1a';
+        hdr.innerHTML=`<div style="font-size:15px;font-weight:800;color:#e8f0fe">📋 Construction Progress Dashboard</div><div style="font-size:10px;color:#6b7a8d">${pg.title} · ${now}</div>`;
+        document.body.insertBefore(hdr,document.body.firstChild);
+
+        // Scroll to top
+        window.scrollTo(0,0);
+        await new Promise(r=>setTimeout(r,400));
+
+        const cv=await html2canvas(document.body,{
           scale:2,useCORS:true,
           backgroundColor:'#0a0f1a',
           logging:false,
-          width:A4W,
-          windowWidth:A4W
+          width:Math.min(document.body.scrollWidth,A4W+56),
+          windowWidth:Math.min(document.body.scrollWidth,A4W+56)
         });
-        document.body.removeChild(wrap);
+
+        // Restore
+        document.body.removeChild(hdr);
+        allZones.forEach(id=>{
+          const el=document.getElementById(id);
+          if(el)el.style.display='';
+        });
+        hideEls.forEach((el,i)=>{el.style.display=prevDisplay[i];});
 
         // Download
         const a=document.createElement('a');
