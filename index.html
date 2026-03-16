@@ -805,7 +805,7 @@ function scheduleAutoSave(){
   if(!isFirebaseReady())return;
   clearTimeout(_saveTimer);
   setSvStatus('unsaved','● มีการเปลี่ยนแปลง...');
-  _saveTimer=setTimeout(saveData,2500);
+  _saveTimer=setTimeout(saveData,5000);
 }
 function clearData(){
   if(!confirm('ล้างข้อมูลทั้งหมด (รีเซ็ตเป็นค่าเริ่มต้น)?'))return;
@@ -848,10 +848,13 @@ function closeFbModal(){
 function showRealtimeGuide(){alert('📡 คู่มือแชร์ Realtime\n\n1. ไปที่ firebase.google.com → สร้าง Project ฟรี\n2. Realtime Database → สร้าง Database → โหมด Test\n3. คัดลอก URL (https://...firebaseio.com)\n4. กดปุ่ม ⚙️ Cloud → วาง URL\n5. กด 💾 บันทึก เพื่ออัพโหลดข้อมูล\n\n🔒 ทุกเครื่องที่ใส่ URL เดียวกัน\nจะแชร์ข้อมูลกัน Realtime!');}
 
 let _autoRefTimer=null;
+let _lastUserInput=0;
 function startAutoRefresh(){
   clearInterval(_autoRefTimer);
   _autoRefTimer=setInterval(async()=>{
     if(!isFirebaseReady())return;
+    // ถ้า user พิมพ์ภายใน 5 วินาทีที่ผ่านมา ข้ามไปก่อน
+    if(Date.now()-_lastUserInput<5000)return;
     try{const res=await fetch(fbPath());if(!res.ok)return;const s=await res.json();if(!s)return;
       if(s.savedAt&&s.savedAt!==_lastSavedAt){_lastSavedAt=s.savedAt;applyState(s);setSvStatus('saved','🔄 รีเฟรชอัตโนมัติ',new Date(s.savedAt).toLocaleString('th-TH'));}
     }catch(e){}
@@ -1646,6 +1649,7 @@ window.addEventListener('resize',()=>setTimeout(forcePieSquare,50));
 document.addEventListener('input',function(e){
   const el=e.target;
   if(!(el.classList.contains('PI')||el.classList.contains('DCI')))return;
+  _lastUserInput=Date.now(); // บันทึกเวลา user พิมพ์
   // ไม่แตะ cursor / selection เลย — ป้องกัน keyboard หายบน iPad/iPhone
   const v=el.value,clean=v.replace(/[^0-9.]/g,'').replace(/\.(?=.*\.)/g,'');
   if(clean!==v)el.value=clean;
