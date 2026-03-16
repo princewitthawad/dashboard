@@ -321,6 +321,7 @@ body.view-mode .edit-only{display:none!important}
     <div class="live-badge"><div class="ld"></div>LIVE</div>
     <div class="view-badge">👁️ โหมดดูอย่างเดียว</div>
     <button class="btn btn-g edit-only" onclick="saveData()">💾 บันทึก</button>
+    <button class="btn edit-only" onclick="printDashboard()" style="background:rgba(255,255,255,.08);color:#e8f0fe;border:1px solid rgba(255,255,255,.2)">🖨️ Print</button>
     <button class="btn edit-only" onclick="openExportJpegModal()" style="background:rgba(0,180,255,.15);color:#00d4ff;border:1px solid rgba(0,212,255,.4)">🖼️ Export JPEG</button>
     <button class="btn btn-b" onclick="showFirebaseGuide()" style="font-size:11px">☁️ ลงทะเบียน</button>
     <button class="btn btn-gold edit-only" onclick="showPwChange()">🔑 รหัสผ่าน</button>
@@ -473,17 +474,20 @@ body.view-mode .edit-only{display:none!important}
 <div class="card">
   <div class="SH"><div class="SN" style="background:#9c27b0">5</div><div class="ST">งานไฟฟ้า กรีดผนัง+ฝังท่อ</div><div class="Stg" style="margin-left:auto">เป้า 80%</div></div>
   <div class="C2" style="margin-bottom:12px"><div class="MS"><span class="MSi">🔌</span><div><div class="MSl">ห้องทั้งหมด</div><div class="MSv">44 ห้อง</div></div></div><div class="MS"><span class="MSi">⚖️</span><div><div class="MSl">น้ำหนักต่อห้อง</div><div class="MSv">2.27%</div></div></div></div>
-  <div class="PW"><div class="PM"><span class="PL">ชั้น 2–5</span><div class="IG"><input type="hidden" id="s5" value="4.5"><input class="PI" type="text" inputmode="decimal" pattern="[0-9.]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="s5r-inp" maxlength="4" value="2" oninput="updRooms('s5',this.value,44)" style="width:54px"><span class="Ps">ห้อง</span><span class="PP" id="s5p" style="color:var(--red);font-size:18px;font-weight:800">4.5%</span><span style="font-size:11px;color:var(--tx3);margin-left:3px">/80%</span></div></div><div class="PBG"><div class="PF r" id="s5b" style="width:4.5%"></div></div></div>
-  <div style="margin-top:10px;padding:9px 12px;background:var(--bg2);border-radius:7px;border:1px solid var(--bdr)"><div style="font-size:11px;color:var(--tx2)">ยังต้องทำ: <span style="color:var(--orange);font-weight:700;font-family:var(--m)" id="s5r">—</span></div><div style="font-size:11px;color:var(--tx2);margin-top:3px">ห้องที่ทำแล้ว: <span style="color:var(--tx);font-weight:700;font-family:var(--m)" id="s5rm">—</span></div></div>
+  <input type="hidden" id="s5" value="4.5">
+  <div class="PW"><div class="PM"><span class="PL">ความคืบหน้ารวม</span><span class="PP" id="s5p" style="color:var(--red)">4.5%</span><span style="font-size:11px;color:var(--tx3);margin-left:4px">/80%</span></div><div class="PBG"><div class="PF r" id="s5b" style="width:4.5%"></div></div></div>
+  <div style="margin-top:9px;padding:9px 12px;background:var(--bg2);border-radius:7px;border:1px solid var(--bdr);margin-bottom:12px"><div style="font-size:11px;color:var(--tx2)">ยังต้องทำ: <span style="color:var(--orange);font-weight:700;font-family:var(--m)" id="s5r">—</span></div><div style="font-size:11px;color:var(--tx2);margin-top:3px">ห้องที่ทำแล้ว: <span style="color:var(--tx);font-weight:700;font-family:var(--m)" id="s5rm">—</span></div></div>
+  <div id="s5rooms" style="display:flex;flex-direction:column;gap:6px;max-height:300px;overflow-y:auto"></div>
 </div>
 <div class="card">
   <div class="SH"><div class="SN" style="background:#00838f">6</div><div class="ST">งานเดินท่อน้ำดี</div><div class="Stg" style="margin-left:auto">เป้า 50%</div></div>
   <div class="C2" style="margin-bottom:12px"><div class="MS"><span class="MSi">💧</span><div><div class="MSl">ห้องทั้งหมด</div><div class="MSv">26 ห้อง</div></div></div><div class="MS"><span class="MSi">⚖️</span><div><div class="MSl">น้ำหนักต่อห้อง</div><div class="MSv">3.85%</div></div></div></div>
-  <div class="PW"><div class="PM"><span class="PL">ชั้น 1–3</span><div class="IG"><input type="hidden" id="s6" value="0"><input class="PI" type="text" inputmode="decimal" pattern="[0-9.]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="s6r-inp" maxlength="4" value="0" oninput="updRooms('s6',this.value,26)" style="width:54px"><span class="Ps">ห้อง</span><span class="PP" id="s6p" style="color:var(--red);font-size:18px;font-weight:800">0%</span><span style="font-size:11px;color:var(--tx3);margin-left:3px">/50%</span></div></div><div class="PBG"><div class="PF r" id="s6b" style="width:0%"></div></div></div>
-  <div style="margin-top:10px;padding:9px 12px;background:var(--bg2);border-radius:7px;border:1px solid var(--bdr)"><div style="font-size:11px;color:var(--tx2)">ยังต้องทำ: <span style="color:var(--orange);font-weight:700;font-family:var(--m)" id="s6r">—</span></div><div style="font-size:11px;color:var(--tx2);margin-top:3px">ห้องที่ทำแล้ว: <span style="color:var(--tx);font-weight:700;font-family:var(--m)" id="s6rm">—</span></div></div>
+  <input type="hidden" id="s6" value="0">
+  <div class="PW"><div class="PM"><span class="PL">ความคืบหน้ารวม</span><span class="PP" id="s6p" style="color:var(--red)">0%</span><span style="font-size:11px;color:var(--tx3);margin-left:4px">/50%</span></div><div class="PBG"><div class="PF r" id="s6b" style="width:0%"></div></div></div>
+  <div style="margin-top:9px;padding:9px 12px;background:var(--bg2);border-radius:7px;border:1px solid var(--bdr);margin-bottom:12px"><div style="font-size:11px;color:var(--tx2)">ยังต้องทำ: <span style="color:var(--orange);font-weight:700;font-family:var(--m)" id="s6r">—</span></div><div style="font-size:11px;color:var(--tx2);margin-top:3px">ห้องที่ทำแล้ว: <span style="color:var(--tx);font-weight:700;font-family:var(--m)" id="s6rm">—</span></div></div>
+  <div id="s6rooms" style="display:flex;flex-direction:column;gap:6px;max-height:300px;overflow-y:auto"></div>
 </div>
 </div>
-
 <div class="card" id="zone-s7">
   <div class="SH"><div class="SN" style="background:#f57c00">7</div><div class="ST">งานฉาบผนังภายใน (ชั้น 4 และ ชั้น 2)</div><div class="Stg" style="margin-left:auto">เป้า 40%</div><span style="font-size:10px;color:var(--tx3);background:var(--bg2);border:1px solid var(--bdr);padding:2px 7px;border-radius:4px">9 ห้อง · น้ำหนักห้องละ 4.44%</span></div>
   <!-- summary bar + stats -->
@@ -744,14 +748,14 @@ function setSvStatus(st,msg,time=''){
 }
 
 function collectState(){
-  return{s1:gv('s1'),s4t:gv('s4t'),s5:gv('s5'),s6:gv('s6'),s7:gv('s7'),s7rooms:Array.from({length:9},(_,i)=>parseFloat(document.getElementById('s7r'+i)?.value||0)||0),s5r:parseFloat(document.getElementById('s5r-inp')?.value||0),s6r:parseFloat(document.getElementById('s6r-inp')?.value||0),s7r:parseFloat(document.getElementById('s7r-inp')?.value||0),
+  return{s1:gv('s1'),s4t:gv('s4t'),s5:gv('s5'),s6:gv('s6'),s7:gv('s7'),s5rooms:Array.from({length:44},(_,i)=>parseFloat(document.getElementById('s5r'+i)?.value||0)||0),s6rooms:Array.from({length:26},(_,i)=>parseFloat(document.getElementById('s6r'+i)?.value||0)||0),s7rooms:Array.from({length:9},(_,i)=>parseFloat(document.getElementById('s7r'+i)?.value||0)||0),s7cors:Array.from({length:9},(_,i)=>parseFloat(document.getElementById('s7c'+i)?.value||0)||0),s5r:parseFloat(document.getElementById('s5r-inp')?.value||0),s6r:parseFloat(document.getElementById('s6r-inp')?.value||0),s7r:parseFloat(document.getElementById('s7r-inp')?.value||0),
     r41:gv('r41'),r42:gv('r42'),r43:gv('r43'),r44:gv('r44'),r45:gv('r45'),
     fd:FD.map(f=>f.pct),od:OD.map(o=>({fd:o.fd,bd:o.bd,sld:o.sld,srd:o.srd})),savedAt:new Date().toISOString()};
 }
 function applyState(s){
   if(!s)return;
   const sv=(id,v)=>{const e=document.getElementById(id);if(e)e.value=v;};
-  sv('s1',s.s1);sv('s4t',s.s4t);sv('s5',s.s5);sv('s6',s.s6);sv('s7',s.s7);if(s.s7rooms)s.s7rooms.forEach((v,i)=>{const e=document.getElementById('s7r'+i);if(e)e.value=v;});
+  sv('s1',s.s1);sv('s4t',s.s4t);sv('s5',s.s5);sv('s6',s.s6);sv('s7',s.s7);if(s.s5rooms)s.s5rooms.forEach((v,i)=>{const e=document.getElementById('s5r'+i);if(e)e.value=v;});if(s.s6rooms)s.s6rooms.forEach((v,i)=>{const e=document.getElementById('s6r'+i);if(e)e.value=v;});if(s.s7rooms)s.s7rooms.forEach((v,i)=>{const e=document.getElementById('s7r'+i);if(e)e.value=v;});if(s.s7cors)s.s7cors.forEach((v,i)=>{const e=document.getElementById('s7c'+i);if(e)e.value=v;});
   // restore room-based visible inputs
   if(s.s5r!==undefined){const e=document.getElementById('s5r-inp');if(e)e.value=s.s5r;}else{const e=document.getElementById('s5r-inp');if(e)e.value=Math.round(gv('s5')/100*44);}
   if(s.s6r!==undefined){const e=document.getElementById('s6r-inp');if(e)e.value=s.s6r;}else{const e=document.getElementById('s6r-inp');if(e)e.value=Math.round(gv('s6')/100*26);}
@@ -762,7 +766,7 @@ function applyState(s){
   buildS2(true);buildS3();
   ['s1','s4t','s5','s6','s7'].forEach(id=>setBar(id,id+'b',id+'p'));
   ['r41','r42','r43','r44','r45'].forEach(id=>setBar(id,id+'b',id+'p'));
-  buildPlasterUI(true);updPlaster();buildDonuts();updS7Chart();ra();
+  buildS5S6UI(true);updS5S6Rooms('s5');updS5S6Rooms('s6');buildS5S6UI();buildPlasterUI();updPlaster();buildDonuts();updS7Chart();ra();
 }
 async function saveData(){
   if(!isFirebaseReady()){showFirebaseGuide();return;}
@@ -825,8 +829,6 @@ function onFbUrlInput(v){
   if(!hint)return;
   if(!v){hint.textContent='';return;}
   if(v.startsWith('https://')){hint.textContent='✅ URL ถูกต้อง';hint.style.color='var(--green)';
-    // auto OK เมื่อ paste URL ที่ถูกต้อง (ความยาว > 20)
-    if(v.length>20)setTimeout(doFbSave,400);
   }else{hint.textContent='❌ ต้องขึ้นต้นด้วย https://';hint.style.color='var(--red)';}
 }
 function doFbSave(){
@@ -1052,69 +1054,83 @@ function updS3Area(){
 function toggleS3Line(i){if(!_s3Chart)return;const meta=_s3Chart.getDatasetMeta(i);meta.hidden=!meta.hidden;_s3Chart.update();const el=document.getElementById('s3-leg-'+i);if(el)el.style.opacity=meta.hidden?'0.3':'1';}
 
 function buildPlasterUI(force=false){
-  // สร้าง DOM ครั้งแรก — เรียกตอน init และ toggle view/edit เท่านั้น
   const ROOMS=9,WTP=40/ROOMS;
   const isView=document.body.classList.contains('view-mode');
   const cont=document.getElementById('prooms');if(!cont)return;
   if(isView){
-    // view mode: card ห้อง (hidden input เก็บค่า)
-    const vals=Array.from({length:ROOMS},(_,i)=>parseFloat(document.getElementById('s7r'+i)?.value||0)||0);
+    const vals=Array.from({length:ROOMS},(_,i)=>({
+      r:parseFloat(document.getElementById('s7r'+i)?.value||0)||0,
+      c:parseFloat(document.getElementById('s7c'+i)?.value||0)||0
+    }));
     let h='<div style="display:flex;flex-wrap:wrap;gap:8px">';
-    vals.forEach((val,i)=>{
-      const contrib=Math.min(WTP,val*WTP/100);
-      const col=val>=90?'var(--green)':val>=50?'var(--blue)':val>=30?'var(--orange)':'var(--red)';
-      h+=`<div id="s7card${i}" style="width:80px;padding:10px 6px;border-radius:var(--rs);text-align:center;border:1px solid;background:${val>=90?'var(--dg)':'rgba(255,255,255,.03)'};border-color:${val>=90?'rgba(0,230,118,.4)':'var(--bdr)'}">
-        <div style="font-size:11px;font-weight:700;color:var(--tx2);margin-bottom:4px">ห้อง ${i+1}</div>
-        <div id="s7cv${i}" style="font-size:22px;font-weight:800;font-family:var(--m);color:${col};line-height:1.1">${val.toFixed(0)}<span style="font-size:11px">%</span></div>
-        <div style="height:4px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;margin-top:5px"><div id="s7cb${i}" style="height:100%;width:${Math.min(100,val)}%;background:${col};border-radius:99px"></div></div>
-        <div id="s7cc${i}" style="font-size:9px;color:var(--tx3);margin-top:3px">${contrib.toFixed(2)}%</div>
-        <input type="hidden" id="s7r${i}" value="${val}">
+    vals.forEach(({r,c},i)=>{
+      const contrib=Math.min(WTP,(r*0.8+c*0.2)*WTP/100);
+      const col=contrib>=WTP*0.9?'var(--green)':contrib>=WTP*0.5?'var(--blue)':contrib>=WTP*0.3?'var(--orange)':'var(--red)';
+      h+=`<div id="s7card${i}" style="width:84px;padding:10px 6px;border-radius:var(--rs);text-align:center;border:1px solid;background:${contrib>=WTP*0.9?'var(--dg)':'rgba(255,255,255,.03)'};border-color:${contrib>=WTP*0.9?'rgba(0,230,118,.4)':'var(--bdr)'}">
+        <div style="font-size:10px;font-weight:700;color:var(--tx2);margin-bottom:3px">ห้อง ${i+1}</div>
+        <div id="s7cv${i}" style="font-size:18px;font-weight:800;font-family:var(--m);color:${col};line-height:1.1">${contrib.toFixed(2)}<span style="font-size:9px">%</span></div>
+        <div style="font-size:9px;color:var(--tx3);margin-top:2px">ใน:${r.toFixed(0)}% เดิน:${c.toFixed(0)}%</div>
+        <div style="height:3px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;margin-top:4px"><div id="s7cb${i}" style="height:100%;width:${Math.min(100,contrib/WTP*100)}%;background:${col};border-radius:99px"></div></div>
+        <input type="hidden" id="s7r${i}" value="${r}">
+        <input type="hidden" id="s7c${i}" value="${c}">
       </div>`;
     });
     h+='</div>';
     cont.innerHTML=h;
   }else{
-    // edit mode: input rows — สร้างแค่ครั้งแรก ต้องไม่ rebuild ขณะพิมพ์
-    if(!force&&cont.querySelector('#s7r0'))return; // มีอยู่แล้ว ไม่ rebuild
+    if(!force&&cont.querySelector('#s7r0'))return;
     let h='';
     for(let i=0;i<ROOMS;i++){
-      h+=`<div id="s7row${i}" style="background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--rs);padding:9px 12px;display:flex;align-items:center;gap:10px;transition:border-color .2s">
-        <div id="s7chk${i}" style="width:22px;height:22px;border-radius:5px;border:2px solid var(--tx3);background:transparent;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s"></div>
-        <div style="font-size:12px;font-weight:700;min-width:60px;color:var(--tx2)">ห้องที่ ${i+1}</div>
-        <div style="flex:1"><div class="PBG" style="height:6px"><div id="s7pb${i}" class="PF r" style="width:0%"></div></div></div>
-        <input class="PI" type="text" inputmode="decimal" pattern="[0-9.]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="s7r${i}" value="0" oninput="updPlaster();updS7Chart();ra();scheduleAutoSave()" style="width:52px;min-width:0;flex-shrink:0;-webkit-user-select:text;user-select:text">
-        <span class="Ps">%</span>
-        <span id="s7pct${i}" style="font-size:11px;font-family:var(--m);color:var(--red);min-width:40px;text-align:right">0.00%</span>
+      const r=parseFloat(document.getElementById('s7r'+i)?.value||0)||0;
+      const c=parseFloat(document.getElementById('s7c'+i)?.value||0)||0;
+      const clr=r>=90?'g':r>=50?'b':r>=30?'o':'r';
+      const clc=c>=90?'g':c>=50?'b':c>=30?'o':'r';
+      const contrib=Math.min(WTP,(r*0.8+c*0.2)*WTP/100);
+      const checked=r>=100&&c>=100;
+      h+=`<div id="s7row${i}" style="background:var(--bg2);border:1px solid ${checked?'rgba(0,230,118,.4)':'var(--bdr)'};border-radius:var(--rs);padding:8px 10px;margin-bottom:2px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div id="s7chk${i}" style="width:20px;height:20px;border-radius:4px;border:2px solid ${checked?'var(--green)':'var(--tx3)'};background:${checked?'var(--green)':'transparent'};flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s">${checked?'<svg width="11" height="11" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2" stroke="#000" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>':''}</div>
+          <div style="font-size:11px;font-weight:700;color:var(--tx);min-width:56px">ห้องที่ ${i+1}</div>
+          <div style="flex:1"><div class="PBG" style="height:5px"><div id="s7pb${i}" class="PF ${clr}" style="width:${Math.min(100,r)}%"></div></div></div>
+          <input class="PI" type="text" inputmode="decimal" pattern="[0-9.]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="s7r${i}" value="${r}" oninput="updPlaster();updS7Chart();ra();scheduleAutoSave()" style="width:48px;min-width:0;flex-shrink:0;-webkit-user-select:text;user-select:text;font-size:14px">
+          <span class="Ps">%</span>
+          <span id="s7pct${i}" style="font-size:10px;font-family:var(--m);color:var(--tx3);min-width:38px;text-align:right">${contrib.toFixed(2)}%</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:5px;padding-left:28px">
+          <div style="font-size:10px;color:var(--tx3);min-width:56px">↳ ทางเดิน</div>
+          <div style="flex:1"><div class="PBG" style="height:4px"><div id="s7cpb${i}" class="PF ${clc}" style="width:${Math.min(100,c)}%"></div></div></div>
+          <input class="PI" type="text" inputmode="decimal" pattern="[0-9.]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="s7c${i}" value="${c}" oninput="updPlaster();updS7Chart();ra();scheduleAutoSave()" style="width:48px;min-width:0;flex-shrink:0;-webkit-user-select:text;user-select:text;font-size:14px">
+          <span class="Ps">%</span>
+        </div>
       </div>`;
     }
     cont.innerHTML=h;
   }
 }
 function updPlaster(){
-  // อัพเดท visual เท่านั้น — ไม่แตะ DOM input
   const ROOMS=9,WTP=40/ROOMS;
   const isView=document.body.classList.contains('view-mode');
   let totalPct=0,doneCount=0;
   for(let i=0;i<ROOMS;i++){
-    const val=parseFloat(document.getElementById('s7r'+i)?.value||0)||0;
-    const contrib=Math.min(WTP,val*WTP/100);
+    const r=parseFloat(document.getElementById('s7r'+i)?.value||0)||0;
+    const c=parseFloat(document.getElementById('s7c'+i)?.value||0)||0;
+    const contrib=Math.min(WTP,(r*0.8+c*0.2)*WTP/100);
     totalPct+=contrib;
-    const checked=val>=100;
-    if(checked)doneCount++;
-    const col=val>=90?'var(--green)':val>=50?'var(--blue)':val>=30?'var(--orange)':'var(--red)';
-    const cl=val>=90?'g':val>=50?'b':val>=30?'o':'r';
+    const checked=r>=100&&c>=100;if(checked)doneCount++;
+    const col=contrib>=WTP*0.9?'var(--green)':contrib>=WTP*0.5?'var(--blue)':contrib>=WTP*0.3?'var(--orange)':'var(--red)';
+    const clr=r>=90?'g':r>=50?'b':r>=30?'o':'r';
+    const clc=c>=90?'g':c>=50?'b':c>=30?'o':'r';
     if(isView){
       const card=document.getElementById('s7card'+i);
-      if(card){card.style.background=val>=90?'var(--dg)':'rgba(255,255,255,.03)';card.style.borderColor=val>=90?'rgba(0,230,118,.4)':'var(--bdr)';}
-      const cv=document.getElementById('s7cv'+i);if(cv){cv.style.color=col;cv.innerHTML=val.toFixed(0)+'<span style="font-size:11px">%</span>';}
-      const cb=document.getElementById('s7cb'+i);if(cb){cb.style.width=Math.min(100,val)+'%';cb.style.background=col;}
-      const cc=document.getElementById('s7cc'+i);if(cc)cc.textContent=contrib.toFixed(2)+'%';
+      if(card){card.style.background=contrib>=WTP*0.9?'var(--dg)':'rgba(255,255,255,.03)';card.style.borderColor=contrib>=WTP*0.9?'rgba(0,230,118,.4)':'var(--bdr)';}
+      const cv=document.getElementById('s7cv'+i);if(cv){cv.style.color=col;cv.innerHTML=contrib.toFixed(2)+'<span style="font-size:9px">%</span>';}
+      const cb=document.getElementById('s7cb'+i);if(cb){cb.style.width=Math.min(100,contrib/WTP*100)+'%';cb.style.background=col;}
     }else{
-      const row=document.getElementById('s7row'+i);
-      if(row)row.style.borderColor=checked?'rgba(0,230,118,.4)':'var(--bdr)';
+      const row=document.getElementById('s7row'+i);if(row)row.style.borderColor=checked?'rgba(0,230,118,.4)':'var(--bdr)';
       const chk=document.getElementById('s7chk'+i);
-      if(chk){chk.style.background=checked?'var(--green)':'transparent';chk.style.borderColor=checked?'var(--green)':'var(--tx3)';chk.innerHTML=checked?'<svg width="12" height="12" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2" stroke="#000" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>':'';}
-      const pb=document.getElementById('s7pb'+i);if(pb){pb.style.width=Math.min(100,val)+'%';pb.className='PF '+cl;}
+      if(chk){chk.style.background=checked?'var(--green)':'transparent';chk.style.borderColor=checked?'var(--green)':'var(--tx3)';chk.innerHTML=checked?'<svg width="11" height="11" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2" stroke="#000" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>':'';}
+      const pb=document.getElementById('s7pb'+i);if(pb){pb.style.width=Math.min(100,r)+'%';pb.className='PF '+clr;}
+      const cpb=document.getElementById('s7cpb'+i);if(cpb){cpb.style.width=Math.min(100,c)+'%';cpb.className='PF '+clc;}
       const pct=document.getElementById('s7pct'+i);if(pct){pct.textContent=contrib.toFixed(2)+'%';pct.style.color=col;}
     }
   }
@@ -1251,14 +1267,55 @@ function updRooms(key,v,total){
   if(key==='s7'){updPlaster2(rooms,total);updS7Chart();}
   ra();scheduleAutoSave();
 }
+function buildS5S6UI(force=false){
+  [{key:'s5',total:44},{key:'s6',total:26}].forEach(({key,total})=>{
+    const c=document.getElementById(key+'rooms');if(!c)return;
+    if(!force&&c.querySelector('#'+key+'r0'))return;
+    let h='';
+    for(let i=0;i<total;i++){
+      const val=parseFloat(document.getElementById(key+'r'+i)?.value||0)||0;
+      const cl=val>=90?'g':val>=50?'b':val>=30?'o':'r';
+      const checked=val>=100;
+      h+=`<div id="${key}row${i}" style="background:var(--bg2);border:1px solid ${checked?'rgba(0,230,118,.4)':'var(--bdr)'};border-radius:var(--rs);padding:7px 10px;display:flex;align-items:center;gap:8px;transition:border-color .2s">
+        <div id="${key}chk${i}" style="width:20px;height:20px;border-radius:4px;border:2px solid ${checked?'var(--green)':'var(--tx3)'};background:${checked?'var(--green)':'transparent'};flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s">${checked?'<svg width="11" height="11" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2" stroke="#000" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>':''}</div>
+        <div style="font-size:11px;font-weight:700;min-width:52px;color:var(--tx2)">ห้องที่ ${i+1}</div>
+        <div style="flex:1"><div class="PBG" style="height:5px"><div id="${key}pb${i}" class="PF ${cl}" style="width:${Math.min(100,val)}%"></div></div></div>
+        <input class="PI" type="text" inputmode="decimal" pattern="[0-9.]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="${key}r${i}" value="${val}" oninput="updS5S6Rooms('${key}');ra();scheduleAutoSave()" style="width:50px;min-width:0;flex-shrink:0;-webkit-user-select:text;user-select:text;font-size:14px">
+        <span class="Ps">%</span>
+      </div>`;
+    }
+    c.innerHTML=h;
+  });
+}
+function updS5S6Rooms(key){
+  const cfg={s5:{total:44,tgt:80},s6:{total:26,tgt:50}};
+  const {total,tgt}=cfg[key];
+  let sum=0,done=0;
+  for(let i=0;i<total;i++){
+    const val=parseFloat(document.getElementById(key+'r'+i)?.value||0)||0;
+    sum+=val; if(val>=100)done++;
+    const cl=val>=90?'g':val>=50?'b':val>=30?'o':'r';
+    const checked=val>=100;
+    const row=document.getElementById(key+'row'+i);if(row)row.style.borderColor=checked?'rgba(0,230,118,.4)':'var(--bdr)';
+    const chk=document.getElementById(key+'chk'+i);
+    if(chk){chk.style.background=checked?'var(--green)':'transparent';chk.style.borderColor=checked?'var(--green)':'var(--tx3)';chk.innerHTML=checked?'<svg width="11" height="11" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2" stroke="#000" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>':'';}
+    const pb=document.getElementById(key+'pb'+i);if(pb){pb.style.width=Math.min(100,val)+'%';pb.className='PF '+cl;}
+  }
+  const pct=parseFloat((sum/total).toFixed(4));
+  const hid=document.getElementById(key);if(hid)hid.value=pct;
+  setBar(key,key+'b',key+'p');
+  updS5S6();
+}
 function updS5S6(){
   const s5v=gv('s5'),s6v=gv('s6');
+  const s5done=Array.from({length:44},(_,i)=>parseFloat(document.getElementById('s5r'+i)?.value||0)||0).filter(v=>v>=100).length;
+  const s6done=Array.from({length:26},(_,i)=>parseFloat(document.getElementById('s6r'+i)?.value||0)||0).filter(v=>v>=100).length;
   const s5r=document.getElementById('s5r'),s5rm=document.getElementById('s5rm');
   const s6r=document.getElementById('s6r'),s6rm=document.getElementById('s6rm');
-  const s5rooms=parseFloat(document.getElementById('s5r-inp')?.value||0);
-  const s6rooms=parseFloat(document.getElementById('s6r-inp')?.value||0);
-  if(s5r)s5r.textContent=ceilTo2(80-s5v)+'% (เป้า 80%)';if(s5rm)s5rm.textContent=s5rooms+'/44 ห้อง (='+ceilTo2(s5v)+'%)';
-  if(s6r)s6r.textContent=ceilTo2(50-s6v)+'% (เป้า 50%)';if(s6rm)s6rm.textContent=s6rooms+'/26 ห้อง (='+ceilTo2(s6v)+'%)';
+  if(s5r)s5r.textContent=ceilTo2(80-s5v)+'% (เป้า 80%)';
+  if(s5rm)s5rm.textContent=s5done+'/44 ห้อง (='+ceilTo2(s5v)+'%)';
+  if(s6r)s6r.textContent=ceilTo2(50-s6v)+'% (เป้า 50%)';
+  if(s6rm)s6rm.textContent=s6done+'/26 ห้อง (='+ceilTo2(s6v)+'%)';
 }
 
 function ra(){
@@ -1271,8 +1328,8 @@ const SESSION_KEY='cp_edit_session';
 let _isLocked=false,_numBuf='',_lastTouch=0;
 function showLockModal(){document.getElementById('lock-modal').classList.add('show');}
 function closeLockModal(){document.getElementById('lock-modal').classList.remove('show');_numBuf='';_syncDots();}
-function applyViewMode(){document.body.classList.add('view-mode');setTimeout(()=>{buildPlasterUI();updPlaster();},50);_isLocked=true;const link=document.getElementById('lockin-link'),logout=document.getElementById('logout-btn');if(link)link.style.display='';if(logout)logout.style.display='none';}
-function applyEditMode(){document.body.classList.remove('view-mode');setTimeout(()=>{document.getElementById('prooms').innerHTML='';buildPlasterUI();updPlaster();},50);_isLocked=false;sessionStorage.setItem(SESSION_KEY,'1');const link=document.getElementById('lockin-link'),logout=document.getElementById('logout-btn');if(link)link.style.display='none';if(logout)logout.style.display='';showGreeting();}
+function applyViewMode(){document.body.classList.add('view-mode');setTimeout(()=>{buildS5S6UI();buildPlasterUI();updPlaster();},50);_isLocked=true;const link=document.getElementById('lockin-link'),logout=document.getElementById('logout-btn');if(link)link.style.display='';if(logout)logout.style.display='none';}
+function applyEditMode(){document.body.classList.remove('view-mode');setTimeout(()=>{document.getElementById('prooms').innerHTML='';buildS5S6UI();buildPlasterUI();updPlaster();},50);_isLocked=false;sessionStorage.setItem(SESSION_KEY,'1');const link=document.getElementById('lockin-link'),logout=document.getElementById('logout-btn');if(link)link.style.display='none';if(logout)logout.style.display='';showGreeting();}
 function showGreeting(){const d=document.createElement('div');d.style.cssText='position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;pointer-events:none';d.innerHTML=`<div style="background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:36px 72px;backdrop-filter:blur(20px);box-shadow:0 12px 60px rgba(0,0,0,.5);animation:greetIn .35s cubic-bezier(.34,1.56,.64,1) both"><span style="font-size:42px;font-weight:800;color:#e8f0fe;font-family:'Sarabun',sans-serif;letter-spacing:1px">สวัสดี ค่ะ</span></div>`;document.body.appendChild(d);setTimeout(()=>{d.firstElementChild.style.cssText+=';animation:greetOut .3s ease forwards';setTimeout(()=>d.remove(),300);},3000);}
 function doLogout(){sessionStorage.removeItem(SESSION_KEY);applyViewMode();showToast('ออกจากระบบแล้ว 🔒','ok');}
 function numPress(n){const now=Date.now();if(now-_lastTouch<300)return;_lastTouch=now;if(_numBuf.length>=6)return;_numBuf+=n;_syncDots();if(_numBuf.length===6){setTimeout(doUnlock,120);}}
@@ -1601,6 +1658,155 @@ document.addEventListener('blur',function(e){
   if(isNaN(v))v=0;
   el.value=Math.min(100,Math.max(0,v));
 },true);
+
+function printDashboard(){
+  const overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-family:var(--f);gap:14px';
+  overlay.innerHTML='<div style="font-size:18px;font-weight:700">🖨️ กำลังเตรียมปริ้นท์...</div><div id="_pr_msg" style="font-size:13px;color:#8899aa">กำลังโหลด...</div><div style="width:240px;height:5px;background:rgba(255,255,255,.1);border-radius:99px;overflow:hidden"><div id="_pr_bar" style="height:100%;width:0%;background:#00e676;transition:width .4s;border-radius:99px"></div></div>';
+  document.body.appendChild(overlay);
+  const msg=document.getElementById('_pr_msg');
+  const bar=document.getElementById('_pr_bar');
+
+  function loadH2C(cb){
+    if(window.html2canvas)return cb();
+    const s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+    s.onload=cb;document.head.appendChild(s);
+  }
+
+  const A4W=794;
+
+  // Ensure S3 detail open for print
+  const s3det=document.getElementById('s3-detail');
+  const s3wasOpen=s3det?.classList.contains('open');
+  if(s3det&&!s3wasOpen){s3det.classList.add('open');try{updS3Area();}catch(e){}}
+
+  // Ensure tab-all visible for donut
+  const tabAll=document.getElementById('tab-all');
+  if(tabAll)tabAll.style.display='block';
+
+  // Ensure S7 chart rendered
+  try{buildS7Chart();}catch(e){}
+
+  // Pages definition
+  const pages=[
+    {title:'หน้า 1/4', ids:['zone-pie','zone-donut']},
+    {title:'หน้า 2/4', ids:['zone-s1s4','zone-s2','zone-s5s6']},
+    {title:'หน้า 3/4', ids:['zone-s3']},
+    {title:'หน้า 4/4', ids:['zone-s7','zone-summary']},
+  ];
+
+  loadH2C(async()=>{
+    try{
+      const now=new Date().toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'});
+      const canvases=[];
+
+      for(let pi=0;pi<pages.length;pi++){
+        const pg=pages[pi];
+        msg.textContent=`กำลัง render ${pg.title}...`;
+        bar.style.width=((pi+1)/pages.length*80)+'%';
+
+        const wrap=document.createElement('div');
+        wrap.style.cssText=`position:fixed;left:-9999px;top:0;width:${A4W}px;padding:20px 24px;background:#0a0f1a;box-sizing:border-box;font-family:'Sarabun',sans-serif`;
+
+        // Header
+        const hdr=document.createElement('div');
+        hdr.style.cssText='display:flex;align-items:center;justify-content:space-between;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.15);margin-bottom:12px';
+        hdr.innerHTML=`<div style="font-size:14px;font-weight:800;color:#e8f0fe">📋 Construction Progress Dashboard</div><div style="font-size:10px;color:#6b7a8d">${pg.title} · ${now}</div>`;
+        wrap.appendChild(hdr);
+
+        // Special: page 1 — show donut tab-all, shrink S7 chart
+        pg.ids.forEach(id=>{
+          const el=document.getElementById(id);
+          if(!el)return;
+          const cl=el.cloneNode(true);
+          cl.style.marginBottom='12px';
+          cl.style.maxWidth='100%';
+          cl.style.boxSizing='border-box';
+
+          // Page 1: ensure donut tab-all visible, hide other tabs
+          if(id==='zone-donut'){
+            cl.querySelectorAll('.DP').forEach(dp=>{dp.style.display='none';});
+            const ta=cl.querySelector('#tab-all');
+            if(ta){ta.style.display='block';}
+            // Hide tab buttons to save space
+            const tabs=cl.querySelector('.TABs,.DS-tabs');
+            if(tabs)tabs.style.display='none';
+          }
+
+          // Page 2: S1S4 — make room cards inline
+          if(id==='zone-s1s4'){
+            cl.style.display='grid';
+            cl.style.gridTemplateColumns='1fr 1fr';
+            cl.style.gap='12px';
+          }
+
+          // Page 3: S3 — open detail
+          if(id==='zone-s3'){
+            const det=cl.querySelector('#s3-detail');
+            if(det){det.classList.add('open');det.style.display='block';}
+          }
+
+          // Page 4: S7 — shrink chart area
+          if(id==='zone-s7'){
+            const chartWrap=cl.querySelector('canvas#s7LineChart')?.parentElement;
+            if(chartWrap){chartWrap.style.height='120px';chartWrap.style.maxHeight='120px';}
+          }
+
+          wrap.appendChild(cl);
+        });
+
+        document.body.appendChild(wrap);
+
+        // For page 4: copy S7 chart image into clone canvas
+        if(pg.ids.includes('zone-s7')){
+          const origCv=document.getElementById('s7LineChart');
+          const cloneCv=wrap.querySelector('canvas#s7LineChart');
+          if(origCv&&cloneCv){
+            cloneCv.width=origCv.width;
+            cloneCv.height=origCv.height;
+            cloneCv.style.height='120px';
+            const ctx2=cloneCv.getContext('2d');
+            if(ctx2)ctx2.drawImage(origCv,0,0,cloneCv.width,cloneCv.height);
+          }
+        }
+
+        await new Promise(r=>setTimeout(r,300));
+        const cv=await html2canvas(wrap,{
+          scale:2,useCORS:true,
+          backgroundColor:'#0a0f1a',
+          logging:false,
+          width:A4W,windowWidth:A4W
+        });
+        document.body.removeChild(wrap);
+        canvases.push(cv);
+      }
+
+      // Restore S3 detail
+      if(s3det&&!s3wasOpen)s3det.classList.remove('open');
+
+      bar.style.width='85%';
+      msg.textContent='กำลังเปิดหน้าปริ้นท์...';
+
+      const w=window.open('','_blank','width=900,height=800');
+      if(!w){alert('กรุณาอนุญาต Popup ในเบราว์เซอร์');document.body.removeChild(overlay);return;}
+
+      const imgs=canvases.map(cv=>`<div class="page"><img src="${cv.toDataURL('image/jpeg',.95)}" style="width:100%;display:block"></div>`).join('');
+      w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Construction Progress Report</title>
+      <style>*{margin:0;padding:0;box-sizing:border-box}body{background:#fff}.page{width:210mm;page-break-after:always}.page:last-child{page-break-after:avoid}img{width:210mm;display:block}@media print{@page{size:A4;margin:0}.page{page-break-after:always;width:210mm}.page:last-child{page-break-after:avoid}}</style>
+      </head><body>${imgs}<script>window.onload=function(){setTimeout(function(){window.print();},500);};<\/script></body></html>`);
+      w.document.close();
+
+      bar.style.width='100%';
+      setTimeout(()=>document.body.removeChild(overlay),1000);
+
+    }catch(e){
+      msg.textContent='เกิดข้อผิดพลาด: '+e.message;
+      console.error(e);
+      setTimeout(()=>document.body.removeChild(overlay),4000);
+    }
+  });
+}
 
 function openExportJpegModal(){
   const overlay=document.createElement('div');
