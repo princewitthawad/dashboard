@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -501,14 +500,14 @@ body.view-mode .edit-only{display:none!important}
 </div>
 
 <div class="card" id="zone-s7">
-  <div class="SH"><div class="SN" style="background:#f57c00">7</div><div class="ST">งานฉาบผนังภายใน (ชั้น 4 และ ชั้น 2)</div><div class="Stg" style="margin-left:auto">เป้า 40%</div><span style="font-size:10px;color:var(--tx3);background:var(--bg2);border:1px solid var(--bdr);padding:2px 7px;border-radius:4px">น้ำหนักห้องละ 4.55%</span></div>
+  <div class="SH"><div class="SN" style="background:#f57c00">7</div><div class="ST">งานฉาบผนังภายใน (ชั้น 4 และ ชั้น 2)</div><div class="Stg" style="margin-left:auto">เป้า <span id="s7-tgt-pct">40%</span></div><span style="font-size:10px;color:var(--tx3);background:var(--bg2);border:1px solid var(--bdr);padding:2px 7px;border-radius:4px">น้ำหนักห้องละ 4.55%</span></div>
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;padding:10px 14px;background:rgba(255,149,0,.07);border:1px solid rgba(255,149,0,.25);border-radius:8px">
     <span style="font-size:22px">🎯</span>
-    <div><div style="font-size:11px;color:var(--tx3);margin-bottom:2px">จำนวนเป้าหมาย</div><div style="font-size:20px;font-weight:800;font-family:var(--m);color:var(--orange)">9 ห้อง <span style="font-size:13px;font-weight:600;color:var(--tx3)">(40% ของ 22 ห้อง)</span></div></div>
+    <div><div style="font-size:11px;color:var(--tx3);margin-bottom:2px">จำนวนเป้าหมาย</div><div style="font-size:20px;font-weight:800;font-family:var(--m);color:var(--orange)">9 ห้อง <span id="s7-tgt-lbl" style="font-size:13px;font-weight:600;color:var(--tx3)">(40% ของ 22 ห้อง)</span></div></div>
   </div>
   <div class="G2" style="gap:16px;align-items:stretch">
     <div style="display:flex;flex-direction:column">
-      <div class="PW"><div class="PM"><span class="PL">ความคืบหน้าฉาบผนัง</span><div class="IG"><input type="hidden" id="s7" value="18.2"><input class="PI" type="text" inputmode="decimal" pattern="[0-9.]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="s7r-inp" maxlength="4" value="4" oninput="updRooms('s7',this.value,22)" style="width:54px"><span class="Ps">ห้อง</span><span class="PP" id="s7p" style="color:var(--orange);font-size:18px;font-weight:800">18.2%</span><span style="font-size:11px;color:var(--tx3);margin-left:3px">/40%</span></div></div><div class="PBG"><div class="PF o" id="s7b" style="width:18.2%"></div></div></div>
+      <div class="PW"><div class="PM"><span class="PL">เป้าหมาย (จำนวนห้อง)</span><div class="IG"><input type="hidden" id="s7" value="18.2"><input class="PI" type="text" inputmode="decimal" pattern="[0-9.]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="s7r-inp" maxlength="4" value="9" oninput="updS7Target(this.value)" style="width:54px"><span class="Ps">ห้อง</span><span class="PP" id="s7p" style="color:var(--orange);font-size:18px;font-weight:800">18.2%</span><span style="font-size:11px;color:var(--tx3);margin-left:3px" id="s7-tgt-bar">/40%</span></div></div><div class="PBG"><div class="PF o" id="s7b" style="width:18.2%"></div></div></div>
       <div style="margin-top:9px;padding:9px 12px;background:var(--bg2);border-radius:7px;border:1px solid var(--bdr)"><div style="display:flex;justify-content:space-between"><span style="font-size:11px;color:var(--tx2)">ทำแล้ว: <span style="color:var(--green);font-weight:700;font-family:var(--m)" id="s7dr">4 ห้อง</span></span><span style="font-size:11px;color:var(--tx2)">ยังต้องทำ: <span style="color:var(--orange);font-weight:700;font-family:var(--m)" id="s7r">21.8%</span></span></div></div>
       <div style="margin-top:6px;background:var(--bg2);border:1px solid var(--bdr);border-radius:9px;padding:12px 14px;flex:1;display:flex;flex-direction:column">
         <div style="font-size:11px;font-weight:700;color:var(--orange);margin-bottom:8px;flex-shrink:0">📈 กราฟความคืบหน้า vs เป้าหมาย</div>
@@ -738,7 +737,7 @@ function setSvStatus(st,msg,time=''){
 }
 
 function collectState(){
-  return{s1:gv('s1'),s4t:gv('s4t'),s5:gv('s5'),s6:gv('s6'),s7:gv('s7'),s5r:parseFloat(document.getElementById('s5r-inp')?.value||0),s6r:parseFloat(document.getElementById('s6r-inp')?.value||0),s7r:parseFloat(document.getElementById('s7r-inp')?.value||0),
+  return{s1:gv('s1'),s4t:gv('s4t'),s5:gv('s5'),s6:gv('s6'),s7:gv('s7'),s7rooms:Array.from({length:9},(_,i)=>parseFloat(document.getElementById('s7r'+i)?.value||0)||0),s7cor:parseFloat(document.getElementById('s7cor')?.value||0)||0,s5r:parseFloat(document.getElementById('s5r-inp')?.value||0),s6r:parseFloat(document.getElementById('s6r-inp')?.value||0),s7r:parseFloat(document.getElementById('s7r-inp')?.value||0),
     r41:gv('r41'),r42:gv('r42'),r43:gv('r43'),r44:gv('r44'),r45:gv('r45'),
     fd:FD.map(f=>f.pct),od:OD.map(o=>({fd:o.fd,bd:o.bd,sld:o.sld,srd:o.srd})),savedAt:new Date().toISOString()};
 }
@@ -750,13 +749,13 @@ function applyState(s){
   if(s.s5r!==undefined){const e=document.getElementById('s5r-inp');if(e)e.value=s.s5r;}else{const e=document.getElementById('s5r-inp');if(e)e.value=Math.round(gv('s5')/100*44);}
   if(s.s6r!==undefined){const e=document.getElementById('s6r-inp');if(e)e.value=s.s6r;}else{const e=document.getElementById('s6r-inp');if(e)e.value=Math.round(gv('s6')/100*26);}
   if(s.s7r!==undefined){const e=document.getElementById('s7r-inp');if(e)e.value=s.s7r;}else{const e=document.getElementById('s7r-inp');if(e)e.value=Math.round(gv('s7')/100*22);}
-  sv('r41',s.r41);sv('r42',s.r42);sv('r43',s.r43);sv('r44',s.r44);sv('r45',s.r45);
+  if(s.s7rooms)s.s7rooms.forEach((v,i)=>{const e=document.getElementById('s7r'+i);if(e)e.value=v;});if(s.s7cor!==undefined){const e=document.getElementById('s7cor');if(e)e.value=s.s7cor;}sv('r41',s.r41);sv('r42',s.r42);sv('r43',s.r43);sv('r44',s.r44);sv('r45',s.r45);
   if(s.fd)FD.forEach((f,i)=>{if(s.fd[i]!==undefined)f.pct=s.fd[i];});
   if(s.od)OD.forEach((o,i)=>{if(s.od[i]){o.fd=s.od[i].fd||0;o.bd=s.od[i].bd||0;o.sld=s.od[i].sld||s.od[i].sd||0;o.srd=s.od[i].srd||0;}});
   buildS2(true);buildS3();
   ['s1','s4t','s5','s6','s7'].forEach(id=>setBar(id,id+'b',id+'p'));
   ['r41','r42','r43','r44','r45'].forEach(id=>setBar(id,id+'b',id+'p'));
-  updPlaster();buildDonuts();updS7Chart();ra();
+  buildPlasterUI(true);updPlaster();buildDonuts();updS7Chart();ra();
 }
 async function saveData(){
   if(!isFirebaseReady()){showFirebaseGuide();return;}
@@ -805,7 +804,7 @@ function clearData(){
   buildS2(true);buildS3();
   ['s1','s4t','s5','s6','s7'].forEach(id=>setBar(id,id+'b',id+'p'));
   ['r41','r42','r43','r44','r45'].forEach(id=>setBar(id,id+'b',id+'p'));
-  updPlaster();buildDonuts();ra();scheduleAutoSave();showToast('ล้างข้อมูลแล้ว','info');
+  buildPlasterUI(true);updPlaster();buildDonuts();ra();scheduleAutoSave();showToast('ล้างข้อมูลแล้ว','info');
 }
 function showFirebaseGuide(){
   const cur=_fbUrl;
@@ -1022,14 +1021,82 @@ function updS3Area(){
 }
 function toggleS3Line(i){if(!_s3Chart)return;const meta=_s3Chart.getDatasetMeta(i);meta.hidden=!meta.hidden;_s3Chart.update();const el=document.getElementById('s3-leg-'+i);if(el)el.style.opacity=meta.hidden?'0.3':'1';}
 
-function updPlaster(){
-  const v=gv('s7'),rooms=22,wt=4.545,done=Math.round(v/wt);
-  const dr=document.getElementById('s7dr'),r=document.getElementById('s7r');
-  if(dr)dr.textContent=done+' ห้อง';if(r)r.textContent=(100-v).toFixed(2)+'%';
+function buildPlasterUI(force=false){
   const c=document.getElementById('prooms');if(!c)return;
+  if(!force&&c.querySelector('#s7r0'))return;
+  const WTP_C=40*0.2,TOTAL=22;
+  const target2=Math.min(22,Math.max(1,parseInt(document.getElementById('s7r-inp')?.value||9)||9));
+  const WTP_R=(40-WTP_C)/target2;
+  const target=target2;
   let h='';
-  for(let i=0;i<rooms;i++){const dn=i<done;h+=`<div class="PB ${dn?'dn':'pd'}"><div class="pn">${i+1}</div><div class="pl">${dn?'✅':'⬜'}</div><div class="pp">${ceilTo2(wt*(i+1))}%</div></div>`;}
+  for(let i=0;i<TOTAL;i++){
+    const isRoom = i<target;       // unlock กรอกได้
+    const isCor  = i===target;     // ช่องทางเดิน (ถัดจากห้องสุดท้าย)
+    const isLocked = i>target;     // ยังไม่ถึง
+    if(isRoom){
+      const val=parseFloat(document.getElementById('s7r'+i)?.value||0)||0;
+      const dn=val>=100;
+      h+=`<div class="PB ${dn?'dn':'pd'}" style="width:88px;padding:8px 4px">
+        <div style="font-size:12px;font-weight:700;font-family:var(--m);color:var(--tx2);margin-bottom:4px">${i+1}</div>
+        <input class="PI" type="text" inputmode="decimal" pattern="[0-9.]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="s7r${i}" value="${val}" oninput="updPlaster();ra();scheduleAutoSave()" style="width:56px;font-size:15px;font-weight:700;text-align:center;padding:3px 4px;background:transparent;border:1px solid ${dn?'rgba(0,230,118,.5)':'var(--bdrh)'};-webkit-user-select:text;user-select:text;min-height:36px">
+        <div style="font-size:8px;color:var(--tx3);margin-top:3px">${(val*WTP_R/100).toFixed(1)}%</div>
+      </div>`;
+    }else if(isCor&&target<TOTAL){
+      const cor=parseFloat(document.getElementById('s7cor')?.value||0)||0;
+      const dnc=cor>=100;
+      h+=`<div class="PB ${dnc?'dn':'pd'}" style="width:88px;padding:8px 4px;border-color:rgba(0,212,255,.4);background:rgba(0,212,255,.07)">
+        <div style="font-size:9px;font-weight:700;color:var(--cyan);margin-bottom:4px">เดิน</div>
+        <input class="PI" type="text" inputmode="decimal" pattern="[0-9.]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="s7cor" value="${cor}" oninput="updPlaster();ra();scheduleAutoSave()" style="width:56px;font-size:15px;font-weight:700;text-align:center;padding:3px 4px;background:transparent;border:1px solid rgba(0,212,255,.5);-webkit-user-select:text;user-select:text;min-height:36px">
+        <div style="font-size:8px;color:var(--cyan);margin-top:3px">${(cor*WTP_C/100).toFixed(1)}%</div>
+      </div>`;
+    }else{
+      // ล็อก — แสดงเหมือนเดิม
+      h+=`<div class="PB pd" style="width:88px;padding:12px 6px;opacity:.4">
+        <div class="pn" style="font-size:28px">${i+1}</div>
+        <div class="pl">⬜</div>
+        <div class="pp">${ceilTo2(3.5556*(i+1))}%</div>
+      </div>`;
+    }
+  }
   c.innerHTML=h;
+}
+function updS7Target(v){
+  const t=Math.min(22,Math.max(0,parseInt(v)||0));
+  const inp=document.getElementById('s7r-inp');if(inp)inp.value=t;
+  // คำนวณ % เป้าใหม่ (22 ห้อง = 100%)
+  const tgtPct=parseFloat((t/22*100).toFixed(2));
+  const e1=document.getElementById('s7-tgt-pct');if(e1)e1.textContent=tgtPct+'%';
+  const e2=document.getElementById('s7-tgt-lbl');if(e2)e2.textContent='('+tgtPct+'% ของ 22 ห้อง)';
+  const e3=document.getElementById('s7-tgt-bar');if(e3)e3.textContent='/'+tgtPct+'%';
+  buildPlasterUI(true);updPlaster();ra();scheduleAutoSave();
+}
+function updPlaster(){
+  // คำนวณ WTP ตามเป้าหมายจำนวนห้องจริง
+  const target=Math.min(22,Math.max(1,parseInt(document.getElementById('s7r-inp')?.value||9)||9));
+  const WTP_C=40*0.2;                    // ทางเดิน = 20% ของ 40% = 8%
+  const WTP_R=(40-WTP_C)/target;         // ห้องละ = 80%×40% ÷ target
+  let total=0,doneCount=0;
+  for(let i=0;i<target;i++){
+    const val=parseFloat(document.getElementById('s7r'+i)?.value||0)||0;
+    total+=Math.min(WTP_R,val*WTP_R/100);
+    if(val>=100)doneCount++;
+    const inp=document.getElementById('s7r'+i);
+    if(inp){const dn=val>=100;const box=inp.closest('.PB');if(box){box.className='PB '+(dn?'dn':'pd');inp.style.borderColor=dn?'rgba(0,230,118,.5)':'var(--bdrh)';}
+      const hint=inp.parentElement?.querySelector('div:last-child');if(hint)hint.textContent=(val*WTP_R/100).toFixed(2)+'%';
+    }
+  }
+  const cor=parseFloat(document.getElementById('s7cor')?.value||0)||0;
+  total+=Math.min(WTP_C,cor*WTP_C/100);
+  const cpct=document.getElementById('s7cor')?.parentElement?.querySelector('div:last-child');
+  if(cpct)cpct.textContent=(cor*WTP_C/100).toFixed(2)+'%';
+  total=Math.min(40,total);
+  const hid=document.getElementById('s7');if(hid)hid.value=total.toFixed(4);
+  setBar('s7','s7b','s7p');
+  const dr=document.getElementById('s7dr'),r=document.getElementById('s7r');
+  if(dr)dr.textContent=doneCount+' ห้อง';
+  if(r)r.textContent=(40-total).toFixed(2)+'%';
+  const s7p=document.getElementById('s7p');
+  if(s7p){s7p.textContent=ceilTo2(total)+'%';s7p.style.color=total>=40?'var(--green)':total>=20?'var(--orange)':'var(--red)';}
 }
 function updPlaster2(rooms,total){
   const wt=parseFloat((100/total).toFixed(4)),done=rooms;
@@ -1451,7 +1518,7 @@ function init(){
   buildS2(true);buildS3();
   ['s1','s4t','s5','s6','s7'].forEach(id=>setBar(id,id+'b',id+'p'));
   ['r41','r42','r43','r44','r45'].forEach(id=>setBar(id,id+'b',id+'p'));
-  updPlaster();
+  buildPlasterUI();updPlaster();
   setTimeout(()=>{
     buildPieChart();buildDonuts();buildS7Chart();ra();
     if(isFirebaseReady()){
