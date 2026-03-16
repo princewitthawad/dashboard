@@ -27,8 +27,8 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .orb{position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0}
 .o1{width:500px;height:500px;background:rgba(56,139,253,.06);top:-150px;right:-100px}
 .o2{width:400px;height:400px;background:rgba(0,212,255,.04);bottom:50px;left:-100px}
-.W{max-width:1600px;margin:0 auto;padding:24px;position:relative;z-index:1}
-header{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;background:rgba(13,21,32,.9);border:1px solid var(--bdr);border-radius:var(--r);margin-bottom:20px;backdrop-filter:blur(12px);position:relative;overflow:hidden;flex-wrap:wrap;gap:12px}
+.W{max-width:1600px;margin:0 auto;padding:24px;position:relative;z-index:1;padding-top:0}
+header{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;background:rgba(13,21,32,.97);border:1px solid var(--bdr);border-bottom:1px solid rgba(56,139,253,.12);border-radius:0;margin-bottom:0;backdrop-filter:blur(16px);position:fixed;top:0;left:0;right:0;z-index:960;overflow:hidden;flex-wrap:wrap;gap:12px;animation:none}
 header::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--blue),var(--cyan),transparent)}
 .hi{width:44px;height:44px;background:linear-gradient(135deg,#1a2d45,#1e3a5f);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
 .ht{font-size:20px;font-weight:800;letter-spacing:-.3px}
@@ -328,7 +328,7 @@ body.view-mode .edit-only{display:none!important}
     </div>
     <div>
       <div class="ht">Construction Progress Dashboard</div>
-      <div class="hs">รายงานความคืบหน้างานก่อสร้าง · v2.0</div>
+      <div class="hs">รายงานความคืบหน้างานก่อสร้าง · v2.3.9</div>
     </div>
   </div>
   <div class="hbtns">
@@ -338,19 +338,18 @@ body.view-mode .edit-only{display:none!important}
     <button class="btn edit-only" onclick="openExportJpegModal()" style="background:rgba(0,180,255,.15);color:#00d4ff;border:1px solid rgba(0,212,255,.4)">🖼️ Export JPEG</button>
     <button class="btn btn-b view-only" onclick="showFirebaseGuide()">☁️ ลงทะเบียน</button>
     <button class="btn btn-gold edit-only" onclick="showPwChange()">🔑 รหัสผ่าน</button>
-    <button class="btn btn-r edit-only" onclick="clearData()">🗑️ ล้าง</button>
     <a id="lockin-link" href="#" onclick="event.preventDefault();showLockModal()" style="font-size:11px;font-weight:600;color:var(--tx2);text-decoration:none;padding:5px 10px;border-radius:6px;transition:color .2s" onmouseover="this.style.color='var(--blue)'" onmouseout="this.style.color='var(--tx2)'">🔓 Login</a>
     <button id="logout-btn" class="btn edit-only" onclick="doLogout()" style="display:none;background:rgba(255,68,68,.12);color:#ff6666;border:1px solid rgba(255,68,68,.3);font-size:11px">🔒 Logout</button>
     <button id="lock-btn" class="btn btn-o edit-only" onclick="applyViewMode()" style="display:none">🔒 ล็อก</button>
   </div>
+  <div style="width:100%;display:flex;align-items:center;gap:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.07);flex-wrap:wrap">
+    <div class="sv-dot" id="sv-dot"></div>
+    <span id="sv-msg" style="font-size:11px;color:var(--tx2)">กำลังโหลด...</span>
+    <span id="sv-time" style="font-size:10px;color:var(--tx3)"></span>
+    <span style="font-size:10px;color:var(--tx3);font-family:var(--m);margin-left:8px">☁️ Firebase Cloud Sync</span>
+  </div>
 </header>
-
-<div class="save-bar">
-  <div class="sv-dot" id="sv-dot"></div>
-  <span id="sv-msg">กำลังโหลด...</span>
-  <span id="sv-time"></span>
-  <span style="font-size:10px;color:var(--tx3);font-family:var(--m);margin-left:14px">☁️ Firebase Cloud Sync</span>
-</div>
+<div id="header-spacer" style="height:0px"></div>
 
 <div class="kg" id="zone-kpi">
   <div class="kc G"><div class="ki">✅</div><div class="kl">งานเสร็จสมบูรณ์</div><div class="kv" id="kp-d">—</div><div class="ks">จาก 7 รายการ</div></div>
@@ -1776,6 +1775,14 @@ function openExportJpegModal(){
     }
   });
 }
+
+function fixHeaderSpacer(){
+  const h=document.querySelector('header');
+  const sp=document.getElementById('header-spacer');
+  if(h&&sp)sp.style.height=(h.offsetHeight+16)+'px';
+}
+window.addEventListener('load',fixHeaderSpacer);
+window.addEventListener('resize',fixHeaderSpacer);
 </script>
 </body>
 </html>
