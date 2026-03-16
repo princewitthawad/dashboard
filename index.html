@@ -512,7 +512,11 @@ body.view-mode .edit-only{display:none!important}
         <div style="position:relative;flex:1"><canvas id="s7LineChart"></canvas></div>
       </div>
     </div>
-    <div><div style="font-size:11px;color:var(--tx2);margin-bottom:9px">สถานะห้อง (แต่ละช่อง = 4.55%)</div><div class="PR" id="prooms"></div></div>
+    <div>
+      <div style="font-size:11px;color:var(--tx2);margin-bottom:9px">สถานะห้อง (แต่ละช่อง = 4.55%)</div>
+      <div class="PR" id="prooms"></div>
+
+    </div>
   </div>
 </div>
 
@@ -1052,12 +1056,24 @@ function buildPlasterUI(force=false){
   const cor2=parseFloat(document.getElementById('s7cor')?.value||0)||0;
   const dnc2=cor2>=100;
   const WTP_C2=40*0.2;
-  h+=`<div style="margin-top:10px;width:100%;padding-top:10px;border-top:1px solid var(--bdr)">
-    <div style="font-size:11px;color:var(--cyan);font-weight:700;margin-bottom:6px">🚶 ทางเดิน (น้ำหนัก 20% = ${WTP_C2}%)</div>
-    <div class="PB ${dnc2?'dn':'pd'}" style="width:88px;padding:8px 4px;border-color:rgba(0,212,255,.4);background:rgba(0,212,255,.07)">
-      <div style="font-size:9px;font-weight:700;color:var(--cyan);margin-bottom:4px">เดิน</div>
-      <input class="PI" type="text" inputmode="decimal" pattern="[0-9.]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="s7cor" value="${cor2}" oninput="updPlaster();ra();scheduleAutoSave()" style="width:56px;font-size:15px;font-weight:700;text-align:center;padding:3px 4px;background:transparent;border:1px solid rgba(0,212,255,.5);-webkit-user-select:text;user-select:text;min-height:36px">
-      <div style="font-size:8px;color:var(--cyan);margin-top:3px">${(cor2*WTP_C2/100).toFixed(1)}%</div>
+  const cor2Pct=parseFloat(((cor2/245.34)*100).toFixed(2));
+  const cor2Weight=parseFloat((cor2Pct*WTP_C2/100).toFixed(2));
+  const cor2Disp=((cor2/245.34)*100).toFixed(1);
+  const cor2WeightDisp=(cor2/245.34*WTP_C2).toFixed(2);
+  h+=`<div class="edit-only" style="margin-top:10px;width:100%;padding-top:10px;border-top:1px solid var(--bdr)">
+    <div style="font-size:11px;color:var(--cyan);font-weight:700;margin-bottom:6px">🚶 ทางเดิน (พื้นที่รวม 245.34 ตร.ม. · น้ำหนัก 20% = ${WTP_C2}%)</div>
+    <div class="PB ${dnc2?'dn':'pd'}" style="width:120px;padding:8px 6px;border-color:rgba(0,212,255,.4);background:rgba(0,212,255,.07)">
+      <div style="font-size:9px;font-weight:700;color:var(--cyan);margin-bottom:4px">ทำแล้ว (ตร.ม.)</div>
+      <input class="PI" type="text" inputmode="decimal" pattern="[0-9.]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="s7cor" value="${cor2}" oninput="updPlaster();ra();scheduleAutoSave()" style="width:72px;font-size:15px;font-weight:700;text-align:center;padding:3px 4px;background:transparent;border:1px solid rgba(0,212,255,.5);-webkit-user-select:text;user-select:text;min-height:36px">
+      <div style="font-size:8px;color:var(--cyan);margin-top:3px">${cor2Disp}% · ${cor2WeightDisp}%</div>
+    </div>
+  </div>
+  <div class="view-only" style="margin-top:10px;width:100%;padding-top:10px;border-top:1px solid var(--bdr)">
+    <div style="font-size:11px;color:var(--cyan);font-weight:700;margin-bottom:6px">🚶 ทางเดิน</div>
+    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+      <div style="font-size:22px;font-weight:800;font-family:var(--m);color:var(--cyan)" id="s7cor-view-pct">${cor2Disp}%</div>
+      <div style="font-size:11px;color:var(--tx3)" id="s7cor-view-sqm">เป้าหมาย 8%</div>
+      <div style="font-size:11px;color:var(--tx2)">น้ำหนัก <span style="color:var(--cyan);font-weight:700">${cor2WeightDisp}%</span></div>
     </div>
   </div>`;
   c.innerHTML=h;
@@ -1087,16 +1103,22 @@ function updPlaster(){
       const hint=inp.parentElement?.querySelector('div:last-child');if(hint)hint.textContent=(val*WTP_R/100).toFixed(2)+'%';
     }
   }
-  const cor=parseFloat(document.getElementById('s7cor')?.value||0)||0;
-  total+=Math.min(WTP_C,cor*WTP_C/100);
+  const corSqm=parseFloat(document.getElementById('s7cor')?.value||0)||0;
+  const corPct=parseFloat(((corSqm/245.34)*100).toFixed(4)); // ตร.ม. → %
+  total+=Math.min(WTP_C,corPct*WTP_C/100);
   const cpct=document.getElementById('s7cor')?.parentElement?.querySelector('div:last-child');
-  if(cpct)cpct.textContent=(cor*WTP_C/100).toFixed(2)+'%';
+  if(cpct)cpct.textContent=corPct.toFixed(1)+'% · '+(corPct*WTP_C/100).toFixed(2)+'%';
   total=Math.min(40,total);
   const hid=document.getElementById('s7');if(hid)hid.value=total.toFixed(4);
   setBar('s7','s7b','s7p');
   const dr=document.getElementById('s7dr'),r=document.getElementById('s7r');
   if(dr)dr.textContent=doneCount+' ห้อง';
   if(r)r.textContent=(40-total).toFixed(2)+'%';
+  const _corSq=parseFloat(document.getElementById('s7cor')?.value||0)||0;
+  const _corPctDisp=((_corSq/245.34)*100).toFixed(1);
+  const _corWtDisp=(_corSq/245.34*WTP_C).toFixed(2);
+  const cv1=document.getElementById('s7cor-view-pct');if(cv1)cv1.textContent=_corPctDisp+'%';
+  const cv2=document.getElementById('s7cor-view-sqm');if(cv2)cv2.textContent='เป้าหมาย 8%';
   const s7p=document.getElementById('s7p');
   if(s7p){s7p.textContent=ceilTo2(total)+'%';s7p.style.color=total>=40?'var(--green)':total>=20?'var(--orange)':'var(--red)';}
 }
