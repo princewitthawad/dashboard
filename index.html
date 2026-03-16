@@ -1478,102 +1478,112 @@ document.addEventListener('blur',function(e){
 },true);
 
 function printDashboard(){
-  const now=new Date().toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'});
+  const overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-family:var(--f);gap:14px';
+  overlay.innerHTML='<div style="font-size:18px;font-weight:700">🖨️ กำลังเตรียมปริ้นท์...</div><div id="_pr_msg" style="font-size:13px;color:#8899aa">กำลังโหลด...</div><div style="width:240px;height:5px;background:rgba(255,255,255,.1);border-radius:99px;overflow:hidden"><div id="_pr_bar" style="height:100%;width:0%;background:#00e676;transition:width .4s;border-radius:99px"></div></div>';
+  document.body.appendChild(overlay);
+  const msg=document.getElementById('_pr_msg');
+  const bar=document.getElementById('_pr_bar');
 
-  // Clone element with inline computed styles stripped to essentials
-  function cloneZone(id){
-    const el=document.getElementById(id);
-    if(!el)return '';
-    return el.outerHTML;
+  function loadH2C(cb){
+    if(window.html2canvas)return cb();
+    const s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+    s.onload=cb;document.head.appendChild(s);
   }
 
-  // Collect all CSS from page
-  const styles=Array.from(document.styleSheets).map(ss=>{
-    try{return Array.from(ss.cssRules).map(r=>r.cssText).join('\n');}catch(e){return '';}
-  }).join('\n');
+  const A4W=794; // px at 96dpi = 210mm
+  const A4H=1123; // px at 96dpi = 297mm
 
-  const pg1=[cloneZone('zone-kpi'),cloneZone('zone-pie'),cloneZone('zone-donut'),cloneZone('zone-s1s4'),cloneZone('zone-s2')].join('');
-  const pg2=[cloneZone('zone-s3'),cloneZone('zone-s5s6'),cloneZone('zone-s7'),cloneZone('zone-summary')].join('');
+  // Zones per page
+  const pages=[
+    {title:'หน้า 1/2',ids:['zone-kpi','zone-pie','zone-donut','zone-s1s4','zone-s2']},
+    {title:'หน้า 2/2',ids:['zone-s3','zone-s5s6','zone-s7','zone-summary']}
+  ];
 
-  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8">
-<title>Construction Progress Report</title>
-<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700;800&family=IBM+Plex+Mono:wght@600&display=swap" rel="stylesheet">
-<style>
-${styles}
-*{box-sizing:border-box}
-html,body{margin:0;padding:0;background:#0a0f1a;color:#e8f0fe;font-family:'Sarabun',sans-serif}
-.print-page{
-  width:210mm;
-  min-height:297mm;
-  padding:10mm 12mm;
-  box-sizing:border-box;
-  page-break-after:always;
-  overflow:hidden;
-}
-.print-page:last-child{page-break-after:avoid;}
-.print-page.last-page{
-  display:flex;
-  flex-direction:column;
-}
-.print-page.last-page .zone-summary-wrap{
-  margin-top:auto;
-}
-.ph{display:flex;align-items:center;justify-content:space-between;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.12);margin-bottom:14px}
-.ph h2{font-size:15px;font-weight:800;color:#e8f0fe;margin:0}
-.ph span{font-size:10px;color:#6b7a8d}
-header,nav,#pnav,.save-bar,#toast,.edit-only,
-[id^="lock"],[id^="jpeg"],[id^="checklist"]{display:none!important}
-.pg{display:block!important}
-@media print{
-  html,body{background:#0a0f1a!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  @page{size:A4;margin:0}
-  .print-page{page-break-after:always;width:210mm;padding:10mm 12mm}
-  .print-page:last-child{page-break-after:avoid}
-}
-</style></head><body>
+  loadH2C(async()=>{
+    try{
+      const now=new Date().toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'});
+      const canvases=[];
 
-<div class="print-page">
-  <div class="ph"><h2>📋 Construction Progress Dashboard</h2><span>หน้า 1/2 · ${now}</span></div>
-  ${pg1}
-</div>
+      for(let pi=0;pi<pages.length;pi++){
+        const pg=pages[pi];
+        msg.textContent=`กำลัง render ${pg.title}...`;
+        bar.style.width=((pi+1)/pages.length*70)+'%';
 
-<div class="print-page last-page">
-  <div class="ph"><h2>📋 รายละเอียดงานทุกประเภท</h2><span>หน้า 2/2 · ${now}</span></div>
-  ${pg2}
-</div>
+        // Build wrapper at exact A4 width
+        const wrap=document.createElement('div');
+        wrap.style.cssText=`position:fixed;left:-9999px;top:0;width:${A4W}px;padding:24px 28px;background:#0a0f1a;box-sizing:border-box;font-family:'Sarabun',sans-serif`;
 
-<script>
-window.onload=function(){
-  // Shrink last card to fit page
-  var pages=document.querySelectorAll('.print-page');
-  var lastPage=pages[pages.length-1];
-  if(lastPage){
-    var A4H=297*3.7795; // mm to px at 96dpi
-    var used=lastPage.scrollHeight;
-    if(used>A4H){
-      var scale=Math.max(0.7,(A4H-20)/used);
-      var inner=lastPage.querySelector('.SB')||lastPage.lastElementChild;
-      if(inner)inner.style.transform='scale('+scale+')';
-      inner.style.transformOrigin='top left';
-      inner.style.width=(100/scale)+'%';
+        // Header
+        const hdr=document.createElement('div');
+        hdr.style.cssText='display:flex;align-items:center;justify-content:space-between;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.15);margin-bottom:16px';
+        hdr.innerHTML=`<div style="font-size:15px;font-weight:800;color:#e8f0fe">📋 Construction Progress Dashboard</div><div style="font-size:10px;color:#6b7a8d">${pg.title} · ${now}</div>`;
+        wrap.appendChild(hdr);
+
+        // Clone each zone
+        pg.ids.forEach(id=>{
+          const el=document.getElementById(id);
+          if(!el)return;
+          const cl=el.cloneNode(true);
+          cl.style.marginBottom='14px';
+          cl.style.maxWidth='100%';
+          cl.style.boxSizing='border-box';
+          wrap.appendChild(cl);
+        });
+
+        document.body.appendChild(wrap);
+        await new Promise(r=>setTimeout(r,300));
+
+        const cv=await html2canvas(wrap,{
+          scale:2,useCORS:true,
+          backgroundColor:'#0a0f1a',
+          logging:false,
+          width:A4W,
+          windowWidth:A4W
+        });
+        document.body.removeChild(wrap);
+        canvases.push(cv);
+      }
+
+      bar.style.width='85%';
+      msg.textContent='กำลังเปิดหน้าปริ้นท์...';
+
+      // Build print window with images
+      const w=window.open('','_blank','width=900,height=800');
+      if(!w){alert('กรุณาอนุญาต Popup ในเบราว์เซอร์');document.body.removeChild(overlay);return;}
+
+      const imgs=canvases.map((cv,i)=>`<div class="page"><img src="${cv.toDataURL('image/jpeg',.95)}" style="width:100%;display:block"></div>`).join('');
+
+      w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Construction Progress Report</title>
+      <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{background:#fff}
+        .page{width:210mm;page-break-after:always;overflow:hidden}
+        .page:last-child{page-break-after:avoid}
+        img{width:210mm;display:block}
+        @media print{@page{size:A4;margin:0}body{background:#fff}.page{page-break-after:always;width:210mm}.page:last-child{page-break-after:avoid}}
+      </style></head><body>${imgs}
+      <script>window.onload=function(){setTimeout(function(){window.print();},500);};<\/script>
+      </body></html>`);
+      w.document.close();
+
+      bar.style.width='100%';
+      setTimeout(()=>document.body.removeChild(overlay),1000);
+
+    }catch(e){
+      msg.textContent='เกิดข้อผิดพลาด: '+e.message;
+      console.error(e);
+      setTimeout(()=>document.body.removeChild(overlay),4000);
     }
-  }
-  setTimeout(function(){window.print();},700);
-};
-<\/script>
-</body></html>`;
-
-  const w=window.open('','_blank','width=900,height=800');
-  if(!w){alert('กรุณาอนุญาต Popup ในเบราว์เซอร์แล้วลองใหม่');return;}
-  w.document.write(html);
-  w.document.close();
+  });
 }
 
 function openExportJpegModal(){
-  const status=document.createElement('div');
-  status.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-family:var(--f);gap:14px';
-  status.innerHTML='<div style="font-size:18px;font-weight:700">🖼️ กำลัง Export JPEG...</div><div id="_exp_msg" style="font-size:13px;color:#8899aa">กำลังโหลด...</div><div style="width:220px;height:5px;background:rgba(255,255,255,.1);border-radius:99px;overflow:hidden"><div id="_exp_bar" style="height:100%;width:0%;background:#00d4ff;transition:width .4s;border-radius:99px"></div></div>';
-  document.body.appendChild(status);
+  const overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-family:var(--f);gap:14px';
+  overlay.innerHTML='<div style="font-size:18px;font-weight:700">🖼️ กำลัง Export JPEG...</div><div id="_exp_msg" style="font-size:13px;color:#8899aa">กำลังโหลด...</div><div style="width:240px;height:5px;background:rgba(255,255,255,.1);border-radius:99px;overflow:hidden"><div id="_exp_bar" style="height:100%;width:0%;background:#00d4ff;transition:width .4s;border-radius:99px"></div></div>';
+  document.body.appendChild(overlay);
   const msg=document.getElementById('_exp_msg');
   const bar=document.getElementById('_exp_bar');
 
@@ -1581,59 +1591,74 @@ function openExportJpegModal(){
     if(window.html2canvas)return cb();
     const s=document.createElement('script');
     s.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
-    s.onload=cb; document.head.appendChild(s);
+    s.onload=cb;document.head.appendChild(s);
   }
+
+  const A4W=794;
+  const pages=[
+    {title:'หน้า 1/2',ids:['zone-kpi','zone-pie','zone-donut','zone-s1s4','zone-s2'],file:'dashboard_page1.jpg'},
+    {title:'หน้า 2/2',ids:['zone-s3','zone-s5s6','zone-s7','zone-summary'],file:'dashboard_page2.jpg'}
+  ];
 
   loadH2C(async()=>{
     try{
-      const W=1200;
       const now=new Date().toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'});
-      const hdrHTML=`<div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:18px"><div style="font-size:18px;font-weight:800;color:#e8f0fe">Construction Progress Dashboard</div><div style="font-size:11px;color:#6b7a8d">${now}</div></div>`;
 
-      // Page 1: zone-kpi, zone-pie, zone-donut, zone-s1s4, zone-s2
-      msg.textContent='กำลัง render ภาพที่ 1...'; bar.style.width='20%';
-      const wrap1=document.createElement('div');
-      wrap1.style.cssText=`position:fixed;left:-9999px;top:0;width:${W}px;padding:28px;background:#0a0f1a;box-sizing:border-box`;
-      wrap1.innerHTML=hdrHTML;
-      ['zone-kpi','zone-pie','zone-donut','zone-s1s4','zone-s2'].forEach(id=>{
-        const el=document.getElementById(id);
-        if(el){const cl=el.cloneNode(true);cl.style.marginBottom='16px';wrap1.appendChild(cl);}
-      });
-      document.body.appendChild(wrap1);
-      await new Promise(r=>setTimeout(r,200));
-      const canvas1=await html2canvas(wrap1,{scale:2,useCORS:true,backgroundColor:'#0a0f1a',logging:false,width:W,windowWidth:W});
-      document.body.removeChild(wrap1);
-      bar.style.width='55%';
+      for(let pi=0;pi<pages.length;pi++){
+        const pg=pages[pi];
+        msg.textContent=`กำลัง render ${pg.title}...`;
+        bar.style.width=((pi+1)/pages.length*80)+'%';
 
-      // Page 2: zone-s3, zone-s5s6, zone-s7, zone-summary
-      msg.textContent='กำลัง render ภาพที่ 2...';
-      const wrap2=document.createElement('div');
-      wrap2.style.cssText=`position:fixed;left:-9999px;top:0;width:${W}px;padding:28px;background:#0a0f1a;box-sizing:border-box`;
-      wrap2.innerHTML=hdrHTML.replace('Construction Progress Dashboard','รายละเอียดงานทุกประเภท');
-      ['zone-s3','zone-s5s6','zone-s7','zone-summary'].forEach(id=>{
-        const el=document.getElementById(id);
-        if(el){const cl=el.cloneNode(true);cl.style.marginBottom='16px';wrap2.appendChild(cl);}
-      });
-      document.body.appendChild(wrap2);
-      await new Promise(r=>setTimeout(r,200));
-      const canvas2=await html2canvas(wrap2,{scale:2,useCORS:true,backgroundColor:'#0a0f1a',logging:false,width:W,windowWidth:W});
-      document.body.removeChild(wrap2);
-      bar.style.width='85%';
+        const wrap=document.createElement('div');
+        wrap.style.cssText=`position:fixed;left:-9999px;top:0;width:${A4W}px;padding:24px 28px;background:#0a0f1a;box-sizing:border-box;font-family:'Sarabun',sans-serif`;
 
-      // Download
-      msg.textContent='กำลังบันทึกไฟล์...';
-      function dl(cv,name){const a=document.createElement('a');a.href=cv.toDataURL('image/jpeg',.92);a.download=name;a.click();}
-      dl(canvas1,'dashboard_page1.jpg');
-      setTimeout(()=>dl(canvas2,'dashboard_page2.jpg'),700);
+        const hdr=document.createElement('div');
+        hdr.style.cssText='display:flex;align-items:center;justify-content:space-between;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.15);margin-bottom:16px';
+        hdr.innerHTML=`<div style="font-size:15px;font-weight:800;color:#e8f0fe">📋 Construction Progress Dashboard</div><div style="font-size:10px;color:#6b7a8d">${pg.title} · ${now}</div>`;
+        wrap.appendChild(hdr);
+
+        pg.ids.forEach(id=>{
+          const el=document.getElementById(id);
+          if(!el)return;
+          const cl=el.cloneNode(true);
+          cl.style.marginBottom='14px';
+          cl.style.maxWidth='100%';
+          cl.style.boxSizing='border-box';
+          wrap.appendChild(cl);
+        });
+
+        document.body.appendChild(wrap);
+        await new Promise(r=>setTimeout(r,300));
+
+        const cv=await html2canvas(wrap,{
+          scale:2,useCORS:true,
+          backgroundColor:'#0a0f1a',
+          logging:false,
+          width:A4W,
+          windowWidth:A4W
+        });
+        document.body.removeChild(wrap);
+
+        // Download
+        const a=document.createElement('a');
+        a.href=cv.toDataURL('image/jpeg',.92);
+        a.download=pg.file;
+        a.click();
+        await new Promise(r=>setTimeout(r,600));
+      }
 
       bar.style.width='100%';
-      setTimeout(()=>document.body.removeChild(status),1500);
+      msg.textContent='✅ ดาวน์โหลดสำเร็จ 2 ไฟล์';
+      setTimeout(()=>document.body.removeChild(overlay),1500);
+
     }catch(e){
       msg.textContent='เกิดข้อผิดพลาด: '+e.message;
-      setTimeout(()=>document.body.removeChild(status),3000);
+      console.error(e);
+      setTimeout(()=>document.body.removeChild(overlay),4000);
     }
   });
 }
+
 </script>
 </body>
 </html>
