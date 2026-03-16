@@ -1492,13 +1492,26 @@ function printDashboard(){
     s.onload=cb;document.head.appendChild(s);
   }
 
-  const A4W=794; // px at 96dpi = 210mm
-  const A4H=1123; // px at 96dpi = 297mm
+  const A4W=794;
 
-  // Zones per page
+  // Ensure S3 detail open for print
+  const s3det=document.getElementById('s3-detail');
+  const s3wasOpen=s3det?.classList.contains('open');
+  if(s3det&&!s3wasOpen){s3det.classList.add('open');try{updS3Area();}catch(e){}}
+
+  // Ensure tab-all visible for donut
+  const tabAll=document.getElementById('tab-all');
+  if(tabAll)tabAll.style.display='block';
+
+  // Ensure S7 chart rendered
+  try{buildS7Chart();}catch(e){}
+
+  // Pages definition
   const pages=[
-    {title:'หน้า 1/2',ids:['zone-kpi','zone-pie','zone-donut','zone-s1s4','zone-s2']},
-    {title:'หน้า 2/2',ids:['zone-s3','zone-s5s6','zone-s7','zone-summary']}
+    {title:'หน้า 1/4', ids:['zone-pie','zone-donut']},
+    {title:'หน้า 2/4', ids:['zone-s1s4','zone-s2','zone-s5s6']},
+    {title:'หน้า 3/4', ids:['zone-s3']},
+    {title:'หน้า 4/4', ids:['zone-s7','zone-summary']},
   ];
 
   loadH2C(async()=>{
@@ -1509,57 +1522,97 @@ function printDashboard(){
       for(let pi=0;pi<pages.length;pi++){
         const pg=pages[pi];
         msg.textContent=`กำลัง render ${pg.title}...`;
-        bar.style.width=((pi+1)/pages.length*70)+'%';
+        bar.style.width=((pi+1)/pages.length*80)+'%';
 
-        // Clone zones into offscreen wrapper
         const wrap=document.createElement('div');
-        wrap.style.cssText=`position:fixed;left:-9999px;top:0;width:${A4W}px;padding:24px 28px;background:#0a0f1a;box-sizing:border-box;font-family:'Sarabun',sans-serif`;
+        wrap.style.cssText=`position:fixed;left:-9999px;top:0;width:${A4W}px;padding:20px 24px;background:#0a0f1a;box-sizing:border-box;font-family:'Sarabun',sans-serif`;
+
+        // Header
         const hdr=document.createElement('div');
-        hdr.style.cssText='display:flex;align-items:center;justify-content:space-between;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.15);margin-bottom:16px';
-        hdr.innerHTML=`<div style="font-size:15px;font-weight:800;color:#e8f0fe">📋 Construction Progress Dashboard</div><div style="font-size:10px;color:#6b7a8d">${pg.title} · ${now}</div>`;
+        hdr.style.cssText='display:flex;align-items:center;justify-content:space-between;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.15);margin-bottom:12px';
+        hdr.innerHTML=`<div style="font-size:14px;font-weight:800;color:#e8f0fe">📋 Construction Progress Dashboard</div><div style="font-size:10px;color:#6b7a8d">${pg.title} · ${now}</div>`;
         wrap.appendChild(hdr);
+
+        // Special: page 1 — show donut tab-all, shrink S7 chart
         pg.ids.forEach(id=>{
           const el=document.getElementById(id);
           if(!el)return;
           const cl=el.cloneNode(true);
-          cl.style.marginBottom='14px';
+          cl.style.marginBottom='12px';
           cl.style.maxWidth='100%';
           cl.style.boxSizing='border-box';
+
+          // Page 1: ensure donut tab-all visible, hide other tabs
+          if(id==='zone-donut'){
+            cl.querySelectorAll('.DP').forEach(dp=>{dp.style.display='none';});
+            const ta=cl.querySelector('#tab-all');
+            if(ta){ta.style.display='block';}
+            // Hide tab buttons to save space
+            const tabs=cl.querySelector('.TABs,.DS-tabs');
+            if(tabs)tabs.style.display='none';
+          }
+
+          // Page 2: S1S4 — make room cards inline
+          if(id==='zone-s1s4'){
+            cl.style.display='grid';
+            cl.style.gridTemplateColumns='1fr 1fr';
+            cl.style.gap='12px';
+          }
+
+          // Page 3: S3 — open detail
+          if(id==='zone-s3'){
+            const det=cl.querySelector('#s3-detail');
+            if(det){det.classList.add('open');det.style.display='block';}
+          }
+
+          // Page 4: S7 — shrink chart area
+          if(id==='zone-s7'){
+            const chartWrap=cl.querySelector('canvas#s7LineChart')?.parentElement;
+            if(chartWrap){chartWrap.style.height='120px';chartWrap.style.maxHeight='120px';}
+          }
+
           wrap.appendChild(cl);
         });
+
         document.body.appendChild(wrap);
+
+        // For page 4: copy S7 chart image into clone canvas
+        if(pg.ids.includes('zone-s7')){
+          const origCv=document.getElementById('s7LineChart');
+          const cloneCv=wrap.querySelector('canvas#s7LineChart');
+          if(origCv&&cloneCv){
+            cloneCv.width=origCv.width;
+            cloneCv.height=origCv.height;
+            cloneCv.style.height='120px';
+            const ctx2=cloneCv.getContext('2d');
+            if(ctx2)ctx2.drawImage(origCv,0,0,cloneCv.width,cloneCv.height);
+          }
+        }
+
         await new Promise(r=>setTimeout(r,300));
         const cv=await html2canvas(wrap,{
           scale:2,useCORS:true,
           backgroundColor:'#0a0f1a',
           logging:false,
-          width:A4W,
-          windowWidth:A4W
+          width:A4W,windowWidth:A4W
         });
         document.body.removeChild(wrap);
         canvases.push(cv);
       }
 
+      // Restore S3 detail
+      if(s3det&&!s3wasOpen)s3det.classList.remove('open');
+
       bar.style.width='85%';
       msg.textContent='กำลังเปิดหน้าปริ้นท์...';
 
-      // Build print window with images
       const w=window.open('','_blank','width=900,height=800');
       if(!w){alert('กรุณาอนุญาต Popup ในเบราว์เซอร์');document.body.removeChild(overlay);return;}
 
-      const imgs=canvases.map((cv,i)=>`<div class="page"><img src="${cv.toDataURL('image/jpeg',.95)}" style="width:100%;display:block"></div>`).join('');
-
+      const imgs=canvases.map(cv=>`<div class="page"><img src="${cv.toDataURL('image/jpeg',.95)}" style="width:100%;display:block"></div>`).join('');
       w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Construction Progress Report</title>
-      <style>
-        *{margin:0;padding:0;box-sizing:border-box}
-        body{background:#fff}
-        .page{width:210mm;page-break-after:always;overflow:hidden}
-        .page:last-child{page-break-after:avoid}
-        img{width:210mm;display:block}
-        @media print{@page{size:A4;margin:0}body{background:#fff}.page{page-break-after:always;width:210mm}.page:last-child{page-break-after:avoid}}
-      </style></head><body>${imgs}
-      <script>window.onload=function(){setTimeout(function(){window.print();},500);};<\/script>
-      </body></html>`);
+      <style>*{margin:0;padding:0;box-sizing:border-box}body{background:#fff}.page{width:210mm;page-break-after:always}.page:last-child{page-break-after:avoid}img{width:210mm;display:block}@media print{@page{size:A4;margin:0}.page{page-break-after:always;width:210mm}.page:last-child{page-break-after:avoid}}</style>
+      </head><body>${imgs}<script>window.onload=function(){setTimeout(function(){window.print();},500);};<\/script></body></html>`);
       w.document.close();
 
       bar.style.width='100%';
