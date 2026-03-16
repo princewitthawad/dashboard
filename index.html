@@ -41,7 +41,15 @@ header::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;back
 body.view-mode .view-badge{display:flex!important}
 .view-only{display:none!important}
 body.view-mode .view-only{display:inline-flex!important}
-.btn{padding:7px 16px;border:none;border-radius:var(--rs);font-family:var(--f);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.btn{padding:7px 16px;border:none;border-radius:var(--rs);font-family:var(--f);font-size:12px;font-weight:600;cursor:pointer;transition:transform .15s cubic-bezier(.34,1.56,.64,1),box-shadow .15s,background .2s,opacity .2s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;position:relative;overflow:hidden}
+.btn::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,.06);opacity:0;transition:opacity .2s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.35)}
+.btn:hover::after{opacity:1}
+.btn:active{transform:scale(.95) translateY(0);box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.lm-num:hover{background:#0f1e2e!important;transform:scale(1.07)}
+.lm-num:active{transform:scale(.92)!important;background:#172840!important}
+button:not(.btn):not(.lm-num):not(.ov-close):hover{opacity:.85}
+button:not(.btn):not(.lm-num):not(.ov-close):active{transform:scale(.96)}
 .btn-g{background:rgba(0,230,118,.15);color:var(--green);border:1px solid rgba(0,230,118,.4)}.btn-g:hover{background:rgba(0,230,118,.25);transform:translateY(-1px)}
 .btn-b{background:rgba(56,139,253,.15);color:var(--blue);border:1px solid rgba(56,139,253,.4)}.btn-b:hover{background:rgba(56,139,253,.25);transform:translateY(-1px)}
 .btn-o{background:rgba(255,149,0,.15);color:var(--orange);border:1px solid rgba(255,149,0,.4)}.btn-o:hover{background:rgba(255,149,0,.25)}
@@ -340,6 +348,7 @@ body.view-mode .edit-only{display:none!important}
     <button class="btn edit-only" onclick="exportDataJSON()" style="background:rgba(255,149,0,.15);color:#ff9500;border:1px solid rgba(255,149,0,.5)">📤 Export JSON</button>
     <button class="btn btn-b view-only" onclick="showFirebaseGuide()">☁️ ลงทะเบียน</button>
     <button class="btn btn-gold edit-only" onclick="showPwChange()">🔑 รหัสผ่าน</button>
+    <button class="btn edit-only" onclick="showDevLogin()" style="background:rgba(120,80,255,.15);color:#9b66ff;border:1px solid rgba(120,80,255,.4);font-size:11px">⚙️ Dev</button>
     <a id="lockin-link" href="#" onclick="event.preventDefault();showLockModal()" style="font-size:11px;font-weight:600;color:var(--tx2);text-decoration:none;padding:5px 10px;border-radius:6px;transition:color .2s" onmouseover="this.style.color='var(--blue)'" onmouseout="this.style.color='var(--tx2)'">🔓 Login</a>
     <button id="logout-btn" class="btn edit-only" onclick="doLogout()" style="display:none;background:rgba(255,68,68,.12);color:#ff6666;border:1px solid rgba(255,68,68,.3);font-size:11px">🔒 Logout</button>
     <button id="lock-btn" class="btn btn-o edit-only" onclick="applyViewMode()" style="display:none">🔒 ล็อก</button>
@@ -697,7 +706,7 @@ function sha256(str){
 function showPwChange(){
   ['pwc-old','pwc-new','pwc-confirm'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   document.getElementById('pwc-err').textContent='';
-  document.getElementById('pwc-bar').style.width='0%';
+  const pwcBar=document.getElementById('pwc-bar');if(pwcBar)pwcBar.style.width='0%';
   document.getElementById('pwc-hint').textContent='';
   document.getElementById('pwc-modal').classList.add('show');
   setTimeout(()=>document.getElementById('pwc-old')?.focus(),80);
@@ -1354,8 +1363,8 @@ function renderChecklist(){
   let total=0,done=0;CHECKLIST_DATA.forEach(g=>g.items.forEach((_,i)=>{total++;if(_clState[g.id+'-'+i])done++;}));
   const pct=total>0?Math.round(done/total*100):0;
   document.getElementById('cl-done-count').textContent=done;document.getElementById('cl-total-count').textContent=total;
-  document.getElementById('cl-pct').textContent=pct+'%';document.getElementById('cl-progress-bar').style.width=pct+'%';
-  document.getElementById('cl-progress-bar').className='PF '+(pct>=80?'g':pct>=50?'b':pct>=30?'o':'r');
+  const clPct=document.getElementById('cl-pct');if(clPct)clPct.textContent=pct+'%';
+  const clBar=document.getElementById('cl-progress-bar');if(clBar){clBar.style.width=pct+'%';clBar.className='PF '+(pct>=80?'g':pct>=50?'b':pct>=30?'o':'r');}
   body.innerHTML=CHECKLIST_DATA.map(g=>{
     const gDone=g.items.filter((_,i)=>_clState[g.id+'-'+i]).length;
     return`<div style="background:var(--bg2);border:1px solid ${g.col}33;border-left:4px solid ${g.col};border-radius:9px;padding:16px;margin-bottom:12px">
@@ -1386,7 +1395,8 @@ function exportChecklistPDF(){
   </head><body>
   <div class="page">${hdr}${p1}${ftr}</div>
   <div class="page"><div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid #1565c0"><div style="font-size:15px;font-weight:800">📋 Checklist (ต่อ)</div><div style="font-size:11px;color:#9ca3af">${today}</div></div>${p2}${rptHTML}${ftr}</div>
-  <script>window.onload=()=>{window.print();}<\/script></body></html>`);
+  <script>window.onload=()=>{window.print();}<\/script>
+</body></html>`);
   win.document.close();
 }
 function shareChecklistLine(){
@@ -2123,6 +2133,249 @@ function showUrgentPopup(){
     </div>`;
   document.body.appendChild(popup);
 }
+
+const DEV_HASH='7e66b5dd3d158d14ba3300cad5702ee6d72befaec37890eed25c91687bb649df';
+const DEV_COLORS=['#00e676','#00d4ff','#00bcd4','#ff9500','#ce93d8','#388bfd','#ffd600','#ff5252','#69f0ae','#40c4ff','#ea80fc','#ffab40'];
+
+function showDevLogin(){
+  const m=document.getElementById('dev-modal');
+  if(!m){alert('dev-modal not found');return;}
+  m.style.setProperty('display','flex','important');
+  const inp=document.getElementById('dev-pw-inp');
+  if(inp){inp.value='';setTimeout(()=>inp.focus(),100);}
+  const err=document.getElementById('dev-err');if(err)err.textContent='';
+}
+function closeDevModal(){
+  const dm=document.getElementById('dev-modal');
+  if(dm)dm.style.display='none';
+}
+function doDevUnlock(){
+  const inp=document.getElementById('dev-pw-inp');
+  const pw=inp?inp.value.trim():'';
+  if(sha256(pw)===DEV_HASH){
+    closeDevModal();
+    openDevOverlay();
+    showToast('เข้าสู่ Dev Mode ✅','ok');
+  }else{
+    const err=document.getElementById('dev-err');
+    if(err)err.textContent='รหัสไม่ถูกต้อง';
+    if(inp)inp.value='';
+  }
+}
+function getDevWorks(){
+  try{return JSON.parse(localStorage.getItem('cp_dev_works')||'[]');}catch(e){return[];}
+}
+function saveDevWorks(works){
+  localStorage.setItem('cp_dev_works',JSON.stringify(works));
+}
+
+// Built-in work definitions (editable name/targets but not deletable)
+const BUILTIN_WORKS=[
+  {id:'s1', name:'S1 หลังคา',         unit:'pct',  rooms:0,   sqm:0,      tgt:100, col:'#00e676', builtin:true},
+  {id:'s2', name:'S2 ก่ออิฐใน',       unit:'room', rooms:44,  sqm:0,      tgt:100, col:'#00d4ff', builtin:true},
+  {id:'s3', name:'S3 ก่ออิฐนอก',      unit:'sqm',  rooms:0,   sqm:979.7,  tgt:50,  col:'#00bcd4', builtin:true},
+  {id:'s4', name:'S4 ก่ออิฐชั้น 1',   unit:'room', rooms:5,   sqm:0,      tgt:100, col:'#ff9500', builtin:true},
+  {id:'s5', name:'S5 ไฟฟ้า',           unit:'room', rooms:44,  sqm:0,      tgt:80,  col:'#ce93d8', builtin:true},
+  {id:'s6', name:'S6 ท่อน้ำดี',        unit:'room', rooms:26,  sqm:0,      tgt:50,  col:'#388bfd', builtin:true},
+  {id:'s7', name:'S7 ฉาบผนัง',        unit:'room', rooms:22,  sqm:0,      tgt:40,  col:'#ffd600', builtin:true},
+];
+
+function getAllWorks(){
+  // Merge builtin + edited names/targets + custom works
+  const overrides=JSON.parse(localStorage.getItem('cp_dev_overrides')||'{}');
+  const custom=getDevWorks();
+  const all=BUILTIN_WORKS.map(w=>({...w,...(overrides[w.id]||{})}));
+  return [...all,...custom];
+}
+
+function openDevOverlay(){
+  const dov=document.getElementById('dev-overlay');
+  if(dov)dov.style.setProperty('display','block','important');
+  renderDevCards();
+}
+function closeDevOverlay(){
+  const dov=document.getElementById('dev-overlay');
+  if(dov)dov.style.setProperty('display','none','important');
+}
+
+function devToggleInputs(){
+  const unit=document.getElementById('dev-new-unit')?.value;
+  const rDiv=document.getElementById('dev-inp-rooms');
+  const sDiv=document.getElementById('dev-inp-sqm');
+  if(rDiv)rDiv.style.display=(unit==='sqm')?'none':'block';
+  if(sDiv)sDiv.style.display=(unit==='room'||unit==='pct')?'none':'block';
+}
+
+function renderDevCards(){
+  const area=document.getElementById('dev-cards-area');if(!area)return;
+  const works=getAllWorks();
+  area.innerHTML=works.map((w,idx)=>{
+    const unitLbl={room:'ห้อง',sqm:'ตร.ม.',both:'ห้อง+ตร.ม.',pct:'%'};
+    const isCustom=!w.builtin;
+    return`<div style="background:var(--bgc);border:1px solid ${w.col}44;border-left:4px solid ${w.col};border-radius:12px;padding:18px 20px;margin-bottom:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:32px;height:32px;border-radius:8px;background:${w.col}22;border:1px solid ${w.col}55;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:${w.col};font-family:var(--m)">${isCustom?'★':idx+1}</div>
+          <div>
+            <input value="${w.name}" onchange="devUpdateField('${w.id}','name',this.value)"
+              style="background:transparent;border:none;border-bottom:1px solid ${w.col}66;color:#e8f0fe;font-size:15px;font-weight:800;font-family:var(--f);outline:none;padding:2px 4px;min-width:200px">
+            <div style="font-size:10px;color:#6b7a8d;margin-top:3px">${w.builtin?'งานหลัก (ระบบ)':'งานเพิ่มเติม'} · หน่วย: ${unitLbl[w.unit]||w.unit}</div>
+          </div>
+        </div>
+        ${isCustom?`<button onclick="devDeleteWork('${w.id}')" style="background:rgba(255,68,68,.1);border:1px solid rgba(255,68,68,.4);color:#ff6b6b;border-radius:6px;padding:5px 12px;cursor:pointer;font-size:11px;font-family:var(--f)">🗑️ ลบงานนี้</button>`:''}
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px">
+        <div style="background:var(--bg2);border-radius:8px;padding:12px">
+          <div style="font-size:10px;color:#6b7a8d;margin-bottom:6px;font-weight:700">เป้าหมาย (%)</div>
+          <input type="number" min="1" max="100" value="${w.tgt}" onchange="devUpdateField('${w.id}','tgt',parseFloat(this.value))"
+            style="width:100%;background:rgba(255,255,255,.05);border:1px solid ${w.col}55;border-radius:6px;padding:8px;color:${w.col};font-size:16px;font-weight:800;font-family:var(--m);outline:none;text-align:center">
+          <div style="font-size:9px;color:#6b7a8d;margin-top:4px;text-align:center">% ที่ต้องถึง</div>
+        </div>
+        ${(w.unit==='room'||w.unit==='both')?`<div style="background:var(--bg2);border-radius:8px;padding:12px">
+          <div style="font-size:10px;color:#6b7a8d;margin-bottom:6px;font-weight:700">จำนวนห้อง</div>
+          <input type="number" min="0" value="${w.rooms||0}" onchange="devUpdateField('${w.id}','rooms',parseFloat(this.value))"
+            style="width:100%;background:rgba(255,255,255,.05);border:1px solid ${w.col}55;border-radius:6px;padding:8px;color:#e8f0fe;font-size:16px;font-weight:800;font-family:var(--m);outline:none;text-align:center">
+          <div style="font-size:9px;color:#6b7a8d;margin-top:4px;text-align:center">ห้องทั้งหมด</div>
+        </div>`:''}
+        ${(w.unit==='sqm'||w.unit==='both')?`<div style="background:var(--bg2);border-radius:8px;padding:12px">
+          <div style="font-size:10px;color:#6b7a8d;margin-bottom:6px;font-weight:700">พื้นที่ (ตร.ม.)</div>
+          <input type="number" min="0" step="0.1" value="${w.sqm||0}" onchange="devUpdateField('${w.id}','sqm',parseFloat(this.value))"
+            style="width:100%;background:rgba(255,255,255,.05);border:1px solid ${w.col}55;border-radius:6px;padding:8px;color:#e8f0fe;font-size:16px;font-weight:800;font-family:var(--m);outline:none;text-align:center">
+          <div style="font-size:9px;color:#6b7a8d;margin-top:4px;text-align:center">ตารางเมตรทั้งหมด</div>
+        </div>`:''}
+        <div style="background:var(--bg2);border-radius:8px;padding:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px">
+          <div style="font-size:10px;color:#6b7a8d;font-weight:700">สี Card</div>
+          <input type="color" value="${w.col}" onchange="devUpdateField('${w.id}','col',this.value)"
+            style="width:48px;height:32px;border:none;border-radius:6px;cursor:pointer;background:transparent">
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function devUpdateField(id,field,val){
+  // Check if builtin
+  const isBuiltin=BUILTIN_WORKS.some(w=>w.id===id);
+  if(isBuiltin){
+    const overrides=JSON.parse(localStorage.getItem('cp_dev_overrides')||'{}');
+    if(!overrides[id])overrides[id]={};
+    overrides[id][field]=val;
+    localStorage.setItem('cp_dev_overrides',JSON.stringify(overrides));
+  }else{
+    const works=getDevWorks();
+    const idx=works.findIndex(w=>w.id===id);
+    if(idx>=0){works[idx][field]=val;saveDevWorks(works);}
+  }
+}
+
+function devAddWork(){
+  const name=document.getElementById('dev-new-name')?.value.trim();
+  const unit=document.getElementById('dev-new-unit')?.value||'room';
+  const rooms=parseFloat(document.getElementById('dev-new-rooms')?.value)||0;
+  const sqm=parseFloat(document.getElementById('dev-new-sqm')?.value)||0;
+  const tgt=parseFloat(document.getElementById('dev-new-tgt')?.value)||100;
+  const col=document.getElementById('dev-new-color')?.value||'#9b66ff';
+  if(!name){showToast('กรุณาใส่ชื่องาน','err');return;}
+  if(unit!=='pct'&&rooms===0&&sqm===0){showToast('กรุณาใส่จำนวนห้องหรือพื้นที่','err');return;}
+  const works=getDevWorks();
+  const newId='cw'+Date.now();
+  works.push({id:newId,name,unit,rooms,sqm,tgt,col,builtin:false,pct:0});
+  saveDevWorks(works);
+  // Clear inputs
+  ['dev-new-name','dev-new-rooms','dev-new-sqm','dev-new-tgt'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  renderDevCards();
+  showToast('✅ เพิ่มงาน "'+name+'" เรียบร้อย','ok');
+}
+
+function devDeleteWork(id){
+  const works=getDevWorks();
+  const w=works.find(x=>x.id===id);
+  if(!w)return;
+  if(!confirm('ลบงาน "'+w.name+'" ?'))return;
+  saveDevWorks(works.filter(x=>x.id!==id));
+  renderDevCards();
+  showToast('ลบงานแล้ว','ok');
+}
+
+function devSaveAll(){
+  showToast('💾 บันทึกการตั้งค่าเรียบร้อย','ok');
+  closeDevOverlay();
+  // Reload page to apply changes
+  setTimeout(()=>location.reload(),800);
+}
+
 </script>
+
+<div id="dev-modal" style="display:none;position:fixed;inset:0;z-index:99998;background:rgba(3,7,14,.92);backdrop-filter:blur(16px);align-items:center;justify-content:center;padding:16px;flex-direction:column">
+  <div style="background:linear-gradient(135deg,#0d1525,#111d30);border:1px solid rgba(120,80,255,.5);border-radius:16px;max-width:400px;width:100%;padding:28px 24px;box-shadow:0 24px 80px rgba(0,0,0,.7)">
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="font-size:26px;margin-bottom:6px">⚙️</div>
+      <div style="font-size:16px;font-weight:800;color:#9b66ff">Developer Mode</div>
+      <div style="font-size:10px;color:#6b7a8d;margin-top:3px">รหัส 4 หลัก</div>
+    </div>
+    <input id="dev-pw-inp" type="password" inputmode="numeric" maxlength="10" placeholder="รหัส Dev" autocomplete="off"
+      style="width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(120,80,255,.5);border-radius:10px;padding:14px 16px;color:#e8f0fe;font-size:20px;font-family:var(--m);text-align:center;letter-spacing:6px;outline:none;margin-bottom:8px"
+      onkeydown="if(event.key==='Enter')doDevUnlock()">
+    <div id="dev-err" style="font-size:11px;color:#ff6b6b;text-align:center;min-height:16px;margin-bottom:12px"></div>
+    <button onclick="doDevUnlock()" class="btn" style="width:100%;background:rgba(120,80,255,.25);border:1px solid rgba(120,80,255,.6);color:#9b66ff;border-radius:10px;padding:13px;font-size:14px;font-weight:800;margin-bottom:8px;justify-content:center">เข้าสู่ Dev Mode</button>
+    <button onclick="closeDevModal()" class="btn" style="width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#6b7a8d;border-radius:10px;padding:10px;font-size:12px;justify-content:center">ยกเลิก</button>
+  </div>
+</div>
+
+
+
+<div id="dev-overlay" style="display:none;position:fixed;inset:0;z-index:99997;background:#080d14;overflow-y:auto">
+  <div style="position:sticky;top:0;z-index:10;background:rgba(13,21,37,.97);border-bottom:2px solid rgba(120,80,255,.4);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;backdrop-filter:blur(12px)">
+    <div style="display:flex;align-items:center;gap:12px">
+      <span style="font-size:22px">⚙️</span>
+      <div>
+        <div style="font-size:15px;font-weight:800;color:#9b66ff">Developer Mode — ตั้งค่างาน</div>
+        <div style="font-size:10px;color:#6b7a8d">แก้ชื่องาน · กำหนดเป้าหมาย · เพิ่มงานใหม่</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button onclick="devSaveAll()" class="btn" style="background:rgba(0,230,118,.15);border:1px solid rgba(0,230,118,.5);color:#00e676;font-weight:800">💾 บันทึก</button>
+      <button onclick="closeDevOverlay()" class="btn" style="background:rgba(255,68,68,.12);border:1px solid rgba(255,68,68,.4);color:#ff6b6b;font-weight:700">✕ ออก</button>
+    </div>
+  </div>
+  <div style="padding:20px;max-width:1200px;margin:0 auto">
+    <div id="dev-cards-area"></div>
+    <div style="margin-top:20px;background:rgba(120,80,255,.07);border:2px dashed rgba(120,80,255,.4);border-radius:14px;padding:20px">
+      <div style="font-size:14px;font-weight:800;color:#9b66ff;margin-bottom:16px">➕ เพิ่มงานใหม่</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:14px">
+        <div>
+          <div style="font-size:10px;color:#6b7a8d;margin-bottom:5px;font-weight:700">ชื่องาน *</div>
+          <input id="dev-new-name" placeholder="เช่น งานทาสี" style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(120,80,255,.35);border-radius:8px;padding:10px 12px;color:#e8f0fe;font-size:13px;font-family:var(--f);outline:none">
+        </div>
+        <div>
+          <div style="font-size:10px;color:#6b7a8d;margin-bottom:5px;font-weight:700">หน่วยวัด</div>
+          <select id="dev-new-unit" onchange="devToggleInputs()" style="width:100%;background:#0d1525;border:1px solid rgba(120,80,255,.35);border-radius:8px;padding:10px 12px;color:#e8f0fe;font-size:13px;font-family:var(--f);outline:none">
+            <option value="room">ห้อง</option>
+            <option value="sqm">ตารางเมตร</option>
+            <option value="both">ห้อง + ตารางเมตร</option>
+            <option value="pct">เปอร์เซ็นต์</option>
+          </select>
+        </div>
+        <div id="dev-inp-rooms">
+          <div style="font-size:10px;color:#6b7a8d;margin-bottom:5px;font-weight:700">จำนวนห้อง</div>
+          <input id="dev-new-rooms" type="number" min="0" placeholder="เช่น 44" style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(120,80,255,.35);border-radius:8px;padding:10px 12px;color:#e8f0fe;font-size:13px;font-family:var(--f);outline:none">
+        </div>
+        <div id="dev-inp-sqm" style="display:none">
+          <div style="font-size:10px;color:#6b7a8d;margin-bottom:5px;font-weight:700">พื้นที่ (ตร.ม.)</div>
+          <input id="dev-new-sqm" type="number" min="0" step="0.1" placeholder="เช่น 245.5" style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(120,80,255,.35);border-radius:8px;padding:10px 12px;color:#e8f0fe;font-size:13px;font-family:var(--f);outline:none">
+        </div>
+        <div>
+          <div style="font-size:10px;color:#6b7a8d;margin-bottom:5px;font-weight:700">เป้าหมาย (%)</div>
+          <input id="dev-new-tgt" type="number" min="1" max="100" placeholder="100" style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(120,80,255,.35);border-radius:8px;padding:10px 12px;color:#e8f0fe;font-size:13px;font-family:var(--f);outline:none">
+        </div>
+        <div>
+          <div style="font-size:10px;color:#6b7a8d;margin-bottom:5px;font-weight:700">สี Card</div>
+          <input id="dev-new-color" type="color" value="#9b66ff" style="width:100%;height:42px;background:rgba(255,255,255,.05);border:1px solid rgba(120,80,255,.35);border-radius:8px;padding:3px 6px;cursor:pointer">
+        </div>
+      </div>
+      <button onclick="devAddWork()" class="btn" style="background:rgba(120,80,255,.2);border:1px solid rgba(120,80,255,.5);color:#9b66ff;padding:10px 28px;font-size:13px;font-weight:800">➕ สร้าง Card งานใหม่</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
