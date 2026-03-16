@@ -1041,14 +1041,6 @@ function buildPlasterUI(force=false){
         <input class="PI" type="text" inputmode="decimal" pattern="[0-9.]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="s7r${i}" value="${val}" oninput="updPlaster();ra();scheduleAutoSave()" style="width:56px;font-size:15px;font-weight:700;text-align:center;padding:3px 4px;background:transparent;border:1px solid ${dn?'rgba(0,230,118,.5)':'var(--bdrh)'};-webkit-user-select:text;user-select:text;min-height:36px">
         <div style="font-size:8px;color:var(--tx3);margin-top:3px">${(val*WTP_R/100).toFixed(1)}%</div>
       </div>`;
-    }else if(isCor&&target<TOTAL){
-      const cor=parseFloat(document.getElementById('s7cor')?.value||0)||0;
-      const dnc=cor>=100;
-      h+=`<div class="PB ${dnc?'dn':'pd'}" style="width:88px;padding:8px 4px;border-color:rgba(0,212,255,.4);background:rgba(0,212,255,.07)">
-        <div style="font-size:9px;font-weight:700;color:var(--cyan);margin-bottom:4px">เดิน</div>
-        <input class="PI" type="text" inputmode="decimal" pattern="[0-9.]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="s7cor" value="${cor}" oninput="updPlaster();ra();scheduleAutoSave()" style="width:56px;font-size:15px;font-weight:700;text-align:center;padding:3px 4px;background:transparent;border:1px solid rgba(0,212,255,.5);-webkit-user-select:text;user-select:text;min-height:36px">
-        <div style="font-size:8px;color:var(--cyan);margin-top:3px">${(cor*WTP_C/100).toFixed(1)}%</div>
-      </div>`;
     }else{
       // ล็อก — แสดงเหมือนเดิม
       h+=`<div class="PB pd" style="width:88px;padding:12px 6px;opacity:.4">
@@ -1058,6 +1050,18 @@ function buildPlasterUI(force=false){
       </div>`;
     }
   }
+  // ช่องทางเดิน — แสดงเสมอ นอกเหนือจาก 22 ช่อง
+  const cor2=parseFloat(document.getElementById('s7cor')?.value||0)||0;
+  const dnc2=cor2>=100;
+  const WTP_C2=40*0.2;
+  h+=`<div style="margin-top:10px;width:100%;padding-top:10px;border-top:1px solid var(--bdr)">
+    <div style="font-size:11px;color:var(--cyan);font-weight:700;margin-bottom:6px">🚶 ทางเดิน (น้ำหนัก 20% = ${WTP_C2}%)</div>
+    <div class="PB ${dnc2?'dn':'pd'}" style="width:88px;padding:8px 4px;border-color:rgba(0,212,255,.4);background:rgba(0,212,255,.07)">
+      <div style="font-size:9px;font-weight:700;color:var(--cyan);margin-bottom:4px">เดิน</div>
+      <input class="PI" type="text" inputmode="decimal" pattern="[0-9.]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="s7cor" value="${cor2}" oninput="updPlaster();ra();scheduleAutoSave()" style="width:56px;font-size:15px;font-weight:700;text-align:center;padding:3px 4px;background:transparent;border:1px solid rgba(0,212,255,.5);-webkit-user-select:text;user-select:text;min-height:36px">
+      <div style="font-size:8px;color:var(--cyan);margin-top:3px">${(cor2*WTP_C2/100).toFixed(1)}%</div>
+    </div>
+  </div>`;
   c.innerHTML=h;
 }
 function updS7Target(v){
