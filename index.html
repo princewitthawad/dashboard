@@ -46,8 +46,8 @@ body.view-mode .view-only{display:inline-flex!important}
 .btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.35)}
 .btn:hover::after{opacity:1}
 .btn:active{transform:scale(.95) translateY(0);box-shadow:0 2px 8px rgba(0,0,0,.3)}
-.lm-num:hover{background:#0f1e2e!important;transform:scale(1.07)}
-.lm-num:active{transform:scale(.92)!important;background:#172840!important}
+.lm-num:hover{background:#0f1e2e!important;box-shadow:0 0 18px rgba(56,139,253,.18)}
+.lm-num:active{animation:numBounce .22s cubic-bezier(.34,1.56,.64,1) both!important;background:#172840!important}
 button:not(.btn):not(.lm-num):not(.ov-close):hover{opacity:.85}
 button:not(.btn):not(.lm-num):not(.ov-close):active{transform:scale(.96)}
 .btn-g{background:rgba(0,230,118,.15);color:var(--green);border:1px solid rgba(0,230,118,.4)}.btn-g:hover{background:rgba(0,230,118,.25);transform:translateY(-1px)}
@@ -206,7 +206,22 @@ body.view-mode .edit-only{display:none!important}
 .lm-dot-inp{width:13px;height:13px;border-radius:50%;background:#0d1a28;border:2px solid #1e3050;transition:all .15s}
 .lm-dot-inp.filled{background:#388bfd;border-color:#388bfd;transform:scale(1.2)}
 .lm-numgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:100%;max-width:320px;margin:0 auto 18px}
-.lm-num{width:100%;min-height:72px;border-radius:14px;background:#080f1a;border:1px solid #152030;color:#c0d4ec;font-size:30px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:background .08s,transform .07s;user-select:none}
+@keyframes numIn{from{opacity:0;transform:translateY(12px) scale(.85)}to{opacity:1;transform:none}}
+.lm-numgrid .lm-num:nth-child(1){animation:numIn .25s .05s both}
+.lm-numgrid .lm-num:nth-child(2){animation:numIn .25s .08s both}
+.lm-numgrid .lm-num:nth-child(3){animation:numIn .25s .11s both}
+.lm-numgrid .lm-num:nth-child(4){animation:numIn .25s .14s both}
+.lm-numgrid .lm-num:nth-child(5){animation:numIn .25s .17s both}
+.lm-numgrid .lm-num:nth-child(6){animation:numIn .25s .20s both}
+.lm-numgrid .lm-num:nth-child(7){animation:numIn .25s .23s both}
+.lm-numgrid .lm-num:nth-child(8){animation:numIn .25s .26s both}
+.lm-numgrid .lm-num:nth-child(9){animation:numIn .25s .29s both}
+.lm-numgrid .lm-num:nth-child(10){animation:numIn .25s .32s both}
+.lm-numgrid .lm-num:nth-child(11){animation:numIn .25s .35s both}
+.lm-numgrid .lm-num:nth-child(12){animation:numIn .25s .38s both}
+@keyframes numBounce{0%{transform:scale(1)}20%{transform:scale(.82)}55%{transform:scale(1.12)}75%{transform:scale(.97)}100%{transform:scale(1)}}
+.lm-num{width:100%;min-height:72px;border-radius:14px;background:#080f1a;border:1px solid #152030;color:#c0d4ec;font-size:30px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:background .1s,box-shadow .15s;user-select:none;position:relative;overflow:hidden}
+.lm-num.pressed{animation:numBounce .25s cubic-bezier(.34,1.56,.64,1) both}
 .lm-num:active{background:#0d1e30;transform:scale(.88)}
 .lm-num-s{font-size:11px;font-weight:700;letter-spacing:.3px;color:#2d4a6a}
 .lm-err{font-size:11px;color:#dc6060;font-family:var(--m);min-height:16px;margin:0 0 14px;text-align:center}
@@ -677,8 +692,15 @@ const SUMDEF=[
   {lbl:'ฉาบผนัง',   key:'s7',  tgt:40, col:'#ffd600'},
 ];
 
-const DEFAULT_HASH='b8d0e8083fee10ac52f6fa0d8d15592232fa442b16d3656bbb695ad4d61540f3';
-function getPassHash(){return localStorage.getItem('cp_pass_hash')||DEFAULT_HASH;}
+const DEFAULT_HASH='7f2680e7a06147bb5e6ac4615d87265d0ca4fc52f2f1172cdea2f6dc860e0013';
+function getPassHash(){
+  const stored=localStorage.getItem('cp_pass_hash');
+  // Clear old default hash if still stored
+  if(stored==='b8d0e8083fee10ac52f6fa0d8d15592232fa442b16d3656bbb695ad4d61540f3'){
+    localStorage.removeItem('cp_pass_hash');return DEFAULT_HASH;
+  }
+  return stored||DEFAULT_HASH;
+}
 function setPassHash(h){localStorage.setItem('cp_pass_hash',h);}
 
 function sha256(str){
@@ -1286,9 +1308,16 @@ function applyEditMode(){document.body.classList.remove('view-mode');_isLocked=f
 function showGreeting(){const d=document.createElement('div');d.style.cssText='position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;pointer-events:none';d.innerHTML=`<div style="background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:36px 72px;backdrop-filter:blur(20px);box-shadow:0 12px 60px rgba(0,0,0,.5);animation:greetIn .35s cubic-bezier(.34,1.56,.64,1) both"><span style="font-size:42px;font-weight:800;color:#e8f0fe;font-family:'Sarabun',sans-serif;letter-spacing:1px">สวัสดี ค่ะ</span></div>`;document.body.appendChild(d);setTimeout(()=>{d.firstElementChild.style.cssText+=';animation:greetOut .3s ease forwards';setTimeout(()=>d.remove(),300);},3000);}
 function doLogout(){sessionStorage.removeItem(SESSION_KEY);applyViewMode();showToast('ออกจากระบบแล้ว 🔒','ok');}
 function numPress(n){
-  const now=Date.now();if(now-_lastTouch<80)return;_lastTouch=now;
+  const now=Date.now();if(now-_lastTouch<180)return;_lastTouch=now;
   if(_numBuf.length>=8)return;
   _numBuf+=n;_syncDots();
+  // Bounce animation on pressed button
+  document.querySelectorAll('.lm-num').forEach(b=>{
+    if(b.textContent.trim()===n){
+      b.classList.remove('pressed');void b.offsetWidth;b.classList.add('pressed');
+      setTimeout(()=>b.classList.remove('pressed'),260);
+    }
+  });
   // Auto-try at the correct password length
   const correctLen=getPassHash()===getPassHash()?_numBuf.length:6;
   // Try unlock at each length from 4-8 silently; shake only at max
