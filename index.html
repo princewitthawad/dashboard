@@ -46,8 +46,8 @@ body.view-mode .view-only{display:inline-flex!important}
 .btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.35)}
 .btn:hover::after{opacity:1}
 .btn:active{transform:scale(.95) translateY(0);box-shadow:0 2px 8px rgba(0,0,0,.3)}
-.lm-num:hover{background:#0f1e2e!important;box-shadow:0 0 18px rgba(56,139,253,.18)}
-.lm-num:active{animation:numBounce .22s cubic-bezier(.34,1.56,.64,1) both!important;background:#172840!important}
+.lm-num:hover{background:#0f1e2e!important;box-shadow:0 0 14px rgba(56,139,253,.15)}
+.lm-num:active{animation:numFlash .5s ease-out both!important}
 button:not(.btn):not(.lm-num):not(.ov-close):hover{opacity:.85}
 button:not(.btn):not(.lm-num):not(.ov-close):active{transform:scale(.96)}
 .btn-g{background:rgba(0,230,118,.15);color:var(--green);border:1px solid rgba(0,230,118,.4)}.btn-g:hover{background:rgba(0,230,118,.25);transform:translateY(-1px)}
@@ -219,9 +219,9 @@ body.view-mode .edit-only{display:none!important}
 .lm-numgrid .lm-num:nth-child(10){animation:numIn .25s .32s both}
 .lm-numgrid .lm-num:nth-child(11){animation:numIn .25s .35s both}
 .lm-numgrid .lm-num:nth-child(12){animation:numIn .25s .38s both}
-@keyframes numBounce{0%{transform:scale(1)}20%{transform:scale(.82)}55%{transform:scale(1.12)}75%{transform:scale(.97)}100%{transform:scale(1)}}
+@keyframes numFlash{0%{background:rgba(56,139,253,.3);box-shadow:0 0 20px rgba(56,139,253,.5)}100%{background:#080f1a;box-shadow:none}}
 .lm-num{width:100%;min-height:72px;border-radius:14px;background:#080f1a;border:1px solid #152030;color:#c0d4ec;font-size:30px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:background .1s,box-shadow .15s;user-select:none;position:relative;overflow:hidden}
-.lm-num.pressed{animation:numBounce .25s cubic-bezier(.34,1.56,.64,1) both}
+.lm-num.pressed{animation:numFlash .5s ease-out both}
 .lm-num:active{background:#0d1e30;transform:scale(.88)}
 .lm-num-s{font-size:11px;font-weight:700;letter-spacing:.3px;color:#2d4a6a}
 .lm-err{font-size:11px;color:#dc6060;font-family:var(--m);min-height:16px;margin:0 0 14px;text-align:center}
