@@ -71,7 +71,7 @@ body.view-mode .view-only{display:inline-flex!important}
 .btn:hover::after{opacity:1}
 .btn:active{transform:scale(.95) translateY(0);box-shadow:0 2px 8px rgba(0,0,0,.3)}
 .lm-num:hover{background:rgba(255,255,255,.14)!important;transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.3)}
-.lm-num:active{transform:scale(.95) translateY(0)!important;background:rgba(255,255,255,.2)!important;transition:transform .1s!important}
+.lm-num:active{transform:scale(.97)!important;transition:transform .08s ease-in!important}
 button:not(.btn):not(.lm-num):not(.ov-close):hover{opacity:.85}
 button:not(.btn):not(.lm-num):not(.ov-close):active{transform:scale(.96)}
 .btn-g{background:rgba(0,230,118,.15);color:var(--green);border:1px solid rgba(0,230,118,.4)}.btn-g:hover{background:rgba(0,230,118,.25);transform:translateY(-1px)}
@@ -143,8 +143,9 @@ button:not(.btn):not(.lm-num):not(.ov-close):active{transform:scale(.96)}
 .PL{font-size:12px;font-weight:600}.PP{font-size:13px;font-weight:700;font-family:var(--m)}
 .PBG{height:9px;border-radius:99px;background:rgba(255,255,255,.06);overflow:hidden}
 .PF{height:100%;border-radius:99px;transition:width .8s cubic-bezier(.34,1.56,.64,1);position:relative;overflow:hidden}
-.PF::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);animation:shim 2.5s infinite}
-@keyframes shim{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+.PF::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);
+}
+
 .PF.g{background:linear-gradient(90deg,#00b248,#00e676)}.PF.o{background:linear-gradient(90deg,#e65c00,#ff9500)}.PF.r{background:linear-gradient(90deg,#c62828,#ff4444)}.PF.b{background:linear-gradient(90deg,#1565c0,#388bfd)}
 .DIV{height:1px;background:var(--bdr);margin:12px 0}
 .IG{display:flex;align-items:center;gap:6px}
@@ -207,22 +208,11 @@ button:not(.btn):not(.lm-num):not(.ov-close):active{transform:scale(.96)}
 .G2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
 .C2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .SB{background:rgba(8,13,20,.05);border:1px solid rgba(56,139,253,.25);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);box-shadow:0 4px 24px rgba(0,0,0,.15),inset 0 1px 0 rgba(255,255,255,.12),inset 0 -1px 0 rgba(255,255,255,.04);border-radius:var(--r);padding:20px 22px;margin-top:20px;position:relative;overflow:hidden}
-@keyframes seaWave{
-  0%   {transform:translateY(0px) rotate(0deg)}
-  15%  {transform:translateY(-4px) rotate(.3deg)}
-  30%  {transform:translateY(-2px) rotate(-.2deg)}
-  45%  {transform:translateY(-6px) rotate(.4deg)}
-  60%  {transform:translateY(-1px) rotate(-.1deg)}
-  75%  {transform:translateY(-5px) rotate(.2deg)}
-  100% {transform:translateY(0px) rotate(0deg)}}
-@keyframes cardShimmer{0%,100%{left:-60%;opacity:0}10%{opacity:1}50%{left:120%;opacity:.5}60%,99%{opacity:0}}
+
+
 .card{}
-.kc{animation:fadein .4s ease both,seaWave var(--sw,4.5s) var(--sd,0s) ease-in-out infinite}
-.card::before,.kc::before,.pie-sec::before,.DS::before,.SB::before{
-  content:'';position:absolute;top:0;left:-60%;width:40%;height:100%;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent);
-  transform:skewX(-15deg);pointer-events:none;
-  animation:cardShimmer 6s ease-in-out infinite}
+.kc{animation:fadein .4s ease both}
+
 .SB::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(56,139,253,.05),transparent 60%);pointer-events:none}
 .SBt{font-size:12px;font-weight:700;margin-bottom:14px;color:var(--tx2);text-transform:uppercase;letter-spacing:1px}
 .SBg{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
@@ -260,10 +250,10 @@ body.view-mode .edit-only{display:none!important}
   0%,100%{transform:translateY(0) scale(1);box-shadow:0 2px 8px rgba(0,0,0,.15),inset 0 1px 0 rgba(255,255,255,.2)}
   33%{transform:translateY(-2px) scale(1.01);box-shadow:0 6px 16px rgba(56,139,253,.12),inset 0 1px 0 rgba(255,255,255,.28)}
   66%{transform:translateY(1px) scale(.99);box-shadow:0 1px 6px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.15)}}
-@keyframes waterShimmer{
-  0%,100%{opacity:.6;transform:translateX(-10%) rotate(-20deg)}
-  50%{opacity:1;transform:translateX(10%) rotate(-15deg)}}
+
 @keyframes numIn{from{opacity:0;transform:translateY(12px) scale(.85)}to{opacity:1;transform:none}}
+
+
 .lm-numgrid .lm-num:nth-child(1){animation:numIn .25s .05s both}
 .lm-numgrid .lm-num:nth-child(2){animation:numIn .25s .08s both}
 .lm-numgrid .lm-num:nth-child(3){animation:numIn .25s .11s both}
@@ -276,34 +266,11 @@ body.view-mode .edit-only{display:none!important}
 .lm-numgrid .lm-num:nth-child(10){animation:numIn .25s .32s both}
 .lm-numgrid .lm-num:nth-child(11){animation:numIn .25s .35s both}
 .lm-numgrid .lm-num:nth-child(12){animation:numIn .25s .38s both}
-@keyframes waterFloat{
-  0%   {transform:translateY(0) scale(1) rotate(0deg)}
-  20%  {transform:translateY(-2px) scale(1.01) rotate(.5deg)}
-  40%  {transform:translateY(-1px) scale(1.005) rotate(-.3deg)}
-  60%  {transform:translateY(-3px) scale(1.015) rotate(.4deg)}
-  80%  {transform:translateY(-1px) scale(1.008) rotate(-.2deg)}
-  100% {transform:translateY(0) scale(1) rotate(0deg)}}
-@keyframes waterShimmer{
-  0%   {transform:translate(-80%,-50%) scale(1);opacity:0}
-  20%  {opacity:.25}
-  50%  {transform:translate(0%,30%) scale(1.4);opacity:.15}
-  80%  {opacity:.08}
-  100% {transform:translate(80%,80%) scale(.8);opacity:0}}
-@keyframes waterShimmer2{
-  0%   {transform:translate(80%,80%) scale(.8);opacity:0}
-  20%  {opacity:.2}
-  50%  {transform:translate(-20%,-20%) scale(1.3);opacity:.12}
-  80%  {opacity:.06}
-  100% {transform:translate(-80%,-50%) scale(1);opacity:0}}
-@keyframes numFlash{0%{background:rgba(255,255,255,.5)}100%{background:rgba(255,255,255,.08)}}
-@keyframes rippleWave{
-  0%{transform:scale(0);opacity:.6}
-  60%{transform:scale(2.5);opacity:.2}
-  100%{transform:scale(4);opacity:0}}
-@keyframes glassPress{
-  0%{box-shadow:0 4px 16px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.3),inset 0 -1px 0 rgba(0,0,0,.2)}
-  30%{box-shadow:0 2px 8px rgba(0,0,0,.4),inset 0 2px 8px rgba(0,0,0,.3),0 0 20px rgba(120,180,255,.4)}
-  100%{box-shadow:0 4px 16px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.3),inset 0 -1px 0 rgba(0,0,0,.2)}}
+
+
+
+
+
 .lm-num{aspect-ratio:1/1;width:100%;border-radius:50%;
   background:rgba(255,255,255,.06);
   border:1px solid rgba(255,255,255,.15);
@@ -314,22 +281,9 @@ body.view-mode .edit-only{display:none!important}
   user-select:none;position:relative;overflow:hidden;letter-spacing:-.5px;
   backdrop-filter:blur(4px);
   box-shadow:0 2px 8px rgba(0,0,0,.15),inset 0 1px 0 rgba(255,255,255,.2);}
-.lm-num::before{
-  content:'';position:absolute;
-  width:70%;height:70%;
-  background:radial-gradient(ellipse,rgba(120,200,255,.22) 0%,rgba(80,160,255,.08) 50%,transparent 80%);
-  border-radius:50%;
-  animation:waterShimmer 3.5s ease-in-out infinite;
-  pointer-events:none;top:10%;left:10%}
-.lm-num::after{
-  content:'';position:absolute;
-  width:50%;height:50%;
-  background:radial-gradient(ellipse,rgba(180,230,255,.18) 0%,transparent 70%);
-  border-radius:50%;
-  animation:waterShimmer2 4.2s 1.1s ease-in-out infinite;
-  pointer-events:none;bottom:10%;right:10%}
 
-.lm-num.pressed{transform:scale(.95);background:rgba(255,255,255,.2)!important;transition:transform .1s}
+
+.lm-num.pressed{transform:scale(.97);transition:transform .08s ease-in}
 
 .lm-num-s{font-size:13px;font-weight:400;color:rgba(255,255,255,.45)}
 .lm-err{font-size:11px;color:#dc6060;font-family:var(--m);min-height:16px;margin:0 0 14px;text-align:center}
@@ -1421,12 +1375,7 @@ function numPress(n){
   // Wave ripple on pressed button
   document.querySelectorAll('.lm-num').forEach(b=>{
     if(b.textContent.trim()===n){
-      b.classList.remove('pressed');void b.offsetWidth;b.classList.add('pressed');
-      // Create ripple wave element
-      const rip=document.createElement('span');
-      rip.style.cssText='position:absolute;border-radius:50%;background:rgba(255,255,255,.35);width:60px;height:60px;margin-left:-30px;margin-top:-30px;top:50%;left:50%;pointer-events:none;animation:rippleWave .6s ease-out forwards';
-      b.appendChild(rip);
-      setTimeout(()=>{rip.remove();b.classList.remove('pressed');},600);
+      b.classList.remove('pressed');void b.offsetWidth;b.classList.add('pressed');setTimeout(()=>b.classList.remove('pressed'),200);
     }
   });
   // Auto-try at the correct password length
@@ -2267,10 +2216,10 @@ function showUrgentPopup(){
 
   const popup=document.createElement('div');
   popup.id='_urgent_popup';
-  popup.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.25);z-index:99999;display:flex;align-items:center;justify-content:center;padding:12px;backdrop-filter:blur(4px)';
+  popup.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.28);z-index:99999;display:flex;align-items:center;justify-content:center;padding:12px;backdrop-filter:blur(5px)';
   popup.innerHTML=`
-    <div style="background:rgba(17,27,40,.2);border:1px solid rgba(255,68,68,.4);border-radius:16px;max-width:860px;width:100%;max-height:96vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.3);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)">
-      <div style="padding:22px 24px 16px;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;background:rgba(13,21,37,.22);border-radius:16px 16px 0 0;z-index:1;backdrop-filter:blur(8px)">
+    <div style="background:rgba(17,27,40,.25);border:1px solid rgba(255,68,68,.4);border-radius:16px;max-width:860px;width:100%;max-height:96vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.25);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)">
+      <div style="padding:22px 24px 16px;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;background:rgba(13,21,37,.25);border-radius:16px 16px 0 0;z-index:1;backdrop-filter:blur(8px)">
         <div style="font-size:22px;font-weight:800;color:#ff4444">🚨 งานเร่งด่วน</div>
         <div style="font-size:11px;color:#6b7a8d;margin-top:4px;font-family:var(--m)">
           เร่งรัด: <strong style="color:var(--orange)">${fmtDate(fastDeadline)}</strong> (${daysFast} วัน) &nbsp;|&nbsp;
