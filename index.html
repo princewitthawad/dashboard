@@ -28,7 +28,7 @@ body{font-family:var(--f);color:var(--tx);min-height:100vh;overflow-x:hidden;
     radial-gradient(ellipse at 85% 10%,rgba(0,212,255,.24) 0%,transparent 40%),
     radial-gradient(ellipse at 50% 80%,rgba(120,80,255,.14) 0%,transparent 45%),
     radial-gradient(ellipse at 90% 70%,rgba(0,230,118,.1) 0%,transparent 38%),
-    linear-gradient(135deg,#010407 0%,#040810 40%,#02060c 100%);
+    linear-gradient(135deg,rgba(0,0,0,.1),rgba(0,0,0,.1)),linear-gradient(135deg,#010407 0%,#040810 40%,#02060c 100%);
   background-attachment:fixed;
   background-size:cover}
 body::before{
@@ -48,6 +48,7 @@ body::after{
     radial-gradient(circle, rgba(56,139,253,.45) 1.5px, transparent 1.5px);
   background-size:80px 80px;
   background-attachment:fixed}
+body .bg-overlay{position:fixed;inset:0;background:rgba(0,0,0,.30);z-index:0;pointer-events:none}
 .orb{position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0}
 .o1{width:500px;height:500px;background:rgba(56,139,253,.06);top:-150px;right:-100px}
 .o2{width:400px;height:400px;background:rgba(0,212,255,.04);bottom:50px;left:-100px}
@@ -380,6 +381,7 @@ body.view-mode .edit-only{display:none!important}
 </style>
 </head>
 <body>
+<div class="bg-overlay"></div>
 <!-- EXPORT JPEG MODAL -->
 <div id="jpeg-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9000;align-items:center;justify-content:center">
   <div style="background:#0d1520;border:1px solid rgba(56,139,253,.4);border-radius:16px;padding:28px 28px 24px;min-width:320px;max-width:420px;width:90%;box-shadow:0 16px 48px rgba(0,0,0,.8)">
