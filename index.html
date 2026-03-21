@@ -292,20 +292,7 @@ body.view-mode .edit-only{display:none!important}
 .lm-num::before{content:'';position:absolute;top:8%;left:18%;width:38%;height:26%;
   background:radial-gradient(ellipse,rgba(255,255,255,.45) 0%,transparent 100%);
   border-radius:50%;transform:rotate(-20deg);pointer-events:none}
-.lm-num:active{
-  transform:scale(1.08)!important;
-  transition:transform .6s cubic-bezier(.22,1,.36,1), box-shadow .6s ease, background .6s ease!important;
-  background:radial-gradient(circle at 35% 30%,
-    rgba(255,255,255,.55) 0%,
-    rgba(255,255,255,.08) 25%,
-    rgba(0,0,0,.5) 65%,
-    rgba(0,0,0,.75) 100%)!important;
-  box-shadow:
-    0 8px 28px rgba(0,0,0,.6),
-    inset 0 2px 6px rgba(255,255,255,.5),
-    inset 0 -2px 8px rgba(0,0,0,.6),
-    inset 2px 0 6px rgba(255,255,255,.15),
-    inset -2px 0 6px rgba(0,0,0,.3)!important}
+
 
 
 
@@ -693,18 +680,18 @@ body.view-mode .edit-only{display:none!important}
       </div>
       <div style="display:none"><input id="lm-pw" type="password" maxlength="30" autocomplete="current-password" onkeydown="if(event.key==='Enter'){event.preventDefault();doUnlock();}"></div>
       <div class="lm-numgrid">
-        <button class="lm-num" ontouchstart="numPress('1')" onclick="numPress('1')">1</button>
-        <button class="lm-num" ontouchstart="numPress('2')" onclick="numPress('2')">2</button>
-        <button class="lm-num" ontouchstart="numPress('3')" onclick="numPress('3')">3</button>
-        <button class="lm-num" ontouchstart="numPress('4')" onclick="numPress('4')">4</button>
-        <button class="lm-num" ontouchstart="numPress('5')" onclick="numPress('5')">5</button>
-        <button class="lm-num" ontouchstart="numPress('6')" onclick="numPress('6')">6</button>
-        <button class="lm-num" ontouchstart="numPress('7')" onclick="numPress('7')">7</button>
-        <button class="lm-num" ontouchstart="numPress('8')" onclick="numPress('8')">8</button>
-        <button class="lm-num" ontouchstart="numPress('9')" onclick="numPress('9')">9</button>
-        <button class="lm-num lm-num-s" ontouchstart="numClear()" onclick="numClear()">ล้าง</button>
-        <button class="lm-num" ontouchstart="numPress('0')" onclick="numPress('0')">0</button>
-        <button class="lm-num lm-num-s" ontouchstart="numDel()" onclick="numDel()">&#x232B;</button>
+        <button class="lm-num" ontouchstart="nmDown(this,'1');event.preventDefault()" ontouchend="nmUp(this)" ontouchcancel="nmUp(this)" onmousedown="nmDown(this,'1')" onmouseup="nmUp(this)" onmouseleave="nmUp(this)">1</button>
+        <button class="lm-num" ontouchstart="nmDown(this,'2');event.preventDefault()" ontouchend="nmUp(this)" ontouchcancel="nmUp(this)" onmousedown="nmDown(this,'2')" onmouseup="nmUp(this)" onmouseleave="nmUp(this)">2</button>
+        <button class="lm-num" ontouchstart="nmDown(this,'3');event.preventDefault()" ontouchend="nmUp(this)" ontouchcancel="nmUp(this)" onmousedown="nmDown(this,'3')" onmouseup="nmUp(this)" onmouseleave="nmUp(this)">3</button>
+        <button class="lm-num" ontouchstart="nmDown(this,'4');event.preventDefault()" ontouchend="nmUp(this)" ontouchcancel="nmUp(this)" onmousedown="nmDown(this,'4')" onmouseup="nmUp(this)" onmouseleave="nmUp(this)">4</button>
+        <button class="lm-num" ontouchstart="nmDown(this,'5');event.preventDefault()" ontouchend="nmUp(this)" ontouchcancel="nmUp(this)" onmousedown="nmDown(this,'5')" onmouseup="nmUp(this)" onmouseleave="nmUp(this)">5</button>
+        <button class="lm-num" ontouchstart="nmDown(this,'6');event.preventDefault()" ontouchend="nmUp(this)" ontouchcancel="nmUp(this)" onmousedown="nmDown(this,'6')" onmouseup="nmUp(this)" onmouseleave="nmUp(this)">6</button>
+        <button class="lm-num" ontouchstart="nmDown(this,'7');event.preventDefault()" ontouchend="nmUp(this)" ontouchcancel="nmUp(this)" onmousedown="nmDown(this,'7')" onmouseup="nmUp(this)" onmouseleave="nmUp(this)">7</button>
+        <button class="lm-num" ontouchstart="nmDown(this,'8');event.preventDefault()" ontouchend="nmUp(this)" ontouchcancel="nmUp(this)" onmousedown="nmDown(this,'8')" onmouseup="nmUp(this)" onmouseleave="nmUp(this)">8</button>
+        <button class="lm-num" ontouchstart="nmDown(this,'9');event.preventDefault()" ontouchend="nmUp(this)" ontouchcancel="nmUp(this)" onmousedown="nmDown(this,'9')" onmouseup="nmUp(this)" onmouseleave="nmUp(this)">9</button>
+        <button class="lm-num lm-num-s" ontouchstart="nmDown(this,null,'c');event.preventDefault()" ontouchend="nmUp(this)" ontouchcancel="nmUp(this)" onmousedown="nmDown(this,null,'c')" onmouseup="nmUp(this)" onmouseleave="nmUp(this)">ล้าง</button>
+        <button class="lm-num" ontouchstart="nmDown(this,'0');event.preventDefault()" ontouchend="nmUp(this)" ontouchcancel="nmUp(this)" onmousedown="nmDown(this,'0')" onmouseup="nmUp(this)" onmouseleave="nmUp(this)">0</button>
+        <button class="lm-num lm-num-s" ontouchstart="nmDown(this,null,'d');event.preventDefault()" ontouchend="nmUp(this)" ontouchcancel="nmUp(this)" onmousedown="nmDown(this,null,'d')" onmouseup="nmUp(this)" onmouseleave="nmUp(this)">&#x232B;</button>
       </div>
       <div class="lm-err" id="lm-err"></div>
       <button class="lm-submit" onclick="doUnlock()">เข้าสู่ระบบ</button>
@@ -2111,7 +2098,7 @@ function runJupiterAI(){
   const deadline2=new Date(2026,3,22);
   const daysLeft2=Math.ceil((deadline2-new Date())/(1000*60*60*24));
   const prompt=`คุณคือ Jupiter ที่ปรึกษาก่อสร้างอาวุโส มีประสบการณ์ 20 ปี\n\n📋 โครงการ: อาคารอพาร์ตเมนต์ 5 ชั้น (ชั้น 2-5 ชั้นละ 11 ห้อง, ชั้น 1 มี 3 ห้อง)\nวันนี้: ${today} | กำหนดส่งงาน: 22 เมษายน 2569 | เหลือ: ${daysLeft2} วัน\n\n📊 ความคืบหน้า:\n${dataSummary}\n\n🎯 เป้าหมาย: S1 100%, S2 100%, S3 50%, S4 100%, S5 80%, S6 50%, S7 40%, ทำความสะอาดทุกวัน\n\nวิเคราะห์:\n1. สถานะโดยรวม — ส่งงานทันหรือไม่?\n2. งานวิกฤตและวิธีแก้ไขเร่งด่วน\n3. แผนงาน ${daysLeft2} วัน (ต้องทำ%/วัน ของแต่ละงาน)\n4. การจัดช่างและทีม\n5. ความเสี่ยงและการป้องกัน\n\nตอบภาษาไทย กระชับ ปฏิบัติได้จริง`;
-  fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':'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','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-5-20251001',max_tokens:1000,messages:[{role:'user',content:prompt}]})})
+  fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':'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','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-5-20251001',max_tokens:1000,messages:[{role:'user',content:prompt}]})})
   .then(r=>r.json())
   .then(data=>{
     if(data.error){result.innerHTML=`<div style="color:#ff6666;font-size:11px">Error: ${data.error.message}</div><button onclick="runJupiterAI()" style="margin-top:8px;background:rgba(255,214,0,.08);border:1px solid rgba(255,214,0,.3);color:#ffd600;border-radius:6px;padding:5px 12px;cursor:pointer;font-size:11px;font-family:var(--f)">🔄 ลองใหม่</button>`;return;}
@@ -2457,6 +2444,22 @@ document.addEventListener('visibilitychange',function(){
 });
 
 
+
+function nmDown(el,n,a){
+  el.style.transition='transform .6s cubic-bezier(.22,1,.36,1),background .6s ease,box-shadow .6s ease';
+  el.style.transform='scale(1.08)';
+  el.style.background='radial-gradient(circle at 35% 30%,rgba(255,255,255,.55) 0%,rgba(255,255,255,.08) 25%,rgba(0,0,0,.5) 65%,rgba(0,0,0,.75) 100%)';
+  el.style.boxShadow='0 8px 28px rgba(0,0,0,.6),inset 0 2px 6px rgba(255,255,255,.5),inset 0 -2px 8px rgba(0,0,0,.6)';
+  if(n)numPress(n);
+  else if(a==='c')numClear();
+  else if(a==='d')numDel();
+}
+function nmUp(el){
+  el.style.transition='transform .6s cubic-bezier(.22,1,.36,1),background .6s ease,box-shadow .6s ease';
+  el.style.transform='scale(1)';
+  el.style.background='radial-gradient(circle at 35% 30%,rgba(255,255,255,.18) 0%,rgba(255,255,255,.04) 40%,transparent 70%)';
+  el.style.boxShadow='0 4px 16px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.3),inset 0 -1px 0 rgba(0,0,0,.15)';
+}
 </script>
 
 <div id="dev-modal" style="display:none;position:fixed;inset:0;z-index:99998;background:rgba(3,7,14,.97);backdrop-filter:blur(24px);align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto">
