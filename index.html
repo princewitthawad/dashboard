@@ -3,7 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5">
-<title>Construction Progress Dashboard v2</title>
+<title>Construction Dashboard</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CP Dashboard">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#080d14">
+<meta name="description" content="Construction Progress Dashboard v2.4.0">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='100' fill='%23080d14'/%3E%3Crect x='40' y='40' width='432' height='432' rx='80' fill='%230d1a2e'/%3E%3Ctext x='256' y='200' text-anchor='middle' font-family='Arial' font-weight='bold' font-size='80' fill='%23388bfd'%3ECP%3C/text%3E%3Ctext x='256' y='290' text-anchor='middle' font-family='Arial' font-size='40' fill='%2300e676'%3EDashboard%3C/text%3E%3Ctext x='256' y='360' text-anchor='middle' font-family='Arial' font-size='28' fill='%236b7a8d'%3Ev2.4.0%3C/text%3E%3Crect x='80' y='390' width='352' height='4' rx='2' fill='%23388bfd' opacity='.5'/%3E%3C/svg%3E">
+<link rel="manifest" href="data:application/json,%7B%22name%22%3A%22Construction%20Progress%20Dashboard%22%2C%22short_name%22%3A%22CP%20Dashboard%22%2C%22description%22%3A%22Construction%20Progress%20Dashboard%20v2.4.0%22%2C%22start_url%22%3A%22.%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23080d14%22%2C%22theme_color%22%3A%22%23080d14%22%2C%22orientation%22%3A%22any%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%2520xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%2520viewBox%3D%270%2520256%2520512%27%253E%253C%2Fsvg%253E%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-3d@0.1.0/dist/chartjs-plugin-3d.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -71,8 +79,8 @@ body.view-mode .view-only{display:inline-flex!important}
 .btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.35)}
 .btn:hover::after{opacity:1}
 .btn:active{transform:scale(.95) translateY(0);box-shadow:0 2px 8px rgba(0,0,0,.3)}
-.lm-num:hover{background:rgba(255,255,255,.14)!important;transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.3)}
-.lm-num:active{transform:scale(.97)!important;transition:transform .08s ease-in!important}
+
+
 button:not(.btn):not(.lm-num):not(.ov-close):hover{opacity:.85}
 button:not(.btn):not(.lm-num):not(.ov-close):active{transform:scale(.96)}
 .btn-g{background:rgba(0,230,118,.15);color:var(--green);border:1px solid rgba(0,230,118,.4)}.btn-g:hover{background:rgba(0,230,118,.25);transform:translateY(-1px)}
@@ -237,7 +245,7 @@ body.view-mode .edit-only{display:none!important}
 #toast.info{border-color:rgba(56,139,253,.5);color:var(--blue)}
 #lock-modal{position:fixed;inset:0;z-index:99999;display:none;align-items:flex-start;justify-content:center;background:rgba(0,0,0,.05);backdrop-filter:blur(2px);padding:16px;overflow-y:auto}
 #lock-modal.show{display:flex!important}
-.lm-card{width:100%;max-width:360px;margin:16px auto;background:rgba(10,15,30,.1);border:1px solid rgba(255,255,255,.15);border-radius:22px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.15);backdrop-filter:blur(8px)}
+.lm-card{width:100%;max-width:360px;margin:16px auto;background:rgba(10,15,30,.1);border:1px solid rgba(255,255,255,.15);border-radius:22px;overflow:visible;box-shadow:0 8px 32px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.15);backdrop-filter:blur(8px)}
 .lm-acc{height:1px;background:linear-gradient(90deg,transparent,rgba(56,139,253,.5) 30%,rgba(120,220,255,.5) 60%,transparent)}
 .lm-body{padding:26px 22px 22px;background:transparent}
 .lm-icon{width:46px;height:46px;background:rgba(56,139,253,.07);border:1px solid rgba(56,139,253,.18);border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 18px}
@@ -246,7 +254,7 @@ body.view-mode .edit-only{display:none!important}
 .lm-dots{display:flex;justify-content:center;gap:14px;margin-bottom:18px}
 .lm-dot-inp{width:13px;height:13px;border-radius:50%;background:#0d1a28;border:2px solid #1e3050;transition:all .15s}
 .lm-dot-inp.filled{background:#388bfd;border-color:#388bfd;transform:scale(1.2)}
-.lm-numgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:100%;max-width:310px;margin:0 auto 18px}
+.lm-numgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:100%;max-width:310px;margin:0 auto 18px;padding:8px;overflow:visible}
 @keyframes waterFloat{
   0%,100%{transform:translateY(0) scale(1);box-shadow:0 2px 8px rgba(0,0,0,.15),inset 0 1px 0 rgba(255,255,255,.2)}
   33%{transform:translateY(-2px) scale(1.01);box-shadow:0 6px 16px rgba(56,139,253,.12),inset 0 1px 0 rgba(255,255,255,.28)}
@@ -273,18 +281,24 @@ body.view-mode .edit-only{display:none!important}
 
 
 .lm-num{aspect-ratio:1/1;width:100%;border-radius:50%;
-  background:rgba(255,255,255,.06);
-  border:1px solid rgba(255,255,255,.15);
+  background:transparent;
+  border:1px solid rgba(255,255,255,.18);
   color:#ffffff;font-size:28px;font-weight:300;
   cursor:pointer;display:flex;align-items:center;justify-content:center;
   touch-action:manipulation;-webkit-tap-highlight-color:transparent;
-  transition:all .2s ease;
-  user-select:none;position:relative;overflow:hidden;letter-spacing:-.5px;
-  backdrop-filter:blur(4px);
-  box-shadow:0 2px 8px rgba(0,0,0,.15),inset 0 1px 0 rgba(255,255,255,.2);}
+  transition:transform .45s cubic-bezier(.22,1,.36,1), background .45s ease, border-color .45s ease;
+  user-select:none;position:relative;overflow:visible;letter-spacing:-.5px;
+  box-shadow:none;
+  will-change:transform;
+  transform:translateZ(0);
+  -webkit-transform:translateZ(0);
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden}
 
 
-.lm-num.pressed{transform:scale(.97);transition:transform .08s ease-in}
+
+
+
 
 .lm-num-s{font-size:13px;font-weight:400;color:rgba(255,255,255,.45)}
 .lm-err{font-size:11px;color:#dc6060;font-family:var(--m);min-height:16px;margin:0 0 14px;text-align:center}
@@ -667,18 +681,18 @@ body.view-mode .edit-only{display:none!important}
       </div>
       <div style="display:none"><input id="lm-pw" type="password" maxlength="30" autocomplete="current-password" onkeydown="if(event.key==='Enter'){event.preventDefault();doUnlock();}"></div>
       <div class="lm-numgrid">
-        <button class="lm-num" ontouchstart="numPress('1')" onclick="numPress('1')">1</button>
-        <button class="lm-num" ontouchstart="numPress('2')" onclick="numPress('2')">2</button>
-        <button class="lm-num" ontouchstart="numPress('3')" onclick="numPress('3')">3</button>
-        <button class="lm-num" ontouchstart="numPress('4')" onclick="numPress('4')">4</button>
-        <button class="lm-num" ontouchstart="numPress('5')" onclick="numPress('5')">5</button>
-        <button class="lm-num" ontouchstart="numPress('6')" onclick="numPress('6')">6</button>
-        <button class="lm-num" ontouchstart="numPress('7')" onclick="numPress('7')">7</button>
-        <button class="lm-num" ontouchstart="numPress('8')" onclick="numPress('8')">8</button>
-        <button class="lm-num" ontouchstart="numPress('9')" onclick="numPress('9')">9</button>
-        <button class="lm-num lm-num-s" ontouchstart="numClear()" onclick="numClear()">ล้าง</button>
-        <button class="lm-num" ontouchstart="numPress('0')" onclick="numPress('0')">0</button>
-        <button class="lm-num lm-num-s" ontouchstart="numDel()" onclick="numDel()">&#x232B;</button>
+        <button class="lm-num" ontouchstart="numBtnDown(this,'1')" ontouchend="numBtnUp(this)" onmousedown="numBtnDown(this,'1')" onmouseup="numBtnUp(this)" onmouseleave="numBtnUp(this)">1</button>
+        <button class="lm-num" ontouchstart="numBtnDown(this,'2')" ontouchend="numBtnUp(this)" onmousedown="numBtnDown(this,'2')" onmouseup="numBtnUp(this)" onmouseleave="numBtnUp(this)">2</button>
+        <button class="lm-num" ontouchstart="numBtnDown(this,'3')" ontouchend="numBtnUp(this)" onmousedown="numBtnDown(this,'3')" onmouseup="numBtnUp(this)" onmouseleave="numBtnUp(this)">3</button>
+        <button class="lm-num" ontouchstart="numBtnDown(this,'4')" ontouchend="numBtnUp(this)" onmousedown="numBtnDown(this,'4')" onmouseup="numBtnUp(this)" onmouseleave="numBtnUp(this)">4</button>
+        <button class="lm-num" ontouchstart="numBtnDown(this,'5')" ontouchend="numBtnUp(this)" onmousedown="numBtnDown(this,'5')" onmouseup="numBtnUp(this)" onmouseleave="numBtnUp(this)">5</button>
+        <button class="lm-num" ontouchstart="numBtnDown(this,'6')" ontouchend="numBtnUp(this)" onmousedown="numBtnDown(this,'6')" onmouseup="numBtnUp(this)" onmouseleave="numBtnUp(this)">6</button>
+        <button class="lm-num" ontouchstart="numBtnDown(this,'7')" ontouchend="numBtnUp(this)" onmousedown="numBtnDown(this,'7')" onmouseup="numBtnUp(this)" onmouseleave="numBtnUp(this)">7</button>
+        <button class="lm-num" ontouchstart="numBtnDown(this,'8')" ontouchend="numBtnUp(this)" onmousedown="numBtnDown(this,'8')" onmouseup="numBtnUp(this)" onmouseleave="numBtnUp(this)">8</button>
+        <button class="lm-num" ontouchstart="numBtnDown(this,'9')" ontouchend="numBtnUp(this)" onmousedown="numBtnDown(this,'9')" onmouseup="numBtnUp(this)" onmouseleave="numBtnUp(this)">9</button>
+        <button class="lm-num lm-num-s" ontouchstart="numBtnDown(this,null,'clear')" ontouchend="numBtnUp(this)" onmousedown="numBtnDown(this,null,'clear')" onmouseup="numBtnUp(this)" onmouseleave="numBtnUp(this)">ล้าง</button>
+        <button class="lm-num" ontouchstart="numBtnDown(this,'0')" ontouchend="numBtnUp(this)" onmousedown="numBtnDown(this,'0')" onmouseup="numBtnUp(this)" onmouseleave="numBtnUp(this)">0</button>
+        <button class="lm-num lm-num-s" ontouchstart="numBtnDown(this,null,'del')" ontouchend="numBtnUp(this)" onmousedown="numBtnDown(this,null,'del')" onmouseup="numBtnUp(this)" onmouseleave="numBtnUp(this)">&#x232B;</button>
       </div>
       <div class="lm-err" id="lm-err"></div>
       <button class="lm-submit" onclick="doUnlock()">เข้าสู่ระบบ</button>
@@ -2085,7 +2099,7 @@ function runJupiterAI(){
   const deadline2=new Date(2026,3,22);
   const daysLeft2=Math.ceil((deadline2-new Date())/(1000*60*60*24));
   const prompt=`คุณคือ Jupiter ที่ปรึกษาก่อสร้างอาวุโส มีประสบการณ์ 20 ปี\n\n📋 โครงการ: อาคารอพาร์ตเมนต์ 5 ชั้น (ชั้น 2-5 ชั้นละ 11 ห้อง, ชั้น 1 มี 3 ห้อง)\nวันนี้: ${today} | กำหนดส่งงาน: 22 เมษายน 2569 | เหลือ: ${daysLeft2} วัน\n\n📊 ความคืบหน้า:\n${dataSummary}\n\n🎯 เป้าหมาย: S1 100%, S2 100%, S3 50%, S4 100%, S5 80%, S6 50%, S7 40%, ทำความสะอาดทุกวัน\n\nวิเคราะห์:\n1. สถานะโดยรวม — ส่งงานทันหรือไม่?\n2. งานวิกฤตและวิธีแก้ไขเร่งด่วน\n3. แผนงาน ${daysLeft2} วัน (ต้องทำ%/วัน ของแต่ละงาน)\n4. การจัดช่างและทีม\n5. ความเสี่ยงและการป้องกัน\n\nตอบภาษาไทย กระชับ ปฏิบัติได้จริง`;
-  fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})})
+  fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':'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','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})})
   .then(r=>r.json())
   .then(data=>{
     const text=data.content?.[0]?.text||'ไม่สามารถรับข้อมูลได้';
@@ -2424,6 +2438,26 @@ function devSaveAll(){
   setTimeout(()=>location.reload(),800);
 }
 
+
+document.addEventListener('visibilitychange',function(){
+  if(!document.hidden){location.reload();}
+});
+
+function numBtnDown(el,n,action){
+  el.style.transition='transform .45s ease-in-out, background .45s ease-in-out, border-color .45s ease-in-out';
+  el.style.transform='translateZ(0) scale(1.22)';
+  el.style.borderColor='rgba(255,255,255,.6)';
+  el.style.background='rgba(0,0,0,.2)';
+  if(n)numPress(n);
+  else if(action==='clear')numClear();
+  else if(action==='del')numDel();
+}
+function numBtnUp(el){
+  el.style.transition='transform .45s ease-in-out, background .45s ease-in-out, border-color .45s ease-in-out';
+  el.style.transform='translateZ(0) scale(1)';
+  el.style.borderColor='rgba(255,255,255,.18)';
+  el.style.background='transparent';
+}
 </script>
 
 <div id="dev-modal" style="display:none;position:fixed;inset:0;z-index:99998;background:rgba(3,7,14,.97);backdrop-filter:blur(24px);align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto">
