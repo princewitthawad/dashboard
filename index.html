@@ -286,9 +286,16 @@ body.view-mode .edit-only{display:none!important}
   color:#ffffff;font-size:28px;font-weight:300;
   cursor:pointer;display:flex;align-items:center;justify-content:center;
   touch-action:manipulation;-webkit-tap-highlight-color:transparent;
-  transition:transform .45s cubic-bezier(.22,1,.36,1), box-shadow .45s ease;
+  transition:transform .7s cubic-bezier(.34,1.56,.64,1), box-shadow .7s ease, background .7s ease;
   user-select:none;position:relative;overflow:visible;letter-spacing:-.5px;
-  box-shadow:0 4px 16px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.3),inset 0 -1px 0 rgba(0,0,0,.15)}
+  box-shadow:0 4px 16px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.3),inset 0 -1px 0 rgba(0,0,0,.15);
+  will-change:transform;transform:scale(1) translateZ(0)}
+.lm-num:active{
+  transform:scale(1.2) translateZ(0)!important;
+  transition:transform .7s cubic-bezier(.34,1.56,.64,1), box-shadow .7s ease, background .7s ease!important;
+  background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.55) 0%,rgba(255,255,255,.08) 30%,rgba(0,0,0,.45) 80%)!important;
+  box-shadow:0 8px 28px rgba(0,0,0,.5),inset 0 2px 6px rgba(255,255,255,.4),inset 0 -2px 8px rgba(0,0,0,.5)!important;
+  z-index:10!important}
 .lm-num::before{content:'';position:absolute;top:8%;left:18%;width:38%;height:26%;
   background:radial-gradient(ellipse,rgba(255,255,255,.45) 0%,transparent 100%);
   border-radius:50%;transform:rotate(-20deg);pointer-events:none}
@@ -631,10 +638,9 @@ body.view-mode .edit-only{display:none!important}
 
 <div style="display:flex;justify-content:center;gap:12px;padding:16px 0 6px;flex-wrap:wrap">
   <button onclick="showRealtimeGuide()" class="btn btn-b edit-only" style="padding:9px 20px;font-size:12px">🌐 คู่มือแชร์ Realtime</button>
+  <button onclick="openJupiter()" class="edit-only" style="background:linear-gradient(135deg,rgba(26,35,126,.6),rgba(255,214,0,.2));color:var(--gold);border:1px solid rgba(255,214,0,.5);border-radius:10px;padding:12px 28px;font-size:14px;cursor:pointer;font-family:var(--f);font-weight:700;display:inline-flex;align-items:center;gap:8px;transition:all .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">🪐 Jupiter AI ↗</button>
   <button onclick="openChecklistPage()" class="edit-only" style="background:linear-gradient(135deg,rgba(0,60,120,.6),rgba(56,139,253,.2));color:var(--blue);border:1px solid rgba(56,139,253,.5);border-radius:10px;padding:12px 28px;font-size:14px;cursor:pointer;font-family:var(--f);font-weight:700;display:inline-flex;align-items:center;gap:8px;transition:all .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">📋 Checklist ประสานงานหน้างาน ↗</button>
-  <div class="edit-only">
-    <button onclick="openJupiterWithAI()" style="background:linear-gradient(135deg,rgba(26,35,126,.6),rgba(255,214,0,.2));color:var(--gold);border:1px solid rgba(255,214,0,.5);border-radius:10px;padding:12px 28px;font-size:14px;cursor:pointer;font-family:var(--f);font-weight:700;display:inline-flex;align-items:center;gap:8px;transition:all .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">🪐 Jupiter — คำแนะนำบริหารงาน ↗</button>
-  </div>
+
   <button onclick="openAnalysisPage()" class="edit-only" style="background:linear-gradient(135deg,rgba(0,100,60,.6),rgba(0,230,118,.2));color:var(--green);border:1px solid rgba(0,230,118,.4);border-radius:10px;padding:12px 28px;font-size:14px;cursor:pointer;font-family:var(--f);font-weight:700;display:inline-flex;align-items:center;gap:8px;transition:all .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">📈 วิเคราะห์ — กราฟ & แผนรายวัน ↗</button>
 </div>
 
@@ -713,9 +719,7 @@ body.view-mode .edit-only{display:none!important}
   </div>
 </div>
 
-<div id="jupiter-overlay" class="overlay">
-  <button class="ov-close" onclick="document.getElementById('jupiter-overlay').classList.remove('show')">✕ ปิด</button>
-  <div class="ov-inner" id="jupiter-body"></div>
+<div id="jupiter-overlay" style="display:none">
 </div>
 <div id="analysis-overlay" class="overlay">
   <button class="ov-close" onclick="document.getElementById('analysis-overlay').classList.remove('show')">✕ ปิด</button>
@@ -2460,6 +2464,96 @@ function nmUp(el){
   el.style.background='radial-gradient(circle at 35% 30%,rgba(255,255,255,.18) 0%,rgba(255,255,255,.04) 40%,transparent 70%)';
   el.style.boxShadow='0 4px 16px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.3),inset 0 -1px 0 rgba(0,0,0,.15)';
 }
+
+// ── Jupiter AI ──
+let _jupHistory=[];
+
+function openJupiter(){
+  document.getElementById('jupiter-overlay').style.setProperty('display','block','important');
+  // Load saved key
+  const saved=localStorage.getItem('cp_jup_key')||'';
+  const inp=document.getElementById('jup-apikey');
+  if(inp)inp.value=saved?'sk-ant-...ที่บันทึกไว้':'';
+  const st=document.getElementById('jup-key-status');
+  if(st)st.textContent=saved?'✅ มี Key บันทึกอยู่ กดวิเคราะห์ได้เลย':'⚠️ ยังไม่มี Key — กรุณาใส่ Key ก่อน';
+}
+function closeJupiter(){
+  document.getElementById('jupiter-overlay').style.setProperty('display','none','important');
+}
+function jupSaveKey(){
+  const v=document.getElementById('jup-apikey').value.trim();
+  if(!v.startsWith('sk-ant-')){showToast('Key ไม่ถูกต้อง','err');return;}
+  localStorage.setItem('cp_jup_key',v);
+  document.getElementById('jup-key-status').textContent='✅ บันทึก Key แล้ว';
+  showToast('บันทึก Key แล้ว ✅','ok');
+}
+function jupGetKey(){return localStorage.getItem('cp_jup_key')||'';}
+function jupBuildContext(){
+  const v=getVals(),vs=[v.s1,v.f25,v.out,v.s4,v.s5,v.s6,v.s7];
+  const names=['S1 หลังคา','S2 ก่ออิฐใน','S3 ก่ออิฐนอก','S4 ก่ออิฐชั้น 1','S5 งานไฟฟ้า','S6 ท่อน้ำดี','S7 ฉาบผนัง'];
+  const tgts=[100,100,50,100,80,50,40];
+  const today=new Date().toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'});
+  const deadline=new Date(2026,3,22);
+  const daysLeft=Math.ceil((deadline-new Date())/(1000*60*60*24));
+  const data=names.map((n,i)=>`${n}: ${vs[i].toFixed(1)}% / เป้า ${tgts[i]}% (${vs[i]>=tgts[i]?'✅ บรรลุ':vs[i]/tgts[i]<0.3?'🔴 ล่าช้ามาก':vs[i]/tgts[i]<0.6?'🟡 ล่าช้า':'🟢 กำลังดี'})`).join('\n');
+  return `โครงการ: อาคารอพาร์ตเมนต์ 5 ชั้น | วันที่: ${today} | กำหนดส่ง: 22 เม.ย. 2569 | เหลือ: ${daysLeft} วัน\n\nความคืบหน้า:\n${data}`;
+}
+async function jupCallAPI(messages){
+  const key=jupGetKey();
+  if(!key){showToast('กรุณาใส่ API Key ก่อน','err');return null;}
+  const res=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:1200,system:`คุณคือ Jupiter ที่ปรึกษาก่อสร้างอาวุโส ประสบการณ์ 20 ปี ตอบภาษาไทย กระชับ ปฏิบัติได้จริง`,messages})
+  });
+  const data=await res.json();
+  if(data.error)throw new Error(data.error.message);
+  return data.content?.[0]?.text||'';
+}
+function jupFmt(t){
+  return t.replace(/\*\*(.*?)\*\*/g,'<strong style="color:var(--gold)">$1</strong>')
+           .replace(/^(\d+\.\s)/gm,'<br><span style="color:var(--gold);font-weight:700">$1</span>')
+           .replace(/\n/g,'<br>');
+}
+async function jupAnalyze(){
+  const res=document.getElementById('jup-auto-result');
+  res.innerHTML='<div style="display:flex;align-items:center;gap:10px;color:#8899aa;font-size:12px"><div style="width:16px;height:16px;border:2px solid var(--gold);border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;flex-shrink:0"></div>Jupiter กำลังวิเคราะห์...</div>';
+  try{
+    const ctx=jupBuildContext();
+    const text=await jupCallAPI([{role:'user',content:`${ctx}\n\nวิเคราะห์:\n1. สถานะโดยรวม — จะส่งงานทันไหม?\n2. งานวิกฤตเร่งด่วนที่สุด + วิธีแก้\n3. ต้องทำ %/วัน แต่ละงาน\n4. คำแนะนำจัดช่าง\n5. ความเสี่ยงสำคัญ`}]);
+    if(!text)return;
+    _jupHistory=[{role:'user',content:ctx},{role:'assistant',content:text}];
+    res.innerHTML=`<div style="font-size:12px;color:#c8d8e8;line-height:1.9">${jupFmt(text)}</div>`;
+  }catch(e){res.innerHTML=`<div style="color:#ff6666;font-size:11px">❌ ${e.message}</div>`;}
+}
+async function jupChat(){
+  const inp=document.getElementById('jup-chat-inp');
+  const q=inp.value.trim();if(!q)return;
+  inp.value='';
+  const msgs=document.getElementById('jup-chat-messages');
+  // Add user bubble
+  msgs.innerHTML+=`<div style="align-self:flex-end;background:rgba(255,214,0,.12);border:1px solid rgba(255,214,0,.3);border-radius:12px 12px 2px 12px;padding:10px 14px;max-width:80%;font-size:12px;color:#e8f0fe">${q}</div>`;
+  // Add thinking bubble
+  const thinkId='jup-think-'+Date.now();
+  msgs.innerHTML+=`<div id="${thinkId}" style="align-self:flex-start;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px 12px 12px 2px;padding:10px 14px;max-width:80%;font-size:12px;color:#6b7a8d"><div style="display:flex;align-items:center;gap:8px"><div style="width:12px;height:12px;border:2px solid var(--gold);border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite"></div>กำลังคิด...</div></div>`;
+  msgs.scrollTop=msgs.scrollHeight;
+  try{
+    const ctx=jupBuildContext();
+    const history=_jupHistory.length>0?_jupHistory:[{role:'user',content:ctx},{role:'assistant',content:'รับทราบข้อมูลโครงการแล้วครับ'}];
+    history.push({role:'user',content:q});
+    const text=await jupCallAPI(history);
+    if(!text)return;
+    _jupHistory=[...history,{role:'assistant',content:text}];
+    // Keep history max 10 turns
+    if(_jupHistory.length>10)_jupHistory=_jupHistory.slice(-10);
+    const think=document.getElementById(thinkId);
+    if(think)think.outerHTML=`<div style="align-self:flex-start;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px 12px 12px 2px;padding:10px 14px;max-width:85%;font-size:12px;color:#c8d8e8;line-height:1.8">${jupFmt(text)}</div>`;
+    msgs.scrollTop=msgs.scrollHeight;
+  }catch(e){
+    const think=document.getElementById(thinkId);
+    if(think)think.outerHTML=`<div style="align-self:flex-start;background:rgba(255,68,68,.08);border:1px solid rgba(255,68,68,.3);border-radius:12px;padding:10px 14px;font-size:11px;color:#ff6666">❌ ${e.message}</div>`;
+  }
+}
 </script>
 
 <div id="dev-modal" style="display:none;position:fixed;inset:0;z-index:99998;background:rgba(3,7,14,.97);backdrop-filter:blur(24px);align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto">
@@ -2556,6 +2650,57 @@ function nmUp(el){
         </div>
       </div>
       <button onclick="devAddWork()" class="btn" style="background:rgba(120,80,255,.2);border:1px solid rgba(120,80,255,.5);color:#9b66ff;padding:10px 28px;font-size:13px;font-weight:800">➕ สร้าง Card งานใหม่</button>
+    </div>
+  </div>
+</div>
+
+<div id="jupiter-overlay" style="display:none;position:fixed;inset:0;z-index:99995;background:rgba(0,0,0,.1);backdrop-filter:blur(3px)">
+  <div style="position:fixed;inset:0;background:var(--bg);overflow-y:auto">
+    <!-- Header -->
+    <div style="position:sticky;top:0;z-index:10;background:rgba(8,13,20,.95);border-bottom:2px solid rgba(255,214,0,.3);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;backdrop-filter:blur(12px)">
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="font-size:24px">🪐</span>
+        <div>
+          <div style="font-size:15px;font-weight:800;color:var(--gold)">Jupiter AI — ที่ปรึกษาก่อสร้าง</div>
+          <div style="font-size:10px;color:#6b7a8d">วิเคราะห์อัตโนมัติจากข้อมูลปัจจุบัน + ถามได้เองครับ</div>
+        </div>
+      </div>
+      <button onclick="closeJupiter()" class="btn btn-r" style="font-weight:700">✕ ปิด</button>
+    </div>
+    <div style="max-width:900px;margin:0 auto;padding:20px">
+      <!-- API Key Section -->
+      <div id="jup-key-section" style="background:rgba(255,214,0,.06);border:1px solid rgba(255,214,0,.25);border-radius:12px;padding:16px;margin-bottom:20px">
+        <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:8px">🔑 Anthropic API Key</div>
+        <div style="display:flex;gap:8px">
+          <input id="jup-apikey" type="password" placeholder="sk-ant-api03-..." 
+            style="flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,214,0,.3);border-radius:8px;padding:9px 12px;color:#e8f0fe;font-size:12px;font-family:var(--m);outline:none">
+          <button onclick="jupSaveKey()" class="btn" style="background:rgba(255,214,0,.15);border:1px solid rgba(255,214,0,.4);color:var(--gold);white-space:nowrap">💾 บันทึก</button>
+        </div>
+        <div id="jup-key-status" style="font-size:10px;color:#6b7a8d;margin-top:6px"></div>
+      </div>
+      <!-- Auto Analysis -->
+      <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,214,0,.2);border-radius:12px;padding:16px;margin-bottom:20px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+          <div style="font-size:13px;font-weight:800;color:var(--gold)">📊 วิเคราะห์สถานการณ์อัตโนมัติ</div>
+          <button onclick="jupAnalyze()" class="btn" style="background:rgba(255,214,0,.18);border:1px solid rgba(255,214,0,.6);color:var(--gold);font-weight:800;padding:9px 20px">▶ วิเคราะห์ตอนนี้</button>
+        </div>
+        <div id="jup-auto-result" style="min-height:60px;font-size:12px;color:#8899aa;line-height:1.8">
+          กด "วิเคราะห์ตอนนี้" เพื่อให้ Jupiter วิเคราะห์ข้อมูลโครงการปัจจุบัน
+        </div>
+      </div>
+      <!-- Chat Section -->
+      <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,214,0,.15);border-radius:12px;overflow:hidden">
+        <div style="padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.06);font-size:12px;font-weight:700;color:var(--gold)">💬 ถามเพิ่มเติม</div>
+        <div id="jup-chat-messages" style="padding:16px;min-height:120px;max-height:340px;overflow-y:auto;display:flex;flex-direction:column;gap:12px">
+          <div style="text-align:center;font-size:11px;color:#6b7a8d">ถามอะไรก็ได้เกี่ยวกับโครงการก่อสร้างนี้ครับ</div>
+        </div>
+        <div style="padding:12px;border-top:1px solid rgba(255,255,255,.06);display:flex;gap:8px">
+          <input id="jup-chat-inp" placeholder="พิมพ์คำถาม เช่น ควรจัดช่างยังไงดี?" 
+            style="flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:10px 14px;color:#e8f0fe;font-size:13px;font-family:var(--f);outline:none"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();jupChat();}">
+          <button onclick="jupChat()" class="btn" style="background:rgba(255,214,0,.15);border:1px solid rgba(255,214,0,.4);color:var(--gold);font-weight:800;padding:10px 18px">ส่ง</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
