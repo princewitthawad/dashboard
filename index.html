@@ -2471,7 +2471,7 @@ function openJupiter(){
   // Load saved key
   const saved=localStorage.getItem('cp_jup_key')||'';
   const inp=document.getElementById('jup-apikey');
-  if(inp)inp.value=saved?'sk-ant-...ที่บันทึกไว้':'';
+  if(inp)inp.value=saved||'';
   const st=document.getElementById('jup-key-status');
   if(st)st.textContent=saved?'✅ มี Key บันทึกอยู่ กดวิเคราะห์ได้เลย':'⚠️ ยังไม่มี Key — กรุณาใส่ Key ก่อน';
 }
