@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -689,6 +688,10 @@ body.view-mode .edit-only{display:none!important}
         <div class="lm-dot-inp" id="d6"></div><div class="lm-dot-inp" id="d7"></div>
       </div>
       <div style="display:none"><input id="lm-pw" type="password" maxlength="30" autocomplete="current-password" onkeydown="if(event.key==='Enter'){event.preventDefault();doUnlock();}"></div>
+      <div id="biometric-btn" style="display:none;margin-bottom:16px">
+        <button onclick="loginBiometric()" style="width:100%;padding:12px;background:linear-gradient(135deg,rgba(76,175,80,.3),rgba(76,175,80,.1));color:#76ff03;border:1px solid rgba(118,255,3,.5);border-radius:8px;font-family:var(--f);font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px">👆 ล็อกอินด้วย Face ID / Fingerprint</button>
+        <button onclick="registerBiometric()" style="width:100%;padding:8px;background:rgba(56,139,253,.12);color:var(--blue);border:1px solid rgba(56,139,253,.3);border-radius:8px;font-family:var(--f);font-size:11px;cursor:pointer">⚙️ ลงทะเบียน Face ID / Fingerprint</button>
+      </div>
       <div class="lm-numgrid">
         <button class="lm-num" ontouchstart="nmDown(this,'1');event.preventDefault()" ontouchend="nmUp(this)" ontouchcancel="nmUp(this)" onmousedown="nmDown(this,'1')" onmouseup="nmUp(this)" onmouseleave="nmUp(this)">1</button>
         <button class="lm-num" ontouchstart="nmDown(this,'2');event.preventDefault()" ontouchend="nmUp(this)" ontouchcancel="nmUp(this)" onmousedown="nmDown(this,'2')" onmouseup="nmUp(this)" onmouseleave="nmUp(this)">2</button>
@@ -1409,12 +1412,48 @@ function ra(){
 }
 const SESSION_KEY='cp_edit_session';
 let _isLocked=false,_numBuf='',_lastTouch=0;
-function showLockModal(){document.getElementById('lock-modal').classList.add('show');}
+function showLockModal(){
+  document.getElementById('lock-modal').classList.add('show');
+  checkBiometricSupport();
+}
 function closeLockModal(){document.getElementById('lock-modal').classList.remove('show');_numBuf='';_syncDots();}
 function applyViewMode(){document.body.classList.add('view-mode');_isLocked=true;const link=document.getElementById('lockin-link'),logout=document.getElementById('logout-btn');if(link)link.style.display='';if(logout)logout.style.display='none';}
 function applyEditMode(){document.body.classList.remove('view-mode');_isLocked=false;sessionStorage.setItem(SESSION_KEY,'1');const link=document.getElementById('lockin-link'),logout=document.getElementById('logout-btn');if(link)link.style.display='none';if(logout)logout.style.display='';setTimeout(()=>showUrgentPopup(),300);}
 function showGreeting(){const d=document.createElement('div');d.style.cssText='position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;pointer-events:none';d.innerHTML=`<div style="background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:36px 72px;backdrop-filter:blur(20px);box-shadow:0 12px 60px rgba(0,0,0,.5);animation:greetIn .35s cubic-bezier(.34,1.56,.64,1) both"><span style="font-size:42px;font-weight:800;color:#e8f0fe;font-family:'Sarabun',sans-serif;letter-spacing:1px">สวัสดี ค่ะ</span></div>`;document.body.appendChild(d);setTimeout(()=>{d.firstElementChild.style.cssText+=';animation:greetOut .3s ease forwards';setTimeout(()=>d.remove(),300);},3000);}
 function doLogout(){sessionStorage.removeItem(SESSION_KEY);applyViewMode();showToast('ออกจากระบบแล้ว 🔒','ok');}
+// ── Biometric Login (Fingerprint / Face ID) ──
+async function checkBiometricSupport(){
+  if(!window.PublicKeyCredential)return;
+  const cid=document.getElementById('biometric-btn');
+  if(!cid){return;}
+  const hasCreds=await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+  if(hasCreds){cid.style.display='block';}
+}
+async function registerBiometric(){
+  if(!window.PublicKeyCredential){showToast('⚠️ จุดประสงค์นี้ไม่รองรับ','err');return;}
+  try{
+    const chal=crypto.getRandomValues(new Uint8Array(32));
+    const cred=await navigator.credentials.create({publicKey:{challenge:chal,rp:{name:'Construction Dashboard',id:window.location.hostname},user:{id:new Uint8Array(16),name:'user@dashboard.local',displayName:'Dashboard User'},pubKeyCredParams:[{alg:-7,type:'public-key'}],timeout:60000,attestation:'none',userVerification:'preferred'}});
+    if(!cred){showToast('❌ ยกเลิกการลงทะเบียน','err');return;}
+    const credId=Array.from(new Uint8Array(cred.id)).map(b=>b.toString(16).padStart(2,'0')).join('');
+    localStorage.setItem('cp_biometric_cred',credId);
+    showToast('✅ ลงทะเบียน Face ID / Fingerprint สำเร็จ','ok');
+  }catch(e){showToast('❌ ข้อผิดพลาด: '+e.message,'err');}
+}
+async function loginBiometric(){
+  if(!window.PublicKeyCredential){showToast('⚠️ จุดประสงค์นี้ไม่รองรับ','err');return;}
+  const credId=localStorage.getItem('cp_biometric_cred');
+  if(!credId){showToast('❌ ต้องลงทะเบียน Face ID / Fingerprint ก่อน','err');return;}
+  try{
+    const chal=crypto.getRandomValues(new Uint8Array(32));
+    const cred=await navigator.credentials.get({publicKey:{challenge:chal,timeout:60000,userVerification:'preferred'}});
+    if(!cred){showToast('❌ ตรวจสอบสิทธิ์ล้มเหลว','err');return;}
+    applyEditMode();
+    closeLockModal();
+    showGreeting();
+    showToast('✅ ล็อกอินด้วย Face ID / Fingerprint สำเร็จ','ok');
+  }catch(e){showToast('❌ ข้อผิดพลาด: '+e.message,'err');}
+}
 function numPress(n){
   const now=Date.now();if(now-_lastTouch<180)return;_lastTouch=now;
   if(_numBuf.length>=8)return;
