@@ -276,7 +276,15 @@ body.view-mode .edit-only{display:none!important}
 .lm-numgrid .lm-num:nth-child(11){animation:numIn .25s .35s both}
 .lm-numgrid .lm-num:nth-child(12){animation:numIn .25s .38s both}
 
-
+@media(max-width:480px){
+  .lm-numgrid{gap:10px!important;max-width:100%!important;padding:12px!important}
+  .lm-num{font-size:32px!important;width:100%!important;aspect-ratio:1!important}
+  .lm-num-s{font-size:14px!important}
+  .lm-body{padding:20px 16px 16px!important}
+  .lm-h{font-size:17px!important}
+  .lm-dots{gap:10px!important}
+  .lm-dot-inp{width:11px!important;height:11px!important}
+}
 
 
 
@@ -2518,20 +2526,23 @@ document.addEventListener('visibilitychange',function(){
 
 
 function nmDown(el,n,a){
-  el.style.transition='transform .6s cubic-bezier(.22,1,.36,1),background .6s ease,box-shadow .6s ease';
-  el.style.transform='scale(1.08)';
+  el.style.transition='transform .1s ease,background .1s ease,box-shadow .1s ease';
+  el.style.transform='scale(1.15)';
   el.style.background='radial-gradient(circle at 35% 30%,rgba(255,255,255,.55) 0%,rgba(255,255,255,.08) 25%,rgba(0,0,0,.5) 65%,rgba(0,0,0,.75) 100%)';
-  el.style.boxShadow='0 8px 28px rgba(0,0,0,.6),inset 0 2px 6px rgba(255,255,255,.5),inset 0 -2px 8px rgba(0,0,0,.6)';
+  el.style.boxShadow='0 6px 20px rgba(0,0,0,.5),inset 0 2px 6px rgba(255,255,255,.5),inset 0 -2px 8px rgba(0,0,0,.6)';
+  // Haptic feedback on mobile
+  if(navigator.vibrate)navigator.vibrate(20);
   if(n)numPress(n);
   else if(a==='c')numClear();
   else if(a==='d')numDel();
 }
 function nmUp(el){
-  el.style.transition='transform .6s cubic-bezier(.22,1,.36,1),background .6s ease,box-shadow .6s ease';
+  el.style.transition='transform .15s cubic-bezier(.34,1.56,.64,1),background .1s ease,box-shadow .1s ease';
   el.style.transform='scale(1)';
   el.style.background='radial-gradient(circle at 35% 30%,rgba(255,255,255,.18) 0%,rgba(255,255,255,.04) 40%,transparent 70%)';
   el.style.boxShadow='0 4px 16px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.3),inset 0 -1px 0 rgba(0,0,0,.15)';
 }
+
 
 // ── Jupiter AI ──
 let _jupHistory=[];
