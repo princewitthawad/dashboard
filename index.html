@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -639,6 +640,9 @@ body.view-mode .edit-only{display:none!important}
 <div style="display:flex;justify-content:center;gap:12px;padding:16px 0 6px;flex-wrap:wrap">
   <button onclick="showRealtimeGuide()" class="btn btn-b edit-only" style="padding:9px 20px;font-size:12px">🌐 คู่มือแชร์ Realtime</button>
   <button onclick="openJupiter()" class="edit-only" style="background:linear-gradient(135deg,rgba(26,35,126,.6),rgba(255,214,0,.2));color:var(--gold);border:1px solid rgba(255,214,0,.5);border-radius:10px;padding:12px 28px;font-size:14px;cursor:pointer;font-family:var(--f);font-weight:700;display:inline-flex;align-items:center;gap:8px;transition:all .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">🪐 Jupiter AI ↗</button>
+
+  <button id="ai-insights-btn" onclick="openAIInsights()" class="edit-only" style="background:linear-gradient(135deg,rgba(76,175,80,.3),rgba(76,175,80,.1));color:#76ff03;border:1px solid rgba(118,255,3,.5);border-radius:10px;padding:12px 28px;font-size:14px;cursor:pointer;font-family:var(--f);font-weight:700;display:inline-flex;align-items:center;gap:8px;transition:all .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">🧠 AI Insights ↗</button>
+
   <button onclick="openChecklistPage()" class="edit-only" style="background:linear-gradient(135deg,rgba(0,60,120,.6),rgba(56,139,253,.2));color:var(--blue);border:1px solid rgba(56,139,253,.5);border-radius:10px;padding:12px 28px;font-size:14px;cursor:pointer;font-family:var(--f);font-weight:700;display:inline-flex;align-items:center;gap:8px;transition:all .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">📋 Checklist ประสานงานหน้างาน ↗</button>
 
   <button onclick="openAnalysisPage()" class="edit-only" style="background:linear-gradient(135deg,rgba(0,100,60,.6),rgba(0,230,118,.2));color:var(--green);border:1px solid rgba(0,230,118,.4);border-radius:10px;padding:12px 28px;font-size:14px;cursor:pointer;font-family:var(--f);font-weight:700;display:inline-flex;align-items:center;gap:8px;transition:all .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">📈 วิเคราะห์ — กราฟ & แผนรายวัน ↗</button>
@@ -735,6 +739,32 @@ body.view-mode .edit-only{display:none!important}
     <div id="an-log" class="DP"></div>
     <div id="an-plan" class="DP"></div>
     <div id="an-safety" class="DP"></div>
+  </div>
+</div>
+
+<div id="api-key-modal" style="position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.8);backdrop-filter:blur(8px);padding:16px">
+  <div style="background:#08111e;border:1px solid rgba(56,139,253,.3);border-radius:16px;padding:28px;width:100%;max-width:420px;box-shadow:0 16px 48px rgba(0,0,0,.8)">
+    <div style="margin-bottom:20px">
+      <div style="font-size:18px;font-weight:800;color:#00d4ff;margin-bottom:6px">🔑 ตั้งค่า Claude API Key</div>
+      <div style="font-size:12px;color:var(--tx2);font-family:var(--m)">ใส่ API Key จาก Anthropic Console เพื่อใช้ Jupiter AI</div>
+    </div>
+    <div style="margin-bottom:16px">
+      <label style="display:block;font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;font-weight:600">Claude API Key</label>
+      <input id="api-key-input" type="password" placeholder="sk-ant-api03-..." style="width:100%;background:#040b14;border:1.5px solid #101e2e;border-radius:8px;padding:12px 14px;color:#e8f0fe;font-size:13px;font-family:monospace;outline:none;transition:border .2s;box-sizing:border-box;-webkit-user-select:text;user-select:text" onkeydown="if(event.key==='Enter'){doSaveAPIKey();}" onfocus="this.type='text'" onblur="this.type='password'">
+      <div style="font-size:10px;color:var(--tx3);margin-top:6px;font-family:var(--m)">✓ บันทึกในเบราว์เซอร์เท่านั้น (ไม่ส่งตรวจสอบ)</div>
+    </div>
+    <div id="api-key-err" style="font-size:11px;color:#ff6666;margin-bottom:12px;min-height:16px;font-family:var(--m)"></div>
+    <div style="display:flex;gap:10px">
+      <button onclick="doSaveAPIKey()" style="flex:1;padding:12px;background:linear-gradient(135deg,#1740b8,#1e90d4);color:#fff;border:none;border-radius:8px;font-family:var(--f);font-size:14px;font-weight:700;cursor:pointer;transition:filter .15s" onmouseover="this.style.filter='brightness(1.1)'" onmouseout="this.style.filter=''">✅ บันทึก API Key</button>
+      <button onclick="document.getElementById('api-key-modal').style.display='none'" style="padding:12px 16px;background:rgba(255,255,255,.04);color:var(--tx2);border:1px solid rgba(255,255,255,.1);border-radius:8px;font-family:var(--f);font-size:14px;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background='rgba(255,255,255,.04)'">ยกเลิก</button>
+    </div>
+    <div style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,.08);font-size:10px;color:var(--tx3);line-height:1.6">
+      <strong style="color:#00d4ff">ได้ API Key ยังไง?</strong><br>
+      1. ไปที่ <strong>https://console.anthropic.com</strong><br>
+      2. Sign Up / เข้าสู่ระบบ<br>
+      3. ไป API Keys → สร้าง New Key<br>
+      4. Copy Key ที่ขึ้นมา (เริ่มด้วย sk-ant-api03-)
+    </div>
   </div>
 </div>
 
@@ -2076,6 +2106,7 @@ function openJupiterWithAI(){
     <div id="_jupiter_ai_result" style="font-size:12px;color:#8899aa">
       <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
         <button onclick="runJupiterAI()" style="background:rgba(255,214,0,.18);border:1px solid rgba(255,214,0,.6);color:#ffd600;border-radius:8px;padding:10px 22px;cursor:pointer;font-size:13px;font-family:var(--f);font-weight:800;box-shadow:0 0 12px rgba(255,214,0,.2)">▶ วิเคราะห์ด้วย AI</button>
+        <button onclick="showAPIKeyModal()" style="background:rgba(56,139,253,.12);border:1px solid rgba(56,139,253,.3);color:var(--blue);border-radius:8px;padding:8px 16px;cursor:pointer;font-size:12px;font-family:var(--f);font-weight:600">🔑 ตั้งค่า API Key</button>
         <div style="background:rgba(255,68,68,.12);border:1px solid rgba(255,68,68,.5);border-radius:8px;padding:7px 14px;display:flex;align-items:center;gap:7px">
           <span style="font-size:16px">⚠️</span>
           <div>
@@ -2486,6 +2517,7 @@ function jupSaveKey(){
   showToast('บันทึก Key แล้ว ✅','ok');
 }
 function jupGetKey(){return localStorage.getItem('cp_jup_key')||'';}
+function jupSetKey(k){localStorage.setItem('cp_jup_key',k);showToast('✅ API Key บันทึกแล้ว','ok');}
 function jupBuildContext(){
   const v=getVals(),vs=[v.s1,v.f25,v.out,v.s4,v.s5,v.s6,v.s7];
   const names=['S1 หลังคา','S2 ก่ออิฐใน','S3 ก่ออิฐนอก','S4 ก่ออิฐชั้น 1','S5 งานไฟฟ้า','S6 ท่อน้ำดี','S7 ฉาบผนัง'];
@@ -2552,6 +2584,108 @@ async function jupChat(){
     if(think)think.outerHTML=`<div style="align-self:flex-start;background:rgba(255,68,68,.08);border:1px solid rgba(255,68,68,.3);border-radius:12px;padding:10px 14px;font-size:11px;color:#ff6666">❌ ${e.message}</div>`;
   }
 }
+// ── AI LOCAL INSIGHTS ──
+function showAPIKeyModal(){
+  document.getElementById('api-key-modal').style.display='flex';
+  document.getElementById('api-key-input').value=jupGetKey();
+  document.getElementById('api-key-err').textContent='';
+  document.getElementById('api-key-input').focus();
+}
+function doSaveAPIKey(){
+  const key=document.getElementById('api-key-input').value.trim();
+  const errEl=document.getElementById('api-key-err');
+  if(!key){
+    errEl.textContent='❌ ใส่ API Key ด้วย';
+    return;
+  }
+  if(!key.startsWith('sk-ant-api')){
+    errEl.textContent='❌ API Key ต้องเริ่มด้วย sk-ant-api03-';
+    return;
+  }
+  jupSetKey(key);
+  document.getElementById('api-key-modal').style.display='none';
+  showToast('✅ API Key บันทึกแล้ว • Jupiter AI พร้อมใช้งาน','ok');
+}
+
+function getAIInsights(){
+  const v=getVals(),vs=[v.s1,v.f25,v.out,v.s4,v.s5,v.s6,v.s7];
+  const names=['หลังคา','ก่ออิฐใน','ก่ออิฐนอก','ก่ออิฐชั้น1','ไฟฟ้า','ท่อน้ำดี','ฉาบผนัง'];
+  const tgts=[100,100,50,100,80,50,40];
+  const deadline=new Date(2026,3,22),today=new Date(),daysLeft=Math.ceil((deadline-today)/(1000*60*60*24));
+  const issues=[],bottlenecks=[],critical=[];
+  vs.forEach((pct,i)=>{
+    const gap=tgts[i]-pct;
+    const risk=pct<tgts[i]*0.3?'CRITICAL':pct<tgts[i]*0.6?'HIGH':pct<tgts[i]?'MEDIUM':'OK';
+    if(risk==='CRITICAL')critical.push({i,name:names[i],pct,tgt:tgts[i],gap});
+    else if(risk==='HIGH')bottlenecks.push({i,name:names[i],pct,tgt:tgts[i],gap});
+    else if(risk==='MEDIUM')issues.push({i,name:names[i],pct,tgt:tgts[i],gap});
+  });
+  return{v,vs,names,tgts,deadline,today,daysLeft,critical,bottlenecks,issues};
+}
+function openAIInsights(){
+  const overlay=document.createElement('div');
+  overlay.id='ai-insights-overlay';
+  overlay.style.cssText='position:fixed;inset:0;z-index:9995;background:rgba(4,8,16,.98);backdrop-filter:blur(16px);overflow-y:auto;display:block';
+  const {v,vs,names,tgts,daysLeft,critical,bottlenecks,issues}=getAIInsights();
+  const overall=(vs.reduce((a,b)=>a+b)/7).toFixed(1);
+  const html=`<div style="max-width:1000px;margin:0 auto;padding:24px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+      <div><div style="font-size:24px;font-weight:800;color:#76ff03">🧠 AI Insights</div><div style="font-size:11px;color:var(--tx2);margin-top:6px;font-family:var(--m)">วิเคราะห์อัจฉริยะ • ตรวจสอบปัญหา • แนะนำวิธีแก้</div></div>
+      <button onclick="document.getElementById('ai-insights-overlay').remove()" style="background:rgba(255,68,68,.15);border:1px solid rgba(255,68,68,.4);color:var(--red);border-radius:8px;padding:8px 14px;font-size:12px;cursor:pointer">✕ ปิด</button>
+    </div>
+    <div style="display:grid;gap:20px">
+      <div style="background:rgba(8,13,20,.05);border:1px solid rgba(118,255,3,.3);border-radius:12px;padding:20px">
+        <div style="font-size:14px;font-weight:800;color:#76ff03;margin-bottom:14px">📊 สถานะโครงการ</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px">
+          <div style="background:var(--bg2);border:1px solid var(--bdr);border-radius:8px;padding:12px;text-align:center">
+            <div style="font-size:10px;color:var(--tx3);margin-bottom:6px">⏱ เวลาเหลือ</div>
+            <div style="font-size:20px;font-weight:800;font-family:var(--m);color:#76ff03">${daysLeft}</div>
+            <div style="font-size:10px;color:var(--tx2)">วัน</div>
+          </div>
+          <div style="background:var(--bg2);border:1px solid var(--bdr);border-radius:8px;padding:12px;text-align:center">
+            <div style="font-size:10px;color:var(--tx3);margin-bottom:6px">📈 คืบหน้า</div>
+            <div style="font-size:20px;font-weight:800;font-family:var(--m);color:#00d4ff">${overall}%</div>
+            <div style="font-size:10px;color:var(--tx2)">เฉลี่ยรวม</div>
+          </div>
+          <div style="background:var(--bg2);border:1px solid var(--bdr);border-radius:8px;padding:12px;text-align:center">
+            <div style="font-size:10px;color:var(--tx3);margin-bottom:6px">🚨 วิกฤต</div>
+            <div style="font-size:20px;font-weight:800;font-family:var(--m);color:#ff6b6b">${critical.length}</div>
+            <div style="font-size:10px;color:var(--tx2)">งาน</div>
+          </div>
+          <div style="background:var(--bg2);border:1px solid var(--bdr);border-radius:8px;padding:12px;text-align:center">
+            <div style="font-size:10px;color:var(--tx3);margin-bottom:6px">⚠️ สถานะ</div>
+            <div style="font-size:18px;margin:4px 0">${critical.length>0?'🔴':bottlenecks.length>0?'🟠':'🟢'}</div>
+            <div style="font-size:10px;color:var(--tx2)">${critical.length>0?'วิกฤต':bottlenecks.length>0?'เสี่ยง':'ปกติ'}</div>
+          </div>
+        </div>
+      </div>
+      ${critical.length>0?`<div style="background:rgba(255,68,68,.08);border:1px solid rgba(255,68,68,.4);border-radius:12px;padding:20px">
+        <div style="font-size:14px;font-weight:800;color:#ff6b6b;margin-bottom:14px">🚨 งานวิกฤต</div>
+        ${critical.map(x=>`<div style="background:rgba(255,68,68,.06);border-left:4px solid #ff6b6b;border-radius:6px;padding:12px;margin-bottom:8px;font-size:12px">
+          <strong style="color:#ff6b6b">${x.name}</strong> ${x.pct.toFixed(1)}% (เป้า ${x.tgt}%) ยังต้อง ${x.gap.toFixed(1)}%<br><span style="color:#ffcc99">💡 +คนงาน • โอที • ต่อจาก/เร่งวัสดุ</span>
+        </div>`).join('')}</div>`:``}
+      ${bottlenecks.length>0?`<div style="background:rgba(255,152,0,.08);border:1px solid rgba(255,152,0,.4);border-radius:12px;padding:20px">
+        <div style="font-size:14px;font-weight:800;color:#ff9500;margin-bottom:14px">⚠️ เสี่ยงสูง</div>
+        ${bottlenecks.map(x=>`<div style="background:rgba(255,152,0,.06);border-left:4px solid #ff9500;border-radius:6px;padding:12px;margin-bottom:8px;font-size:12px">
+          <strong style="color:#ff9500">${x.name}</strong> ${x.pct.toFixed(1)}% (เป้า ${x.tgt}%) ยังต้อง ${x.gap.toFixed(1)}%<br><span style="color:#ffcc99">💡 เตรียมวัสดุ • เพิ่มช่าง • ตรวจสิ่งกีดขวาง</span>
+        </div>`).join('')}</div>`:``}
+      <div style="background:rgba(56,139,253,.08);border:1px solid rgba(56,139,253,.3);border-radius:12px;padding:20px">
+        <div style="font-size:14px;font-weight:800;color:var(--blue);margin-bottom:14px">📋 ต้องทำ/วัน (${daysLeft} วัน)</div>
+        <div style="font-size:12px;color:var(--tx);">${names.map((n,i)=>{const pd=(tgts[i]-vs[i])/daysLeft;return `<div style="padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04)"><strong>${n}</strong>: ${pd.toFixed(2)}%/วัน (${vs[i].toFixed(1)}% → ${tgts[i]}%)</div>`;}).join('')}</div>
+      </div>
+      <div style="background:linear-gradient(135deg,rgba(76,175,80,.1),transparent);border:1px solid rgba(118,255,3,.4);border-radius:12px;padding:20px">
+        <div style="font-size:13px;color:var(--tx);line-height:1.8">
+          <strong style="color:#76ff03">✨ บทสรุป:</strong> อยู่ในระดับ <strong style="color:${critical.length>0?'#ff6b6b':bottlenecks.length>0?'#ff9500':'#76ff03'}">${critical.length>0?'🔴 วิกฤต':bottlenecks.length>0?'🟠 เสี่ยงสูง':'🟢 ปกติ'}</strong> • เร่งรัดตั้งแต่วันนี้ • ติดตามวันละ 2 ครั้ง
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:20px;padding:12px;background:var(--bg2);border-radius:8px;font-size:10px;color:var(--tx3);text-align:center">
+      ℹ️ ${new Date().toLocaleString('th-TH')} • คำนวณจากข้อมูลปัจจุบัน</div>
+  </div>`;
+  overlay.innerHTML=html;
+  document.body.appendChild(overlay);
+}
+
 </script>
 
 <div id="dev-modal" style="display:none;position:fixed;inset:0;z-index:99998;background:rgba(3,7,14,.97);backdrop-filter:blur(24px);align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto">
