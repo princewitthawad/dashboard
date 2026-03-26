@@ -924,7 +924,7 @@ async function saveData(){
     if(!res.ok){const tx=await res.text().catch(()=>'');throw new Error(`HTTP ${res.status}: ${tx.slice(0,60)}`);}
     try{localStorage.setItem('cp_backup',JSON.stringify(state));}catch(e){}
     setSvStatus('saved','☁️ บันทึกสำเร็จ ✓',new Date().toLocaleDateString('th-TH',{year:'numeric',month:'short',day:'numeric'}));
-    showToast('บันทึก Cloud สำเร็จ 💾','ok');
+    autoSaveLog();showToast('บันทึก Cloud สำเร็จ 💾','ok');
   }catch(e){
     let m=e.message;if(m.includes('Failed to fetch')||m.includes('NetworkError'))m='เชื่อมต่อ Firebase ไม่ได้';
     setSvStatus('unsaved','บันทึกล้มเหลว');showToast('❌ '+m,'err',6000);
@@ -1702,8 +1702,87 @@ function openJupiterPage(){
   <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px"><div style="background:linear-gradient(135deg,rgba(0,230,118,.15),rgba(0,230,118,.05));border:1px solid rgba(0,230,118,.35);border-radius:10px;padding:16px;text-align:center"><div style="font-size:10px;color:var(--green);font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px">ความคืบหน้าโครงการ</div><div style="font-size:40px;font-weight:800;font-family:var(--m);color:var(--green)">${overallPct}%</div></div><div style="background:linear-gradient(135deg,rgba(56,139,253,.15),rgba(56,139,253,.05));border:1px solid rgba(56,139,253,.35);border-radius:10px;padding:16px;text-align:center"><div style="font-size:10px;color:var(--blue);font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px">งานที่ได้ตามเป้า</div><div style="font-size:40px;font-weight:800;font-family:var(--m);color:var(--blue)">${doneCount}<span style="font-size:18px;color:var(--tx2)">/7</span></div></div><div style="background:linear-gradient(135deg,rgba(255,149,0,.15),rgba(255,149,0,.05));border:1px solid rgba(255,149,0,.35);border-radius:10px;padding:16px;text-align:center"><div style="font-size:10px;color:var(--orange);font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px">งานที่ต้องเร่ง</div><div style="font-size:40px;font-weight:800;font-family:var(--m);color:var(--orange)">${urgentCount}<span style="font-size:18px;color:var(--tx2)">/7</span></div></div></div>
   <div style="font-size:13px;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px">📊 การวิเคราะห์รายงานแต่ละงาน ณ วันนี้</div>
   ${adviceCards}${laborHTML}`;
+  // เพิ่ม History Analysis section
+  const histHTML=buildJupiterHistory();
+  document.getElementById('jupiter-body').innerHTML+=histHTML;
+
   if(document.body.classList.contains('view-mode')){document.querySelectorAll('#jupiter-body .edit-only').forEach(el=>el.style.display='none');}
   document.getElementById('jupiter-overlay').classList.add('show');
+}
+
+function buildJupiterHistory(){
+  const logs=getDailyLog();
+  if(logs.length<2)return`<div style="background:var(--bg2);border:1px solid var(--bdr);border-radius:10px;padding:18px;margin-top:20px"><div style="font-size:13px;font-weight:800;color:var(--tx2);margin-bottom:8px">📅 ประวัติความคืบหน้า</div><div style="font-size:12px;color:var(--tx3)">ยังไม่มีข้อมูลเพียงพอ — บันทึกอย่างน้อย 2 วัน เพื่อดูการวิเคราะห์</div></div>`;
+
+  const sorted=logs.slice().sort((a,b)=>a.date.localeCompare(b.date));
+  const latest=sorted[sorted.length-1];
+  const prev=sorted[sorted.length-2];
+  const first=sorted[0];
+
+  // คำนวณ velocity (เปลี่ยนแปลงต่อวัน)
+  const daysSinceFirst=Math.max(1,Math.round((new Date(latest.date)-new Date(first.date))/(86400000)));
+  const daysSincePrev=Math.max(1,Math.round((new Date(latest.date)-new Date(prev.date))/(86400000)));
+
+  let histCards='';
+  SUMDEF.forEach((d,i)=>{
+    const cur=latest.vals?.[i]||0;
+    const prevV=prev.vals?.[i]||0;
+    const firstV=first.vals?.[i]||0;
+    const delta=cur-prevV;           // เปลี่ยนจากบันทึกก่อน
+    const totalDelta=cur-firstV;     // เปลี่ยนตั้งแต่ต้น
+    const velocity=totalDelta/daysSinceFirst; // %/วัน
+    const velocityRecent=(cur-prevV)/daysSincePrev;
+    const tgt=SUMDEF[i]?.tgt||100;
+    const remaining=Math.max(0,tgt-cur);
+    const daysToFinish=velocity>0?Math.ceil(remaining/velocity):null;
+    const trend=delta>0.5?'↑ เร็วขึ้น':delta<-0.5?'↓ ช้าลง':'→ คงที่';
+    const trendCol=delta>0.5?'var(--green)':delta<-0.5?'var(--red)':'var(--tx2)';
+
+    histCards+=`<div style="background:var(--bg2);border:1px solid ${d.col}33;border-left:3px solid ${d.col};border-radius:8px;padding:12px 14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:4px">
+        <span style="font-weight:700;color:${d.col};font-size:13px">${d.lbl}</span>
+        <span style="font-size:12px;font-weight:700;font-family:var(--m);color:${trendCol}">${trend} ${delta>=0?'+':''}${delta.toFixed(1)}%</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px">
+        <div style="background:var(--bgc);border-radius:6px;padding:6px;text-align:center">
+          <div style="font-size:9px;color:var(--tx3)">ปัจจุบัน</div>
+          <div style="font-size:16px;font-weight:800;font-family:var(--m);color:${d.col}">${cur.toFixed(1)}%</div>
+        </div>
+        <div style="background:var(--bgc);border-radius:6px;padding:6px;text-align:center">
+          <div style="font-size:9px;color:var(--tx3)">velocity/วัน</div>
+          <div style="font-size:16px;font-weight:800;font-family:var(--m);color:${velocity>0?'var(--green)':'var(--tx3)'}">${velocity.toFixed(2)}%</div>
+        </div>
+        <div style="background:var(--bgc);border-radius:6px;padding:6px;text-align:center">
+          <div style="font-size:9px;color:var(--tx3)">คาดเสร็จใน</div>
+          <div style="font-size:16px;font-weight:800;font-family:var(--m);color:${daysToFinish&&daysToFinish<30?'var(--green)':daysToFinish?'var(--orange)':'var(--red)'}">${daysToFinish?daysToFinish+' วัน':'—'}</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        ${sorted.slice(-5).map(l=>{const v=l.vals?.[i]||0;return`<span style="font-size:9px;background:${d.col}18;border:1px solid ${d.col}33;border-radius:4px;padding:2px 6px;font-family:var(--m);color:${d.col}">${l.date.slice(5)}: ${v.toFixed(1)}%</span>`;}).join('')}
+      </div>
+    </div>`;
+  });
+
+  // สรุปภาพรวม
+  const overallVel=SUMDEF.reduce((a,d,i)=>{
+    const cur=latest.vals?.[i]||0,fv=first.vals?.[i]||0;
+    return a+(cur-fv)/daysSinceFirst/SUMDEF.length;
+  },0);
+
+  return`<div style="background:var(--bg2);border:1px solid rgba(56,139,253,.25);border-radius:10px;padding:18px;margin-top:20px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+      <div style="font-size:14px;font-weight:800;color:var(--blue)">📅 วิเคราะห์ความคืบหน้าย้อนหลัง</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <span style="font-size:11px;font-family:var(--m);color:var(--tx2)">${sorted.length} บันทึก · ${daysSinceFirst} วัน</span>
+        <span style="font-size:11px;font-family:var(--m);color:${overallVel>0.5?'var(--green)':'var(--orange)'}">velocity รวม: ${overallVel.toFixed(2)}%/วัน</span>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px">${histCards}</div>
+    <div style="margin-top:12px;padding:10px 14px;background:var(--bgc);border-radius:8px;border:1px solid var(--bdr)">
+      <div style="font-size:11px;color:var(--tx2);margin-bottom:6px;font-weight:600">📊 บันทึกทั้งหมด (${sorted.length} รายการ)</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">${sorted.slice().reverse().slice(0,10).map(l=>`<div style="font-size:10px;background:var(--bg2);border:1px solid var(--bdr);border-radius:5px;padding:3px 8px;font-family:var(--m);color:var(--tx2)">${l.date}</div>`).join('')}</div>
+    </div>
+  </div>`;
 }
 function adjLabor(key,delta){const lc=getLaborCfg();lc[key]=Math.max(1,(lc[key]||1)+delta);saveLaborCfg(lc);const el=document.getElementById('lc-'+key);if(el)el.textContent=lc[key];}
 
@@ -1735,6 +1814,15 @@ function renderDailyLogUI(){
   c.innerHTML=`<div style="margin-bottom:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap"><div style="font-size:14px;font-weight:800">📝 บันทึกรายวัน</div><button onclick="saveLogEntry()" class="btn btn-g edit-only" style="font-size:11px;padding:6px 12px">💾 บันทึกวันนี้</button><span style="font-size:11px;color:var(--tx3);font-family:var(--m)">${todayStr()}</span></div>
   <div style="margin-bottom:16px;padding:12px;background:var(--bg2);border:1px solid var(--bdr);border-radius:8px"><div style="font-size:11px;color:var(--tx2);margin-bottom:8px">ข้อมูลปัจจุบัน</div><div style="display:flex;gap:8px;flex-wrap:wrap">${SUMDEF.map((d,i)=>`<span style="background:${d.col}22;border:1px solid ${d.col}55;border-radius:6px;padding:3px 8px;font-size:11px;font-family:var(--m);color:${d.col}">${d.lbl}: ${vs[i].toFixed(1)}%</span>`).join('')}</div></div>
   <div>${logs.length===0?'<div style="color:var(--tx2);font-size:12px;padding:16px 0">ยังไม่มีบันทึก</div>':logs.slice().reverse().map(l=>`<div style="background:var(--bg2);border:1px solid var(--bdr);border-radius:8px;padding:12px 14px;margin-bottom:8px"><div style="font-size:11px;color:var(--tx3);font-family:var(--m);margin-bottom:8px">${l.date}</div><div style="display:flex;gap:6px;flex-wrap:wrap">${SUMDEF.map((d,i)=>`<span style="background:${d.col}22;border:1px solid ${d.col}44;border-radius:5px;padding:2px 7px;font-size:10px;font-family:var(--m);color:${d.col}">${d.lbl}: ${(l.vals?.[i]||0).toFixed(1)}%</span>`).join('')}</div></div>`).join('')}</div>`;
+}
+function autoSaveLog(){
+  // บันทึก log อัตโนมัติพร้อมกับ Firebase save (ไม่ซ้ำวันเดิม)
+  const logs=getDailyLog(),today=todayStr(),vals=getVals();
+  const vs=[vals.s1,vals.f25,vals.out,vals.s4,vals.s5,vals.s6,vals.s7];
+  const idx=logs.findIndex(l=>l.date===today);
+  const entry={date:today,vals:vs,ts:new Date().toISOString()};
+  if(idx>=0)logs[idx]=entry;else logs.push(entry);
+  saveDailyLog(logs);
 }
 function saveLogEntry(){
   const logs=getDailyLog(),today=todayStr(),vals=getVals(),vs=[vals.s1,vals.f25,vals.out,vals.s4,vals.s5,vals.s6,vals.s7];
