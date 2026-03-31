@@ -3829,18 +3829,21 @@ function jup7ToggleLine(i){
   if(el)el.style.opacity=hide?'0.3':'1';
 }
 
+// ── overall% สูตรเดียวกับ Dashboard โดนัท ─────────────────────────────────
+const JUP7_TGTS=[100,100,50,100,80,50,40];
+function jup7Overall(vs){
+  if(!vs||!vs.length)return 0;
+  return parseFloat((vs.reduce((a,v,i)=>a+Math.min(1,v/(JUP7_TGTS[i]||100)),0)/vs.length*100).toFixed(2));
+}
+
 function jup7RenderDayCards(hist, days7){
   const el=document.getElementById('jup7-day-cards');
   if(!el)return;
-
-  // build histMap
   const histMap={};
   (hist||[]).forEach(h=>{histMap[h.date]=h.vs;});
-
-  // if no days7 passed, build from today
   if(!days7){
     const today=new Date();today.setHours(0,0,0,0);
-    let startDate=hist&&hist.length?new Date(hist[0].date+'T00:00:00'):new Date(today);
+    const startDate=hist&&hist.length?new Date(hist[0].date+'T00:00:00'):new Date(today);
     days7=[];
     for(let i=0;i<7;i++){
       const d=new Date(startDate);d.setDate(startDate.getDate()+i);
@@ -3850,35 +3853,27 @@ function jup7RenderDayCards(hist, days7){
       days7.push({iso,label:`${dd}/${mm}`,isToday:iso===today.toISOString().split('T')[0],isFuture:d>today});
     }
   }
-
   el.innerHTML=days7.map((day,hi)=>{
     const vs=histMap[day.iso];
     if(!vs){
-      // วันที่ยังไม่มีข้อมูล
       const borderCol=day.isToday?'rgba(255,214,0,.6)':'rgba(255,255,255,.08)';
       return`<div style="background:rgba(255,255,255,.02);border:1px solid ${borderCol};border-top:2px solid ${day.isToday?'var(--gold)':'#445566'};border-radius:7px;padding:8px 5px;text-align:center;opacity:.45">
         <div style="font-size:9px;color:${day.isToday?'var(--gold)':'#445566'};margin-bottom:3px;font-weight:600">${day.label}${day.isToday?' ◀':''}</div>
         <div style="font-size:13px;font-weight:700;font-family:var(--m);color:#445566">—</div>
         <div style="font-size:9px;color:#445566;margin-top:2px">${day.isFuture?'ล่วงหน้า':day.isToday?'วันนี้':'ไม่มีข้อมูล'}</div>
-        <div style="margin-top:5px">${JUP7_SERIES.map(()=>`<div style="height:3px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;margin-bottom:2px"><div style="height:100%;width:0%"></div></div>`).join('')}</div>
+        <div style="margin-top:5px">${JUP7_SERIES.map(()=>`<div style="height:3px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;margin-bottom:2px"></div>`).join('')}</div>
       </div>`;
     }
-    // วันที่มีข้อมูล
-    const overall=(vs.reduce((a,b)=>a+b,0)/vs.length).toFixed(1);
-    const prevIso=days7[hi-1]?.iso;
-    const prevVs=prevIso&&histMap[prevIso]?histMap[prevIso]:null;
-    const delta=prevVs?(vs.reduce((a,b)=>a+b,0)-prevVs.reduce((a,b)=>a+b,0))/vs.length:null;
-    const colOvr=parseFloat(overall)>=60?'var(--green)':parseFloat(overall)>=30?'var(--orange)':'var(--red)';
+    const overall=jup7Overall(vs);
+    const prevVs=hi>0&&histMap[days7[hi-1].iso]?histMap[days7[hi-1].iso]:null;
+    const delta=prevVs?parseFloat((jup7Overall(vs)-jup7Overall(prevVs)).toFixed(1)):null;
+    const colOvr=overall>=60?'var(--green)':overall>=30?'var(--orange)':'var(--red)';
     return`<div style="background:var(--bgc);border:1px solid var(--bdr);border-top:2px solid ${colOvr};border-radius:7px;padding:8px 5px;text-align:center">
       <div style="font-size:9px;color:${day.isToday?'var(--gold)':'var(--tx2)'};margin-bottom:3px;font-weight:600">${day.label}${day.isToday?' ◀':''}</div>
-      <div style="font-size:16px;font-weight:800;font-family:var(--m);color:${colOvr}">${overall}%</div>
+      <div style="font-size:16px;font-weight:800;font-family:var(--m);color:${colOvr}">${overall.toFixed(1)}%</div>
       ${delta!==null?`<div style="font-size:9px;color:${delta>=0?'var(--green)':'var(--red)'};margin-top:2px">${delta>=0?'▲+':'▼'}${Math.abs(delta).toFixed(1)}%</div>`:'<div style="font-size:9px;color:#445566">—</div>'}
       <div style="margin-top:5px">
-        ${vs.map((v,i)=>{
-          const s=JUP7_SERIES[i];
-          const pct=Math.min(100,v/s.tgt*100);
-          return`<div style="height:3px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;margin-bottom:2px"><div style="height:100%;background:${s.col};width:${pct.toFixed(0)}%;border-radius:99px"></div></div>`;
-        }).join('')}
+        ${vs.map((v,i)=>{const pct=Math.min(100,v/JUP7_TGTS[i]*100);return`<div style="height:3px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;margin-bottom:2px"><div style="height:100%;background:${JUP7_SERIES[i].col};width:${pct.toFixed(0)}%;border-radius:99px"></div></div>`;}).join('')}
       </div>
     </div>`;
   }).join('');
@@ -3930,8 +3925,59 @@ async function jupShareA4Chart(){
 
 // Trigger initial auto-snapshot on page load
 window.addEventListener('load',function(){
-  setTimeout(()=>{jupAutoSaveSnapshot();},4000);
+  setTimeout(()=>{
+    jupAutoSaveSnapshot();
+    jup7SeedFromLatest();
+  },4000);
 });
+
+// ── Seed วันที่ 31/3 จาก snapshot ล่าสุด (ถ้ายังไม่มีใน history) ──────────
+function jup7SeedFromLatest(){
+  try{
+    let hist=jupGet7DayHistory();
+    // หา snapshot ล่าสุดจาก cp_jup_snapshots
+    const snapRaw=localStorage.getItem('cp_jup_snapshots')||'[]';
+    const snaps=JSON.parse(snapRaw);
+
+    // วันที่ seed = 2025-03-31
+    const SEED_DATE='2025-03-31';
+
+    // ถ้ามีข้อมูลวันนั้นแล้ว ไม่ต้อง seed
+    if(hist.find(h=>h.date===SEED_DATE))return;
+
+    // หา snapshot ที่ใกล้วันที่ 31/3 มากที่สุด
+    let seedVs=null;
+    if(snaps.length){
+      // เรียง snapshot ตามวันที่ล่าสุดก่อน แล้วหาอันที่ <= 31/3
+      const sorted=[...snaps].sort((a,b)=>b.date?.localeCompare(a.date||'')||0);
+      const found=sorted.find(s=>(s.date||'')<=SEED_DATE&&s.vals);
+      if(found&&Array.isArray(found.vals)&&found.vals.length>=7){
+        seedVs=found.vals.slice(0,7).map(x=>parseFloat((+x||0).toFixed(2)));
+      }
+    }
+
+    // ถ้าไม่มี snapshot ใน cp_jup_snapshots ให้ดูจาก cp_jup_7day เอง
+    if(!seedVs&&hist.length){
+      // ใช้ snapshot วันแรกที่มีแล้ว clone เป็น 31/3
+      seedVs=[...hist[0].vs];
+    }
+
+    // ถ้าไม่มีอะไรเลย ใช้ค่าปัจจุบันจาก DOM
+    if(!seedVs){
+      try{
+        const v=getVals();
+        seedVs=[v.s1,v.f25,v.out,v.s4,v.s5,v.s6,v.s7].map(x=>parseFloat((+x||0).toFixed(2)));
+      }catch(e){return;}
+    }
+
+    // เพิ่ม entry 31/3 เข้าไป
+    const entry={date:SEED_DATE,ts:'31/3/2025 (seed)',vs:seedVs};
+    hist.push(entry);
+    hist.sort((a,b)=>a.date.localeCompare(b.date));
+    if(hist.length>7)hist=hist.slice(-7);
+    localStorage.setItem(JUP_HISTORY_KEY,JSON.stringify(hist));
+  }catch(e){console.warn('jup7Seed:',e);}
+}
 </script>
 </body>
 </html>
