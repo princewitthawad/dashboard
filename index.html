@@ -2598,12 +2598,33 @@ function jupFmt(t){
 }
 async function jupAnalyze(){
   const res=document.getElementById('jup-auto-result');
-  res.innerHTML='<div style="display:flex;align-items:center;gap:10px;color:#8899aa;font-size:12px"><div style="width:16px;height:16px;border:2px solid var(--gold);border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;flex-shrink:0"></div>Jupiter กำลังวิเคราะห์...</div>';
+  res.innerHTML='<div style="display:flex;align-items:center;gap:10px;color:#8899aa;font-size:12px"><div style="width:16px;height:16px;border:2px solid var(--gold);border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;flex-shrink:0"></div>Jupiter กำลังวิเคราะห์ข้อมูล 7 วัน...</div>';
   try{
+    const hist7=jupGet7DayHistory();
     const ctx=jupBuildContext();
-    const text=await jupCallAPI([{role:'user',content:`${ctx}\n\nวิเคราะห์:\n1. สถานะโดยรวม — จะส่งงานทันไหม?\n2. งานวิกฤตเร่งด่วนที่สุด + วิธีแก้\n3. ต้องทำ %/วัน แต่ละงาน\n4. คำแนะนำจัดช่าง\n5. ความเสี่ยงสำคัญ`}]);
+    // Build 7-day snapshot block for analysis
+    let snap7Block='';
+    if(hist7.length>=2){
+      const names=['S1 หลังคา','S2 ก่ออิฐใน','S3 ก่ออิฐนอก','S4 ก่ออิฐ ชั้น 1','S5 งานไฟฟ้า','S6 ท่อน้ำดี','S7 ฉาบผนัง'];
+      const tgts=[100,100,50,100,80,50,40];
+      const rows=hist7.map(h=>`  [${h.ts||h.date}] ${h.vs.map((v,i)=>`${names[i]}:${v}%`).join(', ')}`).join('\n');
+      const first=hist7[0]; const last=hist7[hist7.length-1];
+      const daysDiff=Math.max(1,(new Date(last.date)-new Date(first.date))/(86400000));
+      const rateRows=names.map((n,i)=>{
+        const diff=(last.vs[i]||0)-(first.vs[i]||0);
+        const ratePerDay=(diff/daysDiff).toFixed(2);
+        const remaining=tgts[i]-(last.vs[i]||0);
+        const daysNeeded=parseFloat(ratePerDay)>0?(remaining/parseFloat(ratePerDay)).toFixed(0):'∞';
+        return `  ${n}: +${diff.toFixed(1)}% ใน ${daysDiff} วัน (${ratePerDay}%/วัน) — เหลือ ${remaining.toFixed(1)}% ต้องใช้ ${daysNeeded} วัน`;
+      }).join('\n');
+      snap7Block=`\n\n📊 ประวัติ Snapshot 7 วันย้อนหลัง (${hist7.length} วันที่มีข้อมูล):\n${rows}\n\n📈 อัตราความคืบหน้าจริง:\n${rateRows}`;
+    } else {
+      snap7Block='\n\n⚠️ มีข้อมูล Snapshot น้อยกว่า 2 วัน — วิเคราะห์จากข้อมูลปัจจุบันเท่านั้น';
+    }
+    const fullCtx=ctx+snap7Block;
+    const text=await jupCallAPI([{role:'user',content:`${fullCtx}\n\nโปรดวิเคราะห์โดยอ้างอิงข้อมูล Snapshot 7 วันเป็นหลัก:\n1. สถานะโดยรวม — จะส่งงานทันไหม?\n2. งานไหนคืบหน้าดีที่สุด / แย่ที่สุด (อิงอัตรา/วัน)\n3. งานวิกฤตเร่งด่วนที่สุด + วิธีแก้\n4. ต้องทำ %/วัน แต่ละงาน เพื่อให้ทันเป้า\n5. แนวโน้มและความเสี่ยงสำคัญ`}]);
     if(!text)return;
-    _jupHistory=[{role:'user',content:ctx},{role:'assistant',content:text}];
+    _jupHistory=[{role:'user',content:fullCtx},{role:'assistant',content:text}];
     res.innerHTML=`<div style="font-size:12px;color:#c8d8e8;line-height:1.9">${jupFmt(text)}</div>`;
   }catch(e){res.innerHTML=`<div style="color:#ff6666;font-size:11px">❌ ${e.message}</div>`;}
 }
@@ -3282,6 +3303,7 @@ function jupRenderSnapshots(){
         <div style="font-size:10px;color:#6b7a8d;margin-top:3px;font-family:var(--m)">แกน X = วันที่ · แกน Y = % · คลิก Legend เพื่อซ่อน/แสดงเส้น</div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button onclick="jupManualSaveSnapshot();renderJup7DayChart()" class="btn" style="background:rgba(255,214,0,.15);border:1px solid rgba(255,214,0,.45);color:var(--gold);font-size:11px">📸 บันทึก Snapshot</button>
         <button onclick="jupShareA4Chart()" class="btn" style="background:rgba(0,230,118,.15);border:1px solid rgba(0,230,118,.4);color:var(--green);font-size:11px">📤 แชร์ LINE</button>
         <button onclick="document.getElementById('jup-chart-overlay').style.display='none'" class="btn btn-r">✕ ปิด</button>
       </div>
@@ -3687,24 +3709,58 @@ async function acctShareA4(){
 // ======================== JUPITER AUTO-SAVE + 7-DAY HISTORY ========================
 const JUP_AUTOSAVE_KEY='cp_jup_autosave';
 const JUP_HISTORY_KEY='cp_jup_7day';
+const JUP_SCHED_KEY='cp_jup_sched_date'; // เก็บวันที่บันทึกอัตโนมัติล่าสุด
 
-// Auto-save snapshot every time data changes (called from scheduleAutoSave)
-function jupAutoSaveSnapshot(){
-  const v=getVals();
-  const vs=[v.s1,v.f25,v.out,v.s4,v.s5,v.s6,v.s7];
-  const today=new Date().toISOString().split('T')[0];
-  const now=new Date().toLocaleString('th-TH');
-  // Load history
-  let hist=[];
-  try{hist=JSON.parse(localStorage.getItem(JUP_HISTORY_KEY)||'[]');}catch(e){hist=[];}
-  // Check if today already has an entry — update it
-  const idx=hist.findIndex(h=>h.date===today);
-  const snap={date:today,ts:now,vs:vs.map(x=>parseFloat(x.toFixed(2)))};
-  if(idx>=0)hist[idx]=snap; else hist.push(snap);
-  // Keep only 7 days
-  hist.sort((a,b)=>a.date.localeCompare(b.date));
-  if(hist.length>7)hist=hist.slice(-7);
-  localStorage.setItem(JUP_HISTORY_KEY,JSON.stringify(hist));
+// ── Core: บันทึก snapshot วันนั้น (อัปเดตถ้ามีอยู่แล้ว) ──────────────────
+function jupAutoSaveSnapshot(isManual=false){
+  try{
+    const v=getVals();
+    const vs=[v.s1,v.f25,v.out,v.s4,v.s5,v.s6,v.s7];
+    const today=new Date().toISOString().split('T')[0];
+    const nowStr=new Date().toLocaleString('th-TH',{year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+    let hist=[];
+    try{hist=JSON.parse(localStorage.getItem(JUP_HISTORY_KEY)||'[]');}catch(e){hist=[];}
+    // วันเดียวกัน → อัปเดตด้วยข้อมูลล่าสุดเสมอ
+    const idx=hist.findIndex(h=>h.date===today);
+    const snap={date:today,ts:nowStr,vs:vs.map(x=>parseFloat(x.toFixed(2))),manual:isManual};
+    if(idx>=0) hist[idx]=snap; else hist.push(snap);
+    hist.sort((a,b)=>a.date.localeCompare(b.date));
+    if(hist.length>7) hist=hist.slice(-7);
+    localStorage.setItem(JUP_HISTORY_KEY,JSON.stringify(hist));
+    if(isManual) showToast('📸 บันทึก Snapshot แล้ว — '+nowStr,'ok',4000);
+  }catch(e){console.warn('jupAutoSaveSnapshot:',e);}
+}
+
+// ── Manual save (ปุ่มกด) ──────────────────────────────────────────────────
+function jupManualSaveSnapshot(){
+  jupAutoSaveSnapshot(true);
+  jupRenderSnapshots();
+  // sync 7-day chart ถ้าเปิดอยู่
+  if(document.getElementById('jup-chart-overlay')?.style.display!=='none') renderJup7DayChart();
+}
+
+// ── Scheduled auto-save เวลา 19:00 น. ────────────────────────────────────
+function jupSchedule1900(){
+  function checkAndSave(){
+    const now=new Date();
+    const todayKey=now.toISOString().split('T')[0];
+    const h=now.getHours(); const m=now.getMinutes();
+    // ตรงเวลา 19:00–19:01 และยังไม่ได้บันทึกวันนี้
+    if(h===19&&m===0){
+      const lastSched=localStorage.getItem(JUP_SCHED_KEY)||'';
+      if(lastSched!==todayKey){
+        localStorage.setItem(JUP_SCHED_KEY,todayKey);
+        jupAutoSaveSnapshot(false);
+        jupRenderSnapshots();
+        if(document.getElementById('jup-chart-overlay')?.style.display!=='none') renderJup7DayChart();
+        showToast('🕖 บันทึก Snapshot อัตโนมัติ 19:00 น. แล้ว','ok',5000);
+      }
+    }
+  }
+  // ตรวจทุก 30 วินาที
+  setInterval(checkAndSave, 30000);
+  // ตรวจทันทีเมื่อโหลด (กรณีเปิดเพจหลัง 19:00)
+  checkAndSave();
 }
 
 // Get 7-day history
@@ -3712,20 +3768,20 @@ function jupGet7DayHistory(){
   try{return JSON.parse(localStorage.getItem(JUP_HISTORY_KEY)||'[]');}catch(e){return[];}
 }
 
-// Also call jupAutoSaveSnapshot in original jupSaveSnapshot (extend it)
+// ── Override jupSaveSnapshot (ปุ่มเดิมใน Jupiter panel) ──────────────────
 const _origJupSaveSnapshot=window.jupSaveSnapshot;
 function jupSaveSnapshot(){
   if(typeof _origJupSaveSnapshot==='function')_origJupSaveSnapshot();
-  jupAutoSaveSnapshot();
+  jupManualSaveSnapshot();
 }
 
-// Extend scheduleAutoSave to also save Jupiter snapshot
+// ── Extend scheduleAutoSave (debounce เมื่อกรอกข้อมูล) ──────────────────
 const _origScheduleAutoSave=window.scheduleAutoSave;
 function scheduleAutoSave(){
   if(typeof _origScheduleAutoSave==='function')_origScheduleAutoSave();
-  // Debounce Jupiter auto-snapshot
+  // Debounce: บันทึก snapshot 3 วินาทีหลังหยุดกรอก
   clearTimeout(window._jupAutoSaveTimer);
-  window._jupAutoSaveTimer=setTimeout(()=>{jupAutoSaveSnapshot();},3000);
+  window._jupAutoSaveTimer=setTimeout(()=>{jupAutoSaveSnapshot(false);},3000);
 }
 
 // Open 7-day chart overlay
@@ -3752,11 +3808,10 @@ function renderJup7DayChart(){
   const canvas=document.getElementById('jup-7day-chart');
   if(!canvas)return;
 
-  // ── สร้าง 7 วันล่วงหน้าเสมอ: วันแรกที่มีข้อมูล หรือวันนี้ ──
-  const today=new Date();
-  today.setHours(0,0,0,0);
+  const todayIso=new Date().toISOString().split('T')[0];
+  const today=new Date(todayIso+'T00:00:00');
 
-  // หาวันเริ่มต้น = วันแรกใน hist หรือวันนี้
+  // ── สร้างช่วง 7 วัน: เริ่มจากวันแรกใน snapshot หรือวันนี้ ──
   let startDate;
   if(hist.length){
     startDate=new Date(hist[0].date+'T00:00:00');
@@ -3764,7 +3819,7 @@ function renderJup7DayChart(){
     startDate=new Date(today);
   }
 
-  // สร้าง array 7 วัน จาก startDate
+  // ถ้า snapshot span > 7 วัน ให้ใช้ 7 วันล่าสุด (นับจากวันแรก)
   const days7=[];
   for(let i=0;i<7;i++){
     const d=new Date(startDate);
@@ -3772,32 +3827,28 @@ function renderJup7DayChart(){
     const iso=d.toISOString().split('T')[0];
     const dd=String(d.getDate()).padStart(2,'0');
     const mm=String(d.getMonth()+1).padStart(2,'0');
-    const isToday=iso===today.toISOString().split('T')[0];
-    const isFuture=d>today;
+    const isToday=iso===todayIso;
+    const isFuture=iso>todayIso;
     days7.push({iso, label:`${dd}/${mm}`, isToday, isFuture});
   }
 
-  const labels=days7.map(d=>{
-    if(d.isToday) return `${d.label} ◀`;
-    if(d.isFuture) return d.label;
-    return d.label;
-  });
-
-  // map hist ข้อมูลเข้า index ของ 7 วัน
+  // ── map snapshot เข้า dict ──
   const histMap={};
   hist.forEach(h=>{histMap[h.date]=h.vs;});
 
-  // ── datasets: one per series + target lines ──
+  const labels=days7.map(d=>{
+    if(d.isToday) return `${d.label} ◀`;
+    return d.label;
+  });
+
+  // ── datasets: เส้นข้อมูลจริง (null สำหรับวันที่ยังไม่มี/ล่วงหน้า) ──
   const datasets=JUP7_SERIES.map(s=>({
     label:s.label,
-    data:days7.map(d=>{
-      if(histMap[d.iso]) return histMap[d.iso][s.idx]||0;
-      return null; // ยังไม่มีข้อมูล = null (เส้นขาด)
-    }),
+    data:days7.map(d=>(!d.isFuture&&histMap[d.iso]!=null)?histMap[d.iso][s.idx]:null),
     borderColor:s.col,
     backgroundColor:s.col+'22',
     borderWidth:2.5,
-    pointRadius:days7.map(d=>histMap[d.iso]?5:0),
+    pointRadius:days7.map(d=>(!d.isFuture&&histMap[d.iso]!=null)?5:0),
     pointHoverRadius:9,
     pointBackgroundColor:s.col,
     pointBorderColor:'#080d14',
@@ -3808,7 +3859,7 @@ function renderJup7DayChart(){
     _tgt:s.tgt,
   }));
 
-  // Add target reference lines
+  // เส้น target อ้างอิง (เส้นประ)
   JUP7_SERIES.forEach(s=>{
     datasets.push({
       label:`เป้า ${s.label} (${s.tgt}%)`,
@@ -3824,7 +3875,6 @@ function renderJup7DayChart(){
     });
   });
 
-  // ── render chart ──
   if(_jup7Chart){_jup7Chart.destroy();}
   _jup7Chart=new Chart(canvas,{
     type:'line',
@@ -3835,7 +3885,6 @@ function renderJup7DayChart(){
       interaction:{mode:'index',intersect:false},
       plugins:{
         legend:{display:false},
-        // เส้นแนวตั้งแสดง "วันนี้"
         annotation:{annotations:{}},
         tooltip:{
           backgroundColor:'rgba(8,13,20,.96)',
@@ -3849,9 +3898,10 @@ function renderJup7DayChart(){
               const idx=ctx[0]?.dataIndex;
               const d=days7[idx];
               if(!d)return '';
+              const h=hist.find(x=>x.date===d.iso);
               if(d.isFuture) return `${d.label} (ยังไม่มีข้อมูล)`;
-              if(d.isToday) return `${d.label} (วันนี้)`;
-              return d.label;
+              if(d.isToday) return `${d.label} (วันนี้)${h?' · '+h.ts:''}`;
+              return `${d.label}${h?' · '+h.ts:''}`;
             },
             label:ctx=>{
               if(ctx.dataset._isTarget)return null;
@@ -3859,8 +3909,7 @@ function renderJup7DayChart(){
               if(v===null||v===undefined)return null;
               const s=JUP7_SERIES[ctx.datasetIndex];
               if(!s)return null;
-              const pctOfTgt=(v/s.tgt*100).toFixed(0);
-              return ` ${ctx.dataset.label}: ${v.toFixed(1)}% (${pctOfTgt}% ของเป้า ${s.tgt}%)`;
+              return ` ${ctx.dataset.label}: ${v.toFixed(1)}% (${(v/s.tgt*100).toFixed(0)}% ของเป้า ${s.tgt}%)`;
             }
           }
         }
@@ -4014,8 +4063,9 @@ async function jupShareA4Chart(){
 // Trigger initial auto-snapshot on page load
 window.addEventListener('load',function(){
   setTimeout(()=>{
-    jupAutoSaveSnapshot();
+    jupAutoSaveSnapshot(false);
     jup7SeedFromLatest();
+    jupSchedule1900(); // เริ่ม scheduler บันทึกอัตโนมัติ 19:00 น.
   },4000);
 });
 
