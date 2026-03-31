@@ -9,9 +9,9 @@
 <meta name="apple-mobile-web-app-title" content="CP Dashboard">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#080d14">
-<meta name="description" content="Construction Progress Dashboard v2.4.0">
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='100' fill='%23080d14'/%3E%3Crect x='40' y='40' width='432' height='432' rx='80' fill='%230d1a2e'/%3E%3Ctext x='256' y='200' text-anchor='middle' font-family='Arial' font-weight='bold' font-size='80' fill='%23388bfd'%3ECP%3C/text%3E%3Ctext x='256' y='290' text-anchor='middle' font-family='Arial' font-size='40' fill='%2300e676'%3EDashboard%3C/text%3E%3Ctext x='256' y='360' text-anchor='middle' font-family='Arial' font-size='28' fill='%236b7a8d'%3Ev2.4.0%3C/text%3E%3Crect x='80' y='390' width='352' height='4' rx='2' fill='%23388bfd' opacity='.5'/%3E%3C/svg%3E">
-<link rel="manifest" href="data:application/json,%7B%22name%22%3A%22Construction%20Progress%20Dashboard%22%2C%22short_name%22%3A%22CP%20Dashboard%22%2C%22description%22%3A%22Construction%20Progress%20Dashboard%20v2.4.0%22%2C%22start_url%22%3A%22.%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23080d14%22%2C%22theme_color%22%3A%22%23080d14%22%2C%22orientation%22%3A%22any%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%2520xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%2520viewBox%3D%270%2520256%2520512%27%253E%253C%2Fsvg%253E%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
+<meta name="description" content="Construction Progress Dashboard v2.4.3">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='100' fill='%23080d14'/%3E%3Crect x='40' y='40' width='432' height='432' rx='80' fill='%230d1a2e'/%3E%3Ctext x='256' y='200' text-anchor='middle' font-family='Arial' font-weight='bold' font-size='80' fill='%23388bfd'%3ECP%3C/text%3E%3Ctext x='256' y='290' text-anchor='middle' font-family='Arial' font-size='40' fill='%2300e676'%3EDashboard%3C/text%3E%3Ctext x='256' y='360' text-anchor='middle' font-family='Arial' font-size='28' fill='%236b7a8d'%3Ev2.4.3%3C/text%3E%3Crect x='80' y='390' width='352' height='4' rx='2' fill='%23388bfd' opacity='.5'/%3E%3C/svg%3E">
+<link rel="manifest" href="data:application/json,%7B%22name%22%3A%22Construction%20Progress%20Dashboard%22%2C%22short_name%22%3A%22CP%20Dashboard%22%2C%22description%22%3A%22Construction%20Progress%20Dashboard%20v2.4.3%22%2C%22start_url%22%3A%22.%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23080d14%22%2C%22theme_color%22%3A%22%23080d14%22%2C%22orientation%22%3A%22any%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%2520xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%2520viewBox%3D%270%2520256%2520512%27%253E%253C%2Fsvg%253E%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-3d@0.1.0/dist/chartjs-plugin-3d.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -443,7 +443,7 @@ body.view-mode .edit-only{display:none!important}
     </div>
     <div>
       <div class="ht">Construction Progress Dashboard</div>
-      <div class="hs">รายงานความคืบหน้างานก่อสร้าง · v2.4.0</div>
+      <div class="hs">รายงานความคืบหน้างานก่อสร้าง · v2.4.3</div>
     </div>
   </div>
   <div class="hbtns">
@@ -3079,6 +3079,94 @@ function jupRenderSnapshots(){
       </div>
     </div>
 
+    <!-- 🪐 Jupiter AI Smart Input -->
+    <div id="jup-nlp-box" style="background:linear-gradient(135deg,rgba(26,35,126,.35),rgba(255,214,0,.08));border:2px solid rgba(255,214,0,.4);border-radius:14px;padding:20px;margin-bottom:20px;position:relative;overflow:hidden">
+      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent)"></div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+        <span style="font-size:22px">🪐</span>
+        <div>
+          <div style="font-size:14px;font-weight:800;color:var(--gold)">Jupiter AI — กรอกข้อมูลด้วยภาษาธรรมชาติ</div>
+          <div style="font-size:10px;color:#8899aa;margin-top:2px">พิมพ์รายการเบิกจ่าย/สั่งซื้อ แล้วให้ AI แยกข้อมูลให้อัตโนมัติ</div>
+        </div>
+        <div id="jup-nlp-mode-badge" style="margin-left:auto;padding:4px 12px;background:rgba(255,149,0,.15);border:1px solid rgba(255,149,0,.4);border-radius:20px;font-size:10px;font-weight:700;color:var(--orange)">🛒 สั่งซื้อวัสดุ</div>
+      </div>
+
+      <!-- Mode selector -->
+      <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+        <button onclick="jupNlpSetMode('purchase')" id="nlp-mode-purchase" class="btn" style="font-size:11px;background:rgba(255,149,0,.25);border:1px solid rgba(255,149,0,.6);color:var(--orange)">🛒 สั่งซื้อวัสดุ</button>
+        <button onclick="jupNlpSetMode('labor')" id="nlp-mode-labor" class="btn" style="font-size:11px;background:rgba(0,188,212,.1);border:1px solid rgba(0,188,212,.3);color:var(--teal)">👷 จ่ายค่าแรง</button>
+      </div>
+
+      <!-- ตัวอย่าง -->
+      <div id="jup-nlp-examples" style="margin-bottom:10px;padding:10px 12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:8px">
+        <div style="font-size:10px;color:#6b7a8d;margin-bottom:6px;font-weight:600">💡 ตัวอย่างประโยค:</div>
+        <div id="jup-nlp-ex-text" style="font-size:11px;color:#8899aa;line-height:1.9">
+          • "ซื้ออิฐมวลเบา 500 ก้อน ราคา 4,500 บาท งาน S2 จาก บ.วัสดุก่อสร้าง วันที่ 1 เม.ย."<br>
+          • "สั่งปูนซีเมนต์ 20 ถุง 1,200 บาท หมวด S4 ผู้ขาย หจก.ก่อสร้างดี order PO-001"
+        </div>
+      </div>
+
+      <!-- Text input area -->
+      <div style="position:relative;margin-bottom:12px">
+        <textarea id="jup-nlp-input" rows="3" placeholder="พิมพ์รายการเบิกจ่ายที่นี่... เช่น ซื้อปูน 50 ถุง ราคา 3,500 บาท งาน S2 ก่ออิฐ วันที่ 2 เม.ย."
+          style="width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,214,0,.35);border-radius:10px;padding:12px 14px;color:#e8f0fe;font-size:13px;font-family:var(--f);outline:none;resize:vertical;line-height:1.7;transition:border-color .2s"
+          onfocus="this.style.borderColor='rgba(255,214,0,.7)'" onblur="this.style.borderColor='rgba(255,214,0,.35)'"
+          autocomplete="off" autocorrect="off" spellcheck="false"></textarea>
+      </div>
+
+      <!-- Action buttons -->
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <button onclick="jupNlpParse()" id="jup-nlp-btn" style="background:linear-gradient(135deg,rgba(255,214,0,.3),rgba(255,214,0,.15));border:1px solid rgba(255,214,0,.6);color:var(--gold);border-radius:10px;padding:10px 22px;font-size:13px;font-weight:800;cursor:pointer;font-family:var(--f);display:flex;align-items:center;gap:7px;transition:all .2s" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform=''">
+          <span id="jup-nlp-btn-icon">🪐</span> <span id="jup-nlp-btn-txt">บันทึกรายการ</span>
+        </button>
+        <button onclick="jupNlpClear()" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#8899aa;border-radius:8px;padding:9px 16px;font-size:12px;cursor:pointer;font-family:var(--f)">ล้าง</button>
+        <div id="jup-nlp-status" style="font-size:11px;color:#6b7a8d;font-family:var(--m)"></div>
+      </div>
+    </div>
+
+    <!-- 🔍 Jupiter Review Modal (ตรวจสอบก่อนอนุมัติ) -->
+    <div id="jup-review-modal" style="display:none;position:fixed;inset:0;z-index:100000;background:rgba(0,0,0,.85);backdrop-filter:blur(12px);align-items:center;justify-content:center;padding:16px">
+      <div style="background:linear-gradient(135deg,#0d1525,#111d30);border:2px solid rgba(255,214,0,.5);border-radius:18px;max-width:600px;width:100%;max-height:90vh;overflow-y:auto;padding:26px;box-shadow:0 30px 100px rgba(0,0,0,.7);position:relative">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--gold),transparent);border-radius:18px 18px 0 0"></div>
+        <!-- Header -->
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+          <span style="font-size:26px">🔍</span>
+          <div>
+            <div style="font-size:15px;font-weight:800;color:var(--gold)">ตรวจสอบข้อมูลก่อนบันทึก</div>
+            <div style="font-size:10px;color:#6b7a8d;margin-top:2px">Jupiter AI แยกข้อมูลจากประโยคของคุณ — กรุณาตรวจสอบก่อนยืนยัน</div>
+          </div>
+        </div>
+
+        <!-- ประโยคต้นฉบับ -->
+        <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:10px 14px;margin-bottom:16px">
+          <div style="font-size:10px;color:#6b7a8d;margin-bottom:4px">📝 ประโยคต้นฉบับ</div>
+          <div id="jup-review-original" style="font-size:12px;color:#c8d8e8;line-height:1.6;font-style:italic"></div>
+        </div>
+
+        <!-- ฟิลด์ที่แยกได้ -->
+        <div id="jup-review-fields" style="display:grid;gap:10px;margin-bottom:20px"></div>
+
+        <!-- Confidence indicator -->
+        <div id="jup-review-confidence" style="margin-bottom:16px;padding:10px 14px;border-radius:8px;font-size:11px"></div>
+
+        <!-- หมายเหตุ AI -->
+        <div id="jup-review-note" style="margin-bottom:18px;padding:10px 14px;background:rgba(255,214,0,.06);border:1px solid rgba(255,214,0,.2);border-radius:8px;font-size:11px;color:#c8d8e8;display:none"></div>
+
+        <!-- ปุ่ม -->
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button onclick="jupReviewConfirm()" style="flex:1;background:linear-gradient(135deg,rgba(0,230,118,.25),rgba(0,230,118,.1));border:1px solid rgba(0,230,118,.5);color:var(--green);border-radius:10px;padding:12px;font-size:14px;font-weight:800;cursor:pointer;font-family:var(--f);display:flex;align-items:center;justify-content:center;gap:6px">
+            ✅ ยืนยันและบันทึก
+          </button>
+          <button onclick="jupReviewEdit()" style="background:rgba(255,149,0,.12);border:1px solid rgba(255,149,0,.35);color:var(--orange);border-radius:10px;padding:12px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--f)">
+            ✏️ แก้ไข
+          </button>
+          <button onclick="jupReviewCancel()" style="background:rgba(255,68,68,.1);border:1px solid rgba(255,68,68,.3);color:var(--red);border-radius:10px;padding:12px 18px;font-size:13px;cursor:pointer;font-family:var(--f)">
+            ✕ ยกเลิก
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- สั่งซื้อวัสดุ -->
     <div style="background:rgba(255,149,0,.05);border:1px solid rgba(255,149,0,.25);border-radius:12px;padding:18px;margin-bottom:20px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
@@ -3930,6 +4018,328 @@ window.addEventListener('load',function(){
     jup7SeedFromLatest();
   },4000);
 });
+
+// ======================== JUPITER NLP — ACCT SMART INPUT ========================
+
+let _jupNlpMode = 'purchase'; // 'purchase' | 'labor'
+let _jupReviewData = null;    // parsed data waiting for confirmation
+
+function jupNlpSetMode(mode) {
+  _jupNlpMode = mode;
+  const badge = document.getElementById('jup-nlp-mode-badge');
+  const exText = document.getElementById('jup-nlp-ex-text');
+  const pb = document.getElementById('nlp-mode-purchase');
+  const lb = document.getElementById('nlp-mode-labor');
+  if (mode === 'purchase') {
+    if (badge) { badge.textContent = '🛒 สั่งซื้อวัสดุ'; badge.style.background='rgba(255,149,0,.15)'; badge.style.borderColor='rgba(255,149,0,.4)'; badge.style.color='var(--orange)'; }
+    if (pb) { pb.style.background='rgba(255,149,0,.25)'; pb.style.borderColor='rgba(255,149,0,.6)'; }
+    if (lb) { lb.style.background='rgba(0,188,212,.1)'; lb.style.borderColor='rgba(0,188,212,.3)'; }
+    if (exText) exText.innerHTML = '• "ซื้ออิฐมวลเบา 500 ก้อน ราคา 4,500 บาท งาน S2 จาก บ.วัสดุก่อสร้าง วันที่ 1 เม.ย."<br>• "สั่งปูนซีเมนต์ 20 ถุง 1,200 บาท หมวด S4 ผู้ขาย หจก.ก่อสร้างดี order PO-001"';
+  } else {
+    if (badge) { badge.textContent = '👷 จ่ายค่าแรง'; badge.style.background='rgba(0,188,212,.15)'; badge.style.borderColor='rgba(0,188,212,.4)'; badge.style.color='var(--teal)'; }
+    if (lb) { lb.style.background='rgba(0,188,212,.25)'; lb.style.borderColor='rgba(0,188,212,.6)'; }
+    if (pb) { pb.style.background='rgba(255,149,0,.1)'; pb.style.borderColor='rgba(255,149,0,.3)'; }
+    if (exText) exText.innerHTML = '• "จ่ายค่าแรงทีมช่างก่ออิฐ 8,000 บาท งาน S2 วันที่ 2 เม.ย."<br>• "จ่ายนายสมชาย งานฉาบผนัง S7 ชั้น 4 วันนี้ 5,500 บาท"';
+  }
+}
+
+function jupNlpClear() {
+  const inp = document.getElementById('jup-nlp-input');
+  if (inp) inp.value = '';
+  const st = document.getElementById('jup-nlp-status');
+  if (st) st.textContent = '';
+}
+
+async function jupNlpParse() {
+  const inp = document.getElementById('jup-nlp-input');
+  const txt = (inp?.value || '').trim();
+  if (!txt) { showToast('กรุณาพิมพ์ข้อมูลก่อน', 'err'); return; }
+
+  const btn = document.getElementById('jup-nlp-btn');
+  const btnIcon = document.getElementById('jup-nlp-btn-icon');
+  const btnTxt = document.getElementById('jup-nlp-btn-txt');
+  const st = document.getElementById('jup-nlp-status');
+
+  // Loading state
+  if (btn) btn.style.opacity = '0.7';
+  if (btnIcon) btnIcon.innerHTML = '<div style="width:14px;height:14px;border:2px solid var(--gold);border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite"></div>';
+  if (btnTxt) btnTxt.textContent = 'กำลังวิเคราะห์...';
+  if (st) st.textContent = '🪐 Jupiter กำลังอ่านประโยค...';
+
+  const today = new Date().toLocaleDateString('th-TH', {day:'2-digit',month:'2-digit',year:'numeric'});
+  const cats = ['S1 หลังคา','S2 ก่ออิฐใน','S3 ก่ออิฐนอก','S4 ก่ออิฐชั้น 1','S5 งานไฟฟ้า','S6 งานท่อน้ำดี','S7 ฉาบผนัง','อื่นๆ'];
+
+  let sysPrompt, userPrompt;
+  if (_jupNlpMode === 'purchase') {
+    sysPrompt = `คุณคือ Jupiter ระบบ AI แยกข้อมูลการสั่งซื้อวัสดุก่อสร้าง ตอบเป็น JSON เท่านั้น ห้ามมี text อื่น`;
+    userPrompt = `แยกข้อมูลจากประโยคนี้เป็น JSON:
+"${txt}"
+
+วันที่วันนี้: ${today}
+หมวดงานที่ใช้ได้: ${cats.join(', ')}
+
+ตอบเป็น JSON รูปแบบนี้เท่านั้น (ห้ามมี markdown หรือ text อื่น):
+{
+  "name": "ชื่อวัสดุ",
+  "cat": "หมวดงาน (เลือกจากรายการ)",
+  "price": ราคาเป็นตัวเลข,
+  "quantity": "จำนวนและหน่วย เช่น 500 ก้อน",
+  "order": "เลข PO หรือ order ถ้ามี",
+  "buyer": "ชื่อผู้ขาย/ร้านค้า",
+  "date": "วันที่ในรูปแบบ YYYY-MM-DD",
+  "deliver": "วันที่ส่งมอบ ถ้ามี",
+  "confidence": คะแนนความมั่นใจ 0-100,
+  "missing": ["รายการข้อมูลที่ขาด"],
+  "note": "หมายเหตุจาก AI"
+}`;
+  } else {
+    sysPrompt = `คุณคือ Jupiter ระบบ AI แยกข้อมูลการจ่ายค่าแรงก่อสร้าง ตอบเป็น JSON เท่านั้น ห้ามมี text อื่น`;
+    userPrompt = `แยกข้อมูลจากประโยคนี้เป็น JSON:
+"${txt}"
+
+วันที่วันนี้: ${today}
+หมวดงานที่ใช้ได้: ${cats.join(', ')}
+
+ตอบเป็น JSON รูปแบบนี้เท่านั้น (ห้ามมี markdown หรือ text อื่น):
+{
+  "name": "ชื่อผู้รับเหมา/ช่าง",
+  "cat": "หมวดงาน (เลือกจากรายการ)",
+  "price": ราคาเป็นตัวเลข,
+  "date": "วันที่ในรูปแบบ YYYY-MM-DD",
+  "detail": "รายละเอียดงานที่ทำ",
+  "confidence": คะแนนความมั่นใจ 0-100,
+  "missing": ["รายการข้อมูลที่ขาด"],
+  "note": "หมายเหตุจาก AI"
+}`;
+  }
+
+  try {
+    const key = localStorage.getItem('cp_api_key') || '';
+    if (!key) { showToast('ยังไม่ได้ตั้ง API Key — กด ⚙️ ตั้งค่า', 'err', 5000); resetNlpBtn(); return; }
+
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5',
+        max_tokens: 800,
+        system: sysPrompt,
+        messages: [{ role: 'user', content: userPrompt }]
+      })
+    });
+
+    if (!res.ok) throw new Error(`API Error ${res.status}`);
+    const data = await res.json();
+    const rawText = data.content?.map(b => b.text || '').join('') || '';
+
+    // Parse JSON — strip markdown fences if any
+    let parsed;
+    try {
+      const clean = rawText.replace(/```json|```/g, '').trim();
+      parsed = JSON.parse(clean);
+    } catch(e) {
+      throw new Error('AI ตอบกลับในรูปแบบที่ไม่ถูกต้อง กรุณาลองใหม่');
+    }
+
+    // Store & show review modal
+    _jupReviewData = { mode: _jupNlpMode, parsed, original: txt };
+    jupShowReview(_jupNlpMode, parsed, txt);
+
+    if (st) st.textContent = '✅ วิเคราะห์สำเร็จ — กรุณาตรวจสอบข้อมูล';
+  } catch(e) {
+    showToast('❌ ' + e.message, 'err', 6000);
+    if (st) st.textContent = '❌ เกิดข้อผิดพลาด';
+  }
+  resetNlpBtn();
+}
+
+function resetNlpBtn() {
+  const btn = document.getElementById('jup-nlp-btn');
+  const btnIcon = document.getElementById('jup-nlp-btn-icon');
+  const btnTxt = document.getElementById('jup-nlp-btn-txt');
+  if (btn) btn.style.opacity = '1';
+  if (btnIcon) btnIcon.textContent = '🪐';
+  if (btnTxt) btnTxt.textContent = 'บันทึกรายการ';
+}
+
+function jupShowReview(mode, parsed, original) {
+  const modal = document.getElementById('jup-review-modal');
+  if (!modal) return;
+
+  // Set original text
+  const origEl = document.getElementById('jup-review-original');
+  if (origEl) origEl.textContent = '"' + original + '"';
+
+  // Build fields
+  const fieldsEl = document.getElementById('jup-review-fields');
+  if (fieldsEl) {
+    let fields = [];
+    if (mode === 'purchase') {
+      fields = [
+        { label: '📦 ชื่อวัสดุ', key: 'name', id: 'rv-name', required: true, hint: '' },
+        { label: '📂 หมวดงาน', key: 'cat', id: 'rv-cat', type: 'select',
+          options: ['S1 หลังคา','S2 ก่ออิฐใน','S3 ก่ออิฐนอก','S4 ก่ออิฐชั้น 1','S5 งานไฟฟ้า','S6 งานท่อน้ำดี','S7 ฉาบผนัง','อื่นๆ'] },
+        { label: '💰 ราคา (฿)', key: 'price', id: 'rv-price', type: 'number', required: true },
+        { label: '📏 จำนวน', key: 'quantity', id: 'rv-qty', hint: 'เช่น 500 ก้อน' },
+        { label: '🏪 ผู้ขาย/ร้านค้า', key: 'buyer', id: 'rv-buyer' },
+        { label: '📋 เลข Order/PO', key: 'order', id: 'rv-order' },
+        { label: '📅 วันที่สั่งซื้อ', key: 'date', id: 'rv-date', type: 'date' },
+        { label: '🚚 วันส่งมอบ', key: 'deliver', id: 'rv-deliver', type: 'date' },
+      ];
+    } else {
+      fields = [
+        { label: '👷 ชื่อผู้รับเหมา', key: 'name', id: 'rv-name', required: true },
+        { label: '📂 หมวดงาน', key: 'cat', id: 'rv-cat', type: 'select',
+          options: ['S1 หลังคา','S2 ก่ออิฐใน','S3 ก่ออิฐนอก','S4 ก่ออิฐชั้น 1','S5 งานไฟฟ้า','S6 งานท่อน้ำดี','S7 ฉาบผนัง','อื่นๆ'] },
+        { label: '💰 จำนวนเงิน (฿)', key: 'price', id: 'rv-price', type: 'number', required: true },
+        { label: '📅 วันที่จ่าย', key: 'date', id: 'rv-date', type: 'date' },
+        { label: '📝 รายละเอียดงาน', key: 'detail', id: 'rv-detail' },
+      ];
+    }
+
+    fieldsEl.innerHTML = fields.map(f => {
+      const val = (parsed[f.key] !== undefined && parsed[f.key] !== null) ? parsed[f.key] : '';
+      const isEmpty = !val;
+      const borderCol = isEmpty ? 'rgba(255,149,0,.5)' : 'rgba(0,230,118,.35)';
+      const bg = isEmpty ? 'rgba(255,149,0,.05)' : 'rgba(0,230,118,.04)';
+      const inputStyle = `width:100%;background:rgba(255,255,255,.06);border:1px solid ${borderCol};border-radius:8px;padding:9px 11px;color:#e8f0fe;font-size:13px;font-family:var(--f);outline:none`;
+
+      let input = '';
+      if (f.type === 'select') {
+        input = `<select id="${f.id}" style="${inputStyle};background:#0d1525">${f.options.map(o => `<option value="${o}" ${o === val ? 'selected' : ''}>${o}</option>`).join('')}</select>`;
+      } else if (f.type === 'date') {
+        input = `<input type="date" id="${f.id}" value="${val}" style="${inputStyle};font-family:var(--m)">`;
+      } else if (f.type === 'number') {
+        input = `<input type="number" id="${f.id}" value="${val}" min="0" placeholder="0" style="${inputStyle};font-family:var(--m);font-weight:800">`;
+      } else {
+        input = `<input type="text" id="${f.id}" value="${val}" placeholder="${f.hint||''}" style="${inputStyle}" autocomplete="off" spellcheck="false">`;
+      }
+
+      return `<div style="background:${bg};border:1px solid ${borderCol};border-radius:10px;padding:12px 14px">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+          <div style="font-size:11px;color:${isEmpty?'var(--orange)':'#8899aa'};font-weight:600">${f.label}${f.required?'<span style="color:var(--red)"> *</span>':''}</div>
+          ${isEmpty ? '<div style="font-size:9px;color:var(--orange);background:rgba(255,149,0,.15);padding:1px 6px;border-radius:4px">ไม่พบข้อมูล</div>' : '<div style="font-size:9px;color:var(--green);background:rgba(0,230,118,.1);padding:1px 6px;border-radius:4px">✓ พบ</div>'}
+        </div>
+        ${input}
+      </div>`;
+    }).join('');
+  }
+
+  // Confidence bar
+  const conf = parseInt(parsed.confidence) || 50;
+  const confEl = document.getElementById('jup-review-confidence');
+  if (confEl) {
+    const confCol = conf >= 80 ? 'var(--green)' : conf >= 60 ? 'var(--orange)' : 'var(--red)';
+    const confBg = conf >= 80 ? 'rgba(0,230,118,.08)' : conf >= 60 ? 'rgba(255,149,0,.08)' : 'rgba(255,68,68,.08)';
+    confEl.style.background = confBg;
+    confEl.style.border = `1px solid ${confCol}44`;
+    confEl.style.borderRadius = '8px';
+    confEl.innerHTML = `<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <div style="font-size:11px;color:#8899aa">🎯 ความมั่นใจ AI:</div>
+      <div style="flex:1;background:rgba(255,255,255,.06);border-radius:99px;height:6px;min-width:80px"><div style="width:${conf}%;background:${confCol};height:100%;border-radius:99px;transition:width .6s"></div></div>
+      <div style="font-size:14px;font-weight:800;font-family:var(--m);color:${confCol}">${conf}%</div>
+      <div style="font-size:10px;color:${confCol}">${conf>=80?'มั่นใจสูง — ตรวจสอบก่อนยืนยัน':conf>=60?'ควรตรวจสอบข้อมูลที่ขาด':'ข้อมูลไม่ครบ — กรุณาแก้ไข'}</div>
+    </div>`;
+  }
+
+  // Missing fields & notes
+  const noteEl = document.getElementById('jup-review-note');
+  if (noteEl) {
+    let noteHtml = '';
+    if (parsed.missing && parsed.missing.length) {
+      noteHtml += `<div style="color:var(--orange);font-weight:700;margin-bottom:4px">⚠️ ข้อมูลที่ขาดหาย: ${parsed.missing.join(', ')}</div>`;
+    }
+    if (parsed.note) {
+      noteHtml += `<div style="color:#c8d8e8">💬 AI: ${parsed.note}</div>`;
+    }
+    if (noteHtml) { noteEl.innerHTML = noteHtml; noteEl.style.display = 'block'; }
+    else noteEl.style.display = 'none';
+  }
+
+  modal.style.display = 'flex';
+}
+
+function jupReviewCancel() {
+  const modal = document.getElementById('jup-review-modal');
+  if (modal) modal.style.display = 'none';
+  _jupReviewData = null;
+}
+
+function jupReviewEdit() {
+  // Just close modal — keep text in textarea for user to edit
+  const modal = document.getElementById('jup-review-modal');
+  if (modal) modal.style.display = 'none';
+  const inp = document.getElementById('jup-nlp-input');
+  if (inp) inp.focus();
+  showToast('แก้ไขประโยคแล้วกด "วิเคราะห์" ใหม่', 'info', 4000);
+}
+
+function jupReviewConfirm() {
+  if (!_jupReviewData) return;
+  const { mode } = _jupReviewData;
+
+  // Read back edited values from review form
+  const getName = id => (document.getElementById(id)?.value || '').trim();
+  const getNum = id => parseFloat(document.getElementById(id)?.value) || 0;
+
+  if (mode === 'purchase') {
+    const name = getName('rv-name');
+    const cat = getName('rv-cat');
+    const price = getNum('rv-price');
+    if (!name || !price) { showToast('กรุณากรอกชื่อวัสดุและราคาก่อน', 'err'); return; }
+    const d = getACCT();
+    d.purchases.push({
+      id: Date.now(),
+      name,
+      cat,
+      price,
+      quantity: getName('rv-qty'),
+      order: getName('rv-order'),
+      buyer: getName('rv-buyer'),
+      date: getName('rv-date'),
+      deliver: getName('rv-deliver'),
+      approved: false,
+      aiGenerated: true,
+      ts: new Date().toLocaleString('th-TH')
+    });
+    saveACCTData(d);
+    renderPurchases();
+    recalcSummary();
+    showToast('✅ บันทึกรายการสั่งซื้อแล้ว (รอการอนุมัติ)', 'ok');
+  } else {
+    const name = getName('rv-name');
+    const cat = getName('rv-cat');
+    const price = getNum('rv-price');
+    if (!name || !price) { showToast('กรุณากรอกชื่อผู้รับเหมาและราคาก่อน', 'err'); return; }
+    const d = getACCT();
+    d.laborPayments.push({
+      id: Date.now(),
+      name,
+      cat,
+      price,
+      date: getName('rv-date'),
+      detail: getName('rv-detail'),
+      approved: false,
+      aiGenerated: true,
+      ts: new Date().toLocaleString('th-TH')
+    });
+    saveACCTData(d);
+    renderLaborPayments();
+    recalcSummary();
+    showToast('✅ บันทึกค่าแรงแล้ว (รอการอนุมัติ)', 'ok');
+  }
+
+  // Close modal & clear input
+  jupReviewCancel();
+  jupNlpClear();
+  const st = document.getElementById('jup-nlp-status');
+  if (st) st.textContent = '✅ บันทึกแล้ว — รอการอนุมัติ';
+}
 
 // ── Seed วันที่ 31/3 จาก snapshot ล่าสุด (ถ้ายังไม่มีใน history) ──────────
 function jup7SeedFromLatest(){
