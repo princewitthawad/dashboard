@@ -3186,19 +3186,34 @@ function jupRenderSnapshots(){
 
 <!-- Jupiter Progress Chart Modal -->
 <div id="jup-chart-overlay" style="display:none;position:fixed;inset:0;z-index:99996;background:rgba(0,0,0,.9);backdrop-filter:blur(12px);overflow-y:auto">
-  <div style="max-width:900px;margin:0 auto;padding:20px">
+  <div style="max-width:960px;margin:0 auto;padding:20px">
+    <!-- Header -->
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
-      <div style="font-size:16px;font-weight:800;color:var(--gold)">📈 กราฟความคืบหน้า 7 วัน</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="jupShareA4Chart()" class="btn" style="background:rgba(0,230,118,.15);border:1px solid rgba(0,230,118,.4);color:var(--green);font-size:11px">📤 แชร์ A4 ผ่าน LINE</button>
+      <div>
+        <div style="font-size:16px;font-weight:800;color:var(--gold)">📈 กราฟความคืบหน้า 7 วัน</div>
+        <div style="font-size:10px;color:#6b7a8d;margin-top:3px;font-family:var(--m)">แกน X = วันที่ · แกน Y = % · คลิก Legend เพื่อซ่อน/แสดงเส้น</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button onclick="jupShareA4Chart()" class="btn" style="background:rgba(0,230,118,.15);border:1px solid rgba(0,230,118,.4);color:var(--green);font-size:11px">📤 แชร์ LINE</button>
         <button onclick="document.getElementById('jup-chart-overlay').style.display='none'" class="btn btn-r">✕ ปิด</button>
       </div>
     </div>
+
+    <!-- Chart card -->
+    <div style="background:var(--bg2);border:1px solid var(--bdr);border-radius:12px;padding:18px;margin-bottom:16px">
+      <!-- Interactive legend -->
+      <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px" id="jup7-legend"></div>
+      <!-- Canvas -->
+      <div style="position:relative;height:300px">
+        <canvas id="jup-7day-chart"></canvas>
+      </div>
+      <!-- Per-day summary cards -->
+      <div style="margin-top:16px;display:grid;grid-template-columns:repeat(7,1fr);gap:6px" id="jup7-day-cards"></div>
+    </div>
+
+    <!-- AI analysis result -->
     <div id="jup-chart-analysis-result" style="background:rgba(255,214,0,.05);border:1px solid rgba(255,214,0,.2);border-radius:12px;padding:16px;margin-bottom:16px;font-size:12px;color:#c8d8e8;line-height:1.8;min-height:60px">
       กด "วิเคราะห์ 7 วัน" เพื่อดูผลวิเคราะห์...
-    </div>
-    <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,214,0,.15);border-radius:12px;padding:16px;margin-bottom:16px">
-      <canvas id="jup-7day-chart" style="max-height:340px"></canvas>
     </div>
     <div style="text-align:center">
       <button onclick="jupAnalyze7Days()" class="btn" style="background:rgba(255,214,0,.18);border:1px solid rgba(255,214,0,.6);color:var(--gold);font-weight:800;padding:10px 28px">🪐 วิเคราะห์ 7 วัน ด้วย AI</button>
@@ -3632,45 +3647,241 @@ function openJup7DayChart(){
 }
 
 let _jup7Chart=null;
+
+// ── 7-day series definitions (mirrors SUMDEF + target lines) ──────────────
+const JUP7_SERIES=[
+  {label:'S1 หลังคา',   col:'#00e676', tgt:100, idx:0, dash:false},
+  {label:'S2 ก่ออิฐใน', col:'#00d4ff', tgt:100, idx:1, dash:false},
+  {label:'S3 ก่ออิฐนอก',col:'#00bcd4', tgt:50,  idx:2, dash:false},
+  {label:'S4 ก่ออิฐ ชั้น 1',col:'#ff9500',tgt:100,idx:3,dash:false},
+  {label:'S5 งานไฟฟ้า', col:'#ce93d8', tgt:80,  idx:4, dash:false},
+  {label:'S6 ท่อน้ำดี', col:'#388bfd', tgt:50,  idx:5, dash:false},
+  {label:'S7 ฉาบผนัง',  col:'#ffd600', tgt:40,  idx:6, dash:false},
+];
+
 function renderJup7DayChart(){
   const hist=jupGet7DayHistory();
   const canvas=document.getElementById('jup-7day-chart');
   if(!canvas)return;
-  const names=['S1 หลังคา','S2 ก่ออิฐใน','S3 ก่ออิฐนอก','S4 ก่ออิฐชั้น 1','S5 ไฟฟ้า','S6 ท่อน้ำดี','S7 ฉาบผนัง'];
-  const colors=['#00e676','#00d4ff','#00bcd4','#ff9500','#ce93d8','#388bfd','#ffd600'];
-  const labels=hist.length?hist.map(h=>h.date):[new Date().toISOString().split('T')[0]];
-  const datasets=names.map((n,i)=>({
-    label:n,
-    data:hist.length?hist.map(h=>h.vs[i]||0):[0],
-    borderColor:colors[i],
-    backgroundColor:colors[i]+'20',
-    borderWidth:2,
-    pointRadius:4,
-    pointHoverRadius:7,
-    pointBackgroundColor:colors[i],
+
+  // ── สร้าง 7 วันล่วงหน้าเสมอ: วันแรกที่มีข้อมูล หรือวันนี้ ──
+  const today=new Date();
+  today.setHours(0,0,0,0);
+
+  // หาวันเริ่มต้น = วันแรกใน hist หรือวันนี้
+  let startDate;
+  if(hist.length){
+    startDate=new Date(hist[0].date+'T00:00:00');
+  } else {
+    startDate=new Date(today);
+  }
+
+  // สร้าง array 7 วัน จาก startDate
+  const days7=[];
+  for(let i=0;i<7;i++){
+    const d=new Date(startDate);
+    d.setDate(startDate.getDate()+i);
+    const iso=d.toISOString().split('T')[0];
+    const dd=String(d.getDate()).padStart(2,'0');
+    const mm=String(d.getMonth()+1).padStart(2,'0');
+    const isToday=iso===today.toISOString().split('T')[0];
+    const isFuture=d>today;
+    days7.push({iso, label:`${dd}/${mm}`, isToday, isFuture});
+  }
+
+  const labels=days7.map(d=>{
+    if(d.isToday) return `${d.label} ◀`;
+    if(d.isFuture) return d.label;
+    return d.label;
+  });
+
+  // map hist ข้อมูลเข้า index ของ 7 วัน
+  const histMap={};
+  hist.forEach(h=>{histMap[h.date]=h.vs;});
+
+  // ── datasets: one per series + target lines ──
+  const datasets=JUP7_SERIES.map(s=>({
+    label:s.label,
+    data:days7.map(d=>{
+      if(histMap[d.iso]) return histMap[d.iso][s.idx]||0;
+      return null; // ยังไม่มีข้อมูล = null (เส้นขาด)
+    }),
+    borderColor:s.col,
+    backgroundColor:s.col+'22',
+    borderWidth:2.5,
+    pointRadius:days7.map(d=>histMap[d.iso]?5:0),
+    pointHoverRadius:9,
+    pointBackgroundColor:s.col,
     pointBorderColor:'#080d14',
     pointBorderWidth:2,
     tension:.35,
-    fill:false
+    fill:false,
+    spanGaps:false,
+    _tgt:s.tgt,
   }));
-  if(_jup7Chart)_jup7Chart.destroy();
+
+  // Add target reference lines
+  JUP7_SERIES.forEach(s=>{
+    datasets.push({
+      label:`เป้า ${s.label} (${s.tgt}%)`,
+      data:days7.map(()=>s.tgt),
+      borderColor:s.col+'55',
+      backgroundColor:'transparent',
+      borderWidth:1,
+      pointRadius:0,
+      fill:false,
+      tension:0,
+      borderDash:[5,5],
+      _isTarget:true,
+    });
+  });
+
+  // ── render chart ──
+  if(_jup7Chart){_jup7Chart.destroy();}
   _jup7Chart=new Chart(canvas,{
     type:'line',
     data:{labels,datasets},
     options:{
       responsive:true,
-      maintainAspectRatio:true,
+      maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
       plugins:{
-        legend:{position:'bottom',labels:{color:'#8899aa',font:{size:10},boxWidth:14,padding:10}},
-        tooltip:{mode:'index',intersect:false,backgroundColor:'rgba(8,13,20,.95)',borderColor:'rgba(56,139,253,.3)',borderWidth:1,titleColor:'#e8f0fe',bodyColor:'#8899aa',callbacks:{label:ctx=>` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)}%`}}
+        legend:{display:false},
+        // เส้นแนวตั้งแสดง "วันนี้"
+        annotation:{annotations:{}},
+        tooltip:{
+          backgroundColor:'rgba(8,13,20,.96)',
+          borderColor:'rgba(56,139,253,.3)',
+          borderWidth:1,
+          titleColor:'#e8f0fe',
+          bodyColor:'#8899aa',
+          padding:12,
+          callbacks:{
+            title:ctx=>{
+              const idx=ctx[0]?.dataIndex;
+              const d=days7[idx];
+              if(!d)return '';
+              if(d.isFuture) return `${d.label} (ยังไม่มีข้อมูล)`;
+              if(d.isToday) return `${d.label} (วันนี้)`;
+              return d.label;
+            },
+            label:ctx=>{
+              if(ctx.dataset._isTarget)return null;
+              const v=ctx.parsed.y;
+              if(v===null||v===undefined)return null;
+              const s=JUP7_SERIES[ctx.datasetIndex];
+              if(!s)return null;
+              const pctOfTgt=(v/s.tgt*100).toFixed(0);
+              return ` ${ctx.dataset.label}: ${v.toFixed(1)}% (${pctOfTgt}% ของเป้า ${s.tgt}%)`;
+            }
+          }
+        }
       },
       scales:{
-        x:{ticks:{color:'#8899aa',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'},border:{color:'rgba(56,139,253,.1)'}},
-        y:{min:0,max:100,ticks:{color:'#8899aa',font:{size:9},callback:v=>v+'%',stepSize:20},grid:{color:'rgba(255,255,255,.04)'},border:{color:'rgba(56,139,253,.1)'}}
+        x:{
+          ticks:{
+            color:days7.map(d=>d.isFuture?'#445566':d.isToday?'#ffd600':'#8899aa'),
+            font:{size:11,family:"'IBM Plex Mono'"}
+          },
+          grid:{
+            color:days7.map((_,i)=>days7[i]?.isToday?'rgba(255,214,0,.25)':'rgba(255,255,255,.04)')
+          },
+          border:{color:'rgba(56,139,253,.15)'}
+        },
+        y:{
+          min:0,max:110,
+          ticks:{color:'#8899aa',font:{size:10,family:"'IBM Plex Mono'"},callback:v=>v+'%',stepSize:20},
+          grid:{color:'rgba(255,255,255,.04)'},
+          border:{color:'rgba(56,139,253,.15)'}
+        }
       },
-      animation:{duration:600}
+      animation:{duration:700,easing:'easeInOutQuart'}
     }
   });
+
+  // ── interactive legend ──
+  const legEl=document.getElementById('jup7-legend');
+  if(legEl){
+    legEl.innerHTML=JUP7_SERIES.map((s,i)=>`<div
+      onclick="jup7ToggleLine(${i})"
+      id="jup7-leg-${i}"
+      style="display:flex;align-items:center;gap:5px;padding:4px 10px;background:${s.col}18;border:1px solid ${s.col}44;border-radius:20px;cursor:pointer;font-size:10px;font-weight:600;color:${s.col};transition:opacity .2s;user-select:none">
+      <div style="width:18px;height:2.5px;background:${s.col};border-radius:2px;flex-shrink:0"></div>
+      ${s.label}
+      <span style="font-size:9px;opacity:.7">(เป้า ${s.tgt}%)</span>
+    </div>`).join('');
+  }
+
+  // ── per-day summary cards ──
+  jup7RenderDayCards(hist, days7);
+}
+
+function jup7ToggleLine(i){
+  if(!_jup7Chart)return;
+  // toggle both the series line and its target line
+  const meta=_jup7Chart.getDatasetMeta(i);
+  const metaTgt=_jup7Chart.getDatasetMeta(JUP7_SERIES.length+i);
+  const hide=!meta.hidden;
+  meta.hidden=hide;
+  if(metaTgt)metaTgt.hidden=hide;
+  _jup7Chart.update();
+  const el=document.getElementById('jup7-leg-'+i);
+  if(el)el.style.opacity=hide?'0.3':'1';
+}
+
+function jup7RenderDayCards(hist, days7){
+  const el=document.getElementById('jup7-day-cards');
+  if(!el)return;
+
+  // build histMap
+  const histMap={};
+  (hist||[]).forEach(h=>{histMap[h.date]=h.vs;});
+
+  // if no days7 passed, build from today
+  if(!days7){
+    const today=new Date();today.setHours(0,0,0,0);
+    let startDate=hist&&hist.length?new Date(hist[0].date+'T00:00:00'):new Date(today);
+    days7=[];
+    for(let i=0;i<7;i++){
+      const d=new Date(startDate);d.setDate(startDate.getDate()+i);
+      const iso=d.toISOString().split('T')[0];
+      const dd=String(d.getDate()).padStart(2,'0');
+      const mm=String(d.getMonth()+1).padStart(2,'0');
+      days7.push({iso,label:`${dd}/${mm}`,isToday:iso===today.toISOString().split('T')[0],isFuture:d>today});
+    }
+  }
+
+  el.innerHTML=days7.map((day,hi)=>{
+    const vs=histMap[day.iso];
+    if(!vs){
+      // วันที่ยังไม่มีข้อมูล
+      const borderCol=day.isToday?'rgba(255,214,0,.6)':'rgba(255,255,255,.08)';
+      return`<div style="background:rgba(255,255,255,.02);border:1px solid ${borderCol};border-top:2px solid ${day.isToday?'var(--gold)':'#445566'};border-radius:7px;padding:8px 5px;text-align:center;opacity:.45">
+        <div style="font-size:9px;color:${day.isToday?'var(--gold)':'#445566'};margin-bottom:3px;font-weight:600">${day.label}${day.isToday?' ◀':''}</div>
+        <div style="font-size:13px;font-weight:700;font-family:var(--m);color:#445566">—</div>
+        <div style="font-size:9px;color:#445566;margin-top:2px">${day.isFuture?'ล่วงหน้า':day.isToday?'วันนี้':'ไม่มีข้อมูล'}</div>
+        <div style="margin-top:5px">${JUP7_SERIES.map(()=>`<div style="height:3px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;margin-bottom:2px"><div style="height:100%;width:0%"></div></div>`).join('')}</div>
+      </div>`;
+    }
+    // วันที่มีข้อมูล
+    const overall=(vs.reduce((a,b)=>a+b,0)/vs.length).toFixed(1);
+    const prevIso=days7[hi-1]?.iso;
+    const prevVs=prevIso&&histMap[prevIso]?histMap[prevIso]:null;
+    const delta=prevVs?(vs.reduce((a,b)=>a+b,0)-prevVs.reduce((a,b)=>a+b,0))/vs.length:null;
+    const colOvr=parseFloat(overall)>=60?'var(--green)':parseFloat(overall)>=30?'var(--orange)':'var(--red)';
+    return`<div style="background:var(--bgc);border:1px solid var(--bdr);border-top:2px solid ${colOvr};border-radius:7px;padding:8px 5px;text-align:center">
+      <div style="font-size:9px;color:${day.isToday?'var(--gold)':'var(--tx2)'};margin-bottom:3px;font-weight:600">${day.label}${day.isToday?' ◀':''}</div>
+      <div style="font-size:16px;font-weight:800;font-family:var(--m);color:${colOvr}">${overall}%</div>
+      ${delta!==null?`<div style="font-size:9px;color:${delta>=0?'var(--green)':'var(--red)'};margin-top:2px">${delta>=0?'▲+':'▼'}${Math.abs(delta).toFixed(1)}%</div>`:'<div style="font-size:9px;color:#445566">—</div>'}
+      <div style="margin-top:5px">
+        ${vs.map((v,i)=>{
+          const s=JUP7_SERIES[i];
+          const pct=Math.min(100,v/s.tgt*100);
+          return`<div style="height:3px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;margin-bottom:2px"><div style="height:100%;background:${s.col};width:${pct.toFixed(0)}%;border-radius:99px"></div></div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }).join('');
 }
 
 async function jupAnalyze7Days(){
