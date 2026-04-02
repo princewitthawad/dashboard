@@ -654,6 +654,10 @@ body.view-mode .edit-only{display:none!important}
   <button onclick="openChecklistPage()" class="edit-only" style="background:linear-gradient(135deg,rgba(0,60,120,.6),rgba(56,139,253,.2));color:var(--blue);border:1px solid rgba(56,139,253,.5);border-radius:10px;padding:12px 28px;font-size:14px;cursor:pointer;font-family:var(--f);font-weight:700;display:inline-flex;align-items:center;gap:8px;transition:all .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">📋 Checklist ประสานงานหน้างาน ↗</button>
 
   <button onclick="openAnalysisPage()" class="edit-only" style="background:linear-gradient(135deg,rgba(0,100,60,.6),rgba(0,230,118,.2));color:var(--green);border:1px solid rgba(0,230,118,.4);border-radius:10px;padding:12px 28px;font-size:14px;cursor:pointer;font-family:var(--f);font-weight:700;display:inline-flex;align-items:center;gap:8px;transition:all .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">📈 วิเคราะห์ — กราฟ & แผนรายวัน ↗</button>
+
+  <button onclick="openWorkforceAdmin()" class="edit-only" style="background:linear-gradient(135deg,rgba(0,188,212,.3),rgba(0,188,212,.1));color:var(--cyan);border:1px solid rgba(0,188,212,.5);border-radius:10px;padding:12px 28px;font-size:14px;cursor:pointer;font-family:var(--f);font-weight:700;display:inline-flex;align-items:center;gap:8px;transition:all .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">👷 กำลังพลในไซท์ ↗</button>
+
+  <button onclick="openADS()" class="edit-only" style="background:linear-gradient(135deg,rgba(255,68,68,.25),rgba(255,149,0,.15));color:var(--orange);border:1px solid rgba(255,149,0,.5);border-radius:10px;padding:12px 28px;font-size:14px;cursor:pointer;font-family:var(--f);font-weight:700;display:inline-flex;align-items:center;gap:8px;transition:all .2s;position:relative" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">🧠 AI Decision<span id="ads-bell" style="display:none;position:absolute;top:-6px;right:-6px;background:var(--red);color:#fff;border-radius:50%;width:18px;height:18px;font-size:10px;font-weight:800;align-items:center;justify-content:center">0</span></button>
 </div>
 
 <div id="checklist-overlay" class="overlay">
@@ -881,6 +885,15 @@ function doChangePw(){
 let _fbUrl=localStorage.getItem('cp_fb_url')||'';
 let _saveTimer=null,_lastSavedAt='';
 function fbPath(){return _fbUrl.replace(/\/+$/,'')+'/construction_progress.json';}
+function fbNodePath(node){return _fbUrl.replace(/\/+$/,'')+'/'+node+'.json';}
+async function cloudPutNode(node,payload){
+  if(!isFirebaseReady())return false;
+  try{const res=await fetch(fbNodePath(node),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});return res.ok;}catch(e){return false;}
+}
+async function cloudGetNode(node){
+  if(!isFirebaseReady())return null;
+  try{const res=await fetch(fbNodePath(node));return res.ok?await res.json():null;}catch(e){return null;}
+}
 function isFirebaseReady(){return _fbUrl&&_fbUrl.startsWith('https://');}
 
 function showToast(msg,type='ok',dur=3500){
@@ -951,9 +964,9 @@ async function loadData(){
   }
 }
 function scheduleAutoSave(){
-  if(!isFirebaseReady())return;
   clearTimeout(_saveTimer);
   setSvStatus('unsaved','● มีการเปลี่ยนแปลง...');
+  // บันทึกอัตโนมัติ 5 วินาทีหลังเปลี่ยนแปลง (ไม่ต้องรอ Firebase)
   _saveTimer=setTimeout(saveData,5000);
 }
 function clearData(){
@@ -983,6 +996,9 @@ function startAutoRefresh(){
     try{const res=await fetch(fbPath());if(!res.ok)return;const s=await res.json();if(!s)return;
       if(s.savedAt&&s.savedAt!==_lastSavedAt){_lastSavedAt=s.savedAt;applyState(s);setSvStatus('saved','🔄 รีเฟรชอัตโนมัติ',new Date(s.savedAt).toLocaleDateString('th-TH',{year:'numeric',month:'short',day:'numeric'}));}
     }catch(e){}
+    // Also pull ACCT + snapshots from cloud every cycle
+    if(typeof refreshACCTFromCloud==='function')refreshACCTFromCloud();
+    if(typeof refreshSnapshotsFromCloud==='function')refreshSnapshotsFromCloud();
   },15000);
 }
 
@@ -1592,7 +1608,7 @@ function exportChecklistPDF(){
   </head><body>
   <div class="page">${hdr}${p1}${ftr}</div>
   <div class="page"><div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid #1565c0"><div style="font-size:15px;font-weight:800">📋 Checklist (ต่อ)</div><div style="font-size:11px;color:#9ca3af">${today}</div></div>${p2}${rptHTML}${ftr}</div>
-  <script>window.onload=()=>{window.print();}<\/script>
+  \u003cscript\u003ewindow.onload=()=>{window.print();}\u003c/script\u003e
 </body></html>`);
   win.document.close();
 }
@@ -1646,7 +1662,7 @@ function shareChecklistLine(){
   <style>${pageStyle}</style></head><body>
   <div class="page">${pageHeader('ภายในและภายนอกองค์กร · Construction Progress Dashboard')}${summaryHTML}${p1cards}${ftr}</div>
   <div class="page">${pageHeader('Checklist (ต่อ)')}${p2cards}${rptHTML}${ftr}</div>
-  <script>window.onload=()=>{window.print();}<\/script></body></html>`;
+  \u003cscript\u003ewindow.onload=()=>{window.print();}\u003c/script\u003e</body></html>`;
 
   showToast('⏳ กำลังสร้าง PDF...','info',10000);
   function loadScript(src,cb){if(document.querySelector(`script[src="${src}"]`)){cb();return;}const s=document.createElement('script');s.src=src;s.onload=cb;document.head.appendChild(s);}
@@ -1727,7 +1743,11 @@ function renderTrendChart(){
   const existing=Chart.getChart(ctx);if(existing)existing.destroy();
   new Chart(ctx,{type:'line',data:{labels,datasets},options:{responsive:true,plugins:{legend:{labels:{color:'#8899aa',font:{size:10}}}},scales:{x:{ticks:{color:'#8899aa',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'}},y:{ticks:{color:'#8899aa'},grid:{color:'rgba(255,255,255,.04)'},min:0,max:110}}}});
 }
-function todayStr(){return new Date().toISOString().slice(0,10);}
+function localDateIso(d){
+  if(!d)d=new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function todayStr(){return localDateIso();}
 function getDailyLog(){try{return JSON.parse(localStorage.getItem('cp_daily_log')||'[]');}catch(e){return[];}}
 function saveDailyLog(logs){try{localStorage.setItem('cp_daily_log',JSON.stringify(logs));}catch(e){}}
 function renderDailyLogUI(){
@@ -1811,6 +1831,13 @@ shakeStyle.textContent='@keyframes shake{0%,100%{transform:translateX(0)}20%,60%
 document.head.appendChild(shakeStyle);
 
 window.addEventListener('DOMContentLoaded',init);
+// Daily auto-snapshot: save on load and schedule daily at 19:00
+window.addEventListener('load',function(){
+  // Auto-snapshot on load (after 4s to let data settle)
+  setTimeout(function(){
+    if(typeof jupAutoSaveSnapshot==='function')jupAutoSaveSnapshot(false);
+  },4000);
+});
 window.addEventListener('resize',()=>setTimeout(forcePieSquare,50));
 
 document.addEventListener('input',function(e){
@@ -2199,7 +2226,7 @@ function downloadCurrentState(){
   // Build HTML with pre-filled values
   const html=document.documentElement.outerHTML;
   // Inject state as default values via script at end
-  const stateScript=`\n<script>\n(function(){\n  var _preload=${JSON.stringify(state)};\n  window.addEventListener('load',function(){\n    if(typeof applyState==='function'){applyState(_preload);buildPlasterUI(true);updPlaster();buildDonuts();ra();}\n  },false);\n})();\n<\/script>`;
+  const stateScript=`\n\u003cscript\u003e\n(function(){\n  var _preload=${JSON.stringify(state)};\n  window.addEventListener('load',function(){\n    if(typeof applyState==='function'){applyState(_preload);buildPlasterUI(true);updPlaster();buildDonuts();ra();}\n  },false);\n})();\n\u003c/script\u003e`;
   const finalHtml=html.replace('</body>',stateScript+'</body>');
 
   const blob=new Blob([finalHtml],{type:'text/html;charset=utf-8'});
@@ -2598,33 +2625,12 @@ function jupFmt(t){
 }
 async function jupAnalyze(){
   const res=document.getElementById('jup-auto-result');
-  res.innerHTML='<div style="display:flex;align-items:center;gap:10px;color:#8899aa;font-size:12px"><div style="width:16px;height:16px;border:2px solid var(--gold);border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;flex-shrink:0"></div>Jupiter กำลังวิเคราะห์ข้อมูล 7 วัน...</div>';
+  res.innerHTML='<div style="display:flex;align-items:center;gap:10px;color:#8899aa;font-size:12px"><div style="width:16px;height:16px;border:2px solid var(--gold);border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;flex-shrink:0"></div>Jupiter กำลังวิเคราะห์...</div>';
   try{
-    const hist7=jupGet7DayHistory();
     const ctx=jupBuildContext();
-    // Build 7-day snapshot block for analysis
-    let snap7Block='';
-    if(hist7.length>=2){
-      const names=['S1 หลังคา','S2 ก่ออิฐใน','S3 ก่ออิฐนอก','S4 ก่ออิฐ ชั้น 1','S5 งานไฟฟ้า','S6 ท่อน้ำดี','S7 ฉาบผนัง'];
-      const tgts=[100,100,50,100,80,50,40];
-      const rows=hist7.map(h=>`  [${h.ts||h.date}] ${h.vs.map((v,i)=>`${names[i]}:${v}%`).join(', ')}`).join('\n');
-      const first=hist7[0]; const last=hist7[hist7.length-1];
-      const daysDiff=Math.max(1,(new Date(last.date)-new Date(first.date))/(86400000));
-      const rateRows=names.map((n,i)=>{
-        const diff=(last.vs[i]||0)-(first.vs[i]||0);
-        const ratePerDay=(diff/daysDiff).toFixed(2);
-        const remaining=tgts[i]-(last.vs[i]||0);
-        const daysNeeded=parseFloat(ratePerDay)>0?(remaining/parseFloat(ratePerDay)).toFixed(0):'∞';
-        return `  ${n}: +${diff.toFixed(1)}% ใน ${daysDiff} วัน (${ratePerDay}%/วัน) — เหลือ ${remaining.toFixed(1)}% ต้องใช้ ${daysNeeded} วัน`;
-      }).join('\n');
-      snap7Block=`\n\n📊 ประวัติ Snapshot 7 วันย้อนหลัง (${hist7.length} วันที่มีข้อมูล):\n${rows}\n\n📈 อัตราความคืบหน้าจริง:\n${rateRows}`;
-    } else {
-      snap7Block='\n\n⚠️ มีข้อมูล Snapshot น้อยกว่า 2 วัน — วิเคราะห์จากข้อมูลปัจจุบันเท่านั้น';
-    }
-    const fullCtx=ctx+snap7Block;
-    const text=await jupCallAPI([{role:'user',content:`${fullCtx}\n\nโปรดวิเคราะห์โดยอ้างอิงข้อมูล Snapshot 7 วันเป็นหลัก:\n1. สถานะโดยรวม — จะส่งงานทันไหม?\n2. งานไหนคืบหน้าดีที่สุด / แย่ที่สุด (อิงอัตรา/วัน)\n3. งานวิกฤตเร่งด่วนที่สุด + วิธีแก้\n4. ต้องทำ %/วัน แต่ละงาน เพื่อให้ทันเป้า\n5. แนวโน้มและความเสี่ยงสำคัญ`}]);
+    const text=await jupCallAPI([{role:'user',content:`${ctx}\n\nวิเคราะห์:\n1. สถานะโดยรวม — จะส่งงานทันไหม?\n2. งานวิกฤตเร่งด่วนที่สุด + วิธีแก้\n3. ต้องทำ %/วัน แต่ละงาน\n4. คำแนะนำจัดช่าง\n5. ความเสี่ยงสำคัญ`}]);
     if(!text)return;
-    _jupHistory=[{role:'user',content:fullCtx},{role:'assistant',content:text}];
+    _jupHistory=[{role:'user',content:ctx},{role:'assistant',content:text}];
     res.innerHTML=`<div style="font-size:12px;color:#c8d8e8;line-height:1.9">${jupFmt(text)}</div>`;
   }catch(e){res.innerHTML=`<div style="color:#ff6666;font-size:11px">❌ ${e.message}</div>`;}
 }
@@ -3303,7 +3309,6 @@ function jupRenderSnapshots(){
         <div style="font-size:10px;color:#6b7a8d;margin-top:3px;font-family:var(--m)">แกน X = วันที่ · แกน Y = % · คลิก Legend เพื่อซ่อน/แสดงเส้น</div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button onclick="jupManualSaveSnapshot();renderJup7DayChart()" class="btn" style="background:rgba(255,214,0,.15);border:1px solid rgba(255,214,0,.45);color:var(--gold);font-size:11px">📸 บันทึก Snapshot</button>
         <button onclick="jupShareA4Chart()" class="btn" style="background:rgba(0,230,118,.15);border:1px solid rgba(0,230,118,.4);color:var(--green);font-size:11px">📤 แชร์ LINE</button>
         <button onclick="document.getElementById('jup-chart-overlay').style.display='none'" class="btn btn-r">✕ ปิด</button>
       </div>
@@ -3335,6 +3340,14 @@ function jupRenderSnapshots(){
 // ======================== ACCT MODULE ========================
 const ACCT_HASH = '30072530'; // plain compare for this module
 const ACCT_KEY = 'cp_acct_data';
+const CUSTOM_CATS_KEY = 'cp_custom_cats';
+function getAllCats(){
+  const base=['S1 หลังคา','S2 ก่ออิฐใน','S3 ก่ออิฐนอก','S4 ก่ออิฐชั้น 1','S5 งานไฟฟ้า','S6 งานท่อน้ำดี','S7 ฉาบผนัง','อื่นๆ'];
+  try{const c=JSON.parse(localStorage.getItem(CUSTOM_CATS_KEY)||'[]');return [...base,...c];}catch(e){return base;}
+}
+function saveCustomCat(label){
+  try{const c=JSON.parse(localStorage.getItem(CUSTOM_CATS_KEY)||'[]');if(!c.includes(label)){c.push(label);localStorage.setItem(CUSTOM_CATS_KEY,JSON.stringify(c));cloudPutNode('custom_cats',c).catch(()=>{});}}catch(e){}
+}
 
 // --- ACCT Numpad ---
 let _acctBuf='', _acctLastTouch=0;
@@ -3377,8 +3390,8 @@ function doACCTUnlock(){
   if(pw===ACCT_HASH){
     closeACCTLogin();
     document.getElementById('acct-overlay').style.display='block';
-    renderACCT();
-    showToast('เข้าสู่ระบบ ACCT ✅','ok');
+    showToast('กำลังโหลดข้อมูล ACCT...','info',2000);
+    refreshACCTFromCloud().finally(()=>{renderACCT();showToast('เข้าสู่ระบบ ACCT ✅','ok');});
   } else {
     document.getElementById('acct-err').textContent='รหัสไม่ถูกต้อง';
     _acctBuf='';_acctSyncDots();
@@ -3396,8 +3409,25 @@ function closeACCT(){
 function loadACCTData(){
   try{return JSON.parse(localStorage.getItem(ACCT_KEY)||'{}');}catch(e){return {};}
 }
-function saveACCTData(d){
+function saveACCTData(d,silent=false){
+  d.updatedAt=new Date().toISOString();
   localStorage.setItem(ACCT_KEY,JSON.stringify(d));
+  if(!silent)syncACCTNow();
+}
+async function syncACCTNow(){
+  try{const d=loadACCTData();await cloudPutNode('acct_data',d);showToast('ซิงค์ ACCT ✅','ok',2000);}catch(e){}
+}
+async function refreshACCTFromCloud(){
+  try{
+    const d=await cloudGetNode('acct_data');
+    if(d&&d.updatedAt){
+      const local=loadACCTData();
+      if(!local.updatedAt||d.updatedAt>local.updatedAt){
+        localStorage.setItem(ACCT_KEY,JSON.stringify(d));
+        if(document.getElementById('acct-overlay')?.style.display==='block')renderACCT();
+      }
+    }
+  }catch(e){}
 }
 function getACCT(){
   const d=loadACCTData();
@@ -3419,9 +3449,10 @@ function renderACCT(){
       <div style="background:rgba(0,230,118,.07);border:1px solid rgba(0,230,118,.2);border-radius:8px;padding:10px;text-align:center">
         <div style="font-size:10px;color:var(--tx3);margin-bottom:4px">งวดที่ ${i+1}</div>
         <input type="number" value="${v}" min="0" placeholder="0"
-          oninput="updActualIncome(${i},this.value)"
+          id="inc-inp-${i}" oninput="updActualIncome(${i},this.value)"
           style="width:100%;background:transparent;border:none;border-bottom:1px solid rgba(0,230,118,.3);color:var(--green);font-size:14px;font-weight:800;font-family:var(--m);outline:none;text-align:center;padding:3px">
-        <div style="font-size:9px;color:var(--tx3);margin-top:3px">฿</div>
+        <div style="font-size:9px;color:var(--tx3);margin-top:2px">฿</div>
+        <button onclick="saveIncomeEntry(${i})" style="margin-top:4px;width:100%;background:rgba(0,230,118,.2);border:1px solid rgba(0,230,118,.4);color:var(--green);border-radius:5px;padding:3px;font-size:9px;font-weight:700;cursor:pointer">💾 บันทึก</button>
       </div>`).join('')
     + d.forecastIncome.map((v,i)=>`
       <div style="background:rgba(0,212,255,.07);border:1px solid rgba(0,212,255,.2);border-radius:8px;padding:10px;text-align:center">
@@ -3442,14 +3473,24 @@ function renderACCT(){
 function updActualIncome(i,v){
   const d=getACCT();
   d.actualIncome[i]=parseFloat(v)||0;
-  saveACCTData(d);
+  saveACCTData(d,true);
   recalcSummary();
 }
 function updForecastIncome(i,v){
   const d=getACCT();
   d.forecastIncome[i]=parseFloat(v)||0;
-  saveACCTData(d);
+  saveACCTData(d,true);
   recalcSummary();
+}
+async function saveIncomeEntry(i){
+  const d=getACCT();
+  const inp=document.getElementById('inc-inp-'+i);
+  if(inp)d.actualIncome[i]=parseFloat(inp.value)||0;
+  d.updatedAt=new Date().toISOString();
+  localStorage.setItem(ACCT_KEY,JSON.stringify(d));
+  recalcSummary();
+  try{await syncACCTNow();showToast('บันทึกงวดที่ '+(i+1)+' แล้ว ☁️','ok',2500);}
+  catch(e){showToast('บันทึกเครื่องนี้แล้ว','ok',2000);}
 }
 
 function fmtB(n){return'฿'+(parseFloat(n)||0).toLocaleString('th-TH',{minimumFractionDigits:0,maximumFractionDigits:0});}
@@ -3559,7 +3600,7 @@ function delBGLab(id){
 // Purchase
 function openPurchaseForm(){
   document.getElementById('purchase-form-modal').style.display='flex';
-  const today=new Date().toISOString().split('T')[0];
+  const today=localDateIso();
   document.getElementById('pur-date').value=today;
   document.getElementById('pur-approve-status').textContent='';
   document.getElementById('pur-approve-pw').value='';
@@ -3625,7 +3666,7 @@ function delPurchase(id){
 // Labor Payment
 function openLaborForm(){
   document.getElementById('labor-form-modal').style.display='flex';
-  const today=new Date().toISOString().split('T')[0];
+  const today=localDateIso();
   document.getElementById('lab-date').value=today;
   document.getElementById('lab-approve-status').textContent='';
   document.getElementById('lab-approve-pw').value='';
@@ -3709,58 +3750,42 @@ async function acctShareA4(){
 // ======================== JUPITER AUTO-SAVE + 7-DAY HISTORY ========================
 const JUP_AUTOSAVE_KEY='cp_jup_autosave';
 const JUP_HISTORY_KEY='cp_jup_7day';
-const JUP_SCHED_KEY='cp_jup_sched_date'; // เก็บวันที่บันทึกอัตโนมัติล่าสุด
 
-// ── Core: บันทึก snapshot วันนั้น (อัปเดตถ้ามีอยู่แล้ว) ──────────────────
-function jupAutoSaveSnapshot(isManual=false){
+// Auto-save snapshot every time data changes (called from scheduleAutoSave)
+function jupAutoSaveSnapshot(manual=false){
+  if(typeof getVals!=='function')return;
   try{
     const v=getVals();
     const vs=[v.s1,v.f25,v.out,v.s4,v.s5,v.s6,v.s7];
-    const today=new Date().toISOString().split('T')[0];
-    const nowStr=new Date().toLocaleString('th-TH',{year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+    const today=localDateIso();
+    const now=new Date().toLocaleString('th-TH');
     let hist=[];
     try{hist=JSON.parse(localStorage.getItem(JUP_HISTORY_KEY)||'[]');}catch(e){hist=[];}
-    // วันเดียวกัน → อัปเดตด้วยข้อมูลล่าสุดเสมอ
     const idx=hist.findIndex(h=>h.date===today);
-    const snap={date:today,ts:nowStr,vs:vs.map(x=>parseFloat(x.toFixed(2))),manual:isManual};
-    if(idx>=0) hist[idx]=snap; else hist.push(snap);
+    const snap={date:today,ts:now,vs:vs.map(x=>parseFloat(x.toFixed(2)))};
+    if(idx>=0)hist[idx]=snap; else hist.push(snap);
     hist.sort((a,b)=>a.date.localeCompare(b.date));
-    if(hist.length>7) hist=hist.slice(-7);
+    if(hist.length>7)hist=hist.slice(-7);
     localStorage.setItem(JUP_HISTORY_KEY,JSON.stringify(hist));
-    if(isManual) showToast('📸 บันทึก Snapshot แล้ว — '+nowStr,'ok',4000);
+    // Sync to Firebase
+    cloudPutNode('jup_snapshots',{history:hist,updatedAt:new Date().toISOString()}).catch(()=>{});
+    if(manual)showToast('📸 บันทึก Snapshot แล้ว','ok',3000);
   }catch(e){console.warn('jupAutoSaveSnapshot:',e);}
 }
-
-// ── Manual save (ปุ่มกด) ──────────────────────────────────────────────────
-function jupManualSaveSnapshot(){
-  jupAutoSaveSnapshot(true);
-  jupRenderSnapshots();
-  // sync 7-day chart ถ้าเปิดอยู่
-  if(document.getElementById('jup-chart-overlay')?.style.display!=='none') renderJup7DayChart();
-}
-
-// ── Scheduled auto-save เวลา 19:00 น. ────────────────────────────────────
-function jupSchedule1900(){
-  function checkAndSave(){
-    const now=new Date();
-    const todayKey=now.toISOString().split('T')[0];
-    const h=now.getHours(); const m=now.getMinutes();
-    // ตรงเวลา 19:00–19:01 และยังไม่ได้บันทึกวันนี้
-    if(h===19&&m===0){
-      const lastSched=localStorage.getItem(JUP_SCHED_KEY)||'';
-      if(lastSched!==todayKey){
-        localStorage.setItem(JUP_SCHED_KEY,todayKey);
-        jupAutoSaveSnapshot(false);
-        jupRenderSnapshots();
-        if(document.getElementById('jup-chart-overlay')?.style.display!=='none') renderJup7DayChart();
-        showToast('🕖 บันทึก Snapshot อัตโนมัติ 19:00 น. แล้ว','ok',5000);
+// Pull snapshots from cloud
+async function refreshSnapshotsFromCloud(){
+  try{
+    const d=await cloudGetNode('jup_snapshots');
+    if(d&&Array.isArray(d.history)&&d.history.length){
+      let local=[];try{local=JSON.parse(localStorage.getItem(JUP_HISTORY_KEY)||'[]');}catch(e){}
+      const remLast=d.history[d.history.length-1]?.date||'';
+      const locLast=local.length?local[local.length-1]?.date||'':'';
+      if(d.history.length>local.length||remLast>locLast){
+        localStorage.setItem(JUP_HISTORY_KEY,JSON.stringify(d.history));
+        if(document.getElementById('jup-chart-overlay')?.style.display==='block')renderJup7DayChart();
       }
     }
-  }
-  // ตรวจทุก 30 วินาที
-  setInterval(checkAndSave, 30000);
-  // ตรวจทันทีเมื่อโหลด (กรณีเปิดเพจหลัง 19:00)
-  checkAndSave();
+  }catch(e){}
 }
 
 // Get 7-day history
@@ -3768,20 +3793,20 @@ function jupGet7DayHistory(){
   try{return JSON.parse(localStorage.getItem(JUP_HISTORY_KEY)||'[]');}catch(e){return[];}
 }
 
-// ── Override jupSaveSnapshot (ปุ่มเดิมใน Jupiter panel) ──────────────────
+// Also call jupAutoSaveSnapshot in original jupSaveSnapshot (extend it)
 const _origJupSaveSnapshot=window.jupSaveSnapshot;
 function jupSaveSnapshot(){
   if(typeof _origJupSaveSnapshot==='function')_origJupSaveSnapshot();
-  jupManualSaveSnapshot();
+  jupAutoSaveSnapshot();
 }
 
-// ── Extend scheduleAutoSave (debounce เมื่อกรอกข้อมูล) ──────────────────
+// Extend scheduleAutoSave to also save Jupiter snapshot
 const _origScheduleAutoSave=window.scheduleAutoSave;
 function scheduleAutoSave(){
   if(typeof _origScheduleAutoSave==='function')_origScheduleAutoSave();
-  // Debounce: บันทึก snapshot 3 วินาทีหลังหยุดกรอก
+  // Debounce Jupiter auto-snapshot
   clearTimeout(window._jupAutoSaveTimer);
-  window._jupAutoSaveTimer=setTimeout(()=>{jupAutoSaveSnapshot(false);},3000);
+  window._jupAutoSaveTimer=setTimeout(()=>{jupAutoSaveSnapshot();},3000);
 }
 
 // Open 7-day chart overlay
@@ -3808,47 +3833,50 @@ function renderJup7DayChart(){
   const canvas=document.getElementById('jup-7day-chart');
   if(!canvas)return;
 
-  const todayIso=new Date().toISOString().split('T')[0];
-  const today=new Date(todayIso+'T00:00:00');
-
-  // ── สร้างช่วง 7 วัน: เริ่มจากวันแรกใน snapshot หรือวันนี้ ──
-  let startDate;
+  // ── Window แบบ rolling: วันนี้อยู่ขวาสุด ย้อนหลัง 6 วัน ──
+  const today=new Date();
+  today.setHours(0,0,0,0);
+  const sixDaysAgo=new Date(today); sixDaysAgo.setDate(today.getDate()-6);
+  let startDate=sixDaysAgo;
   if(hist.length){
-    startDate=new Date(hist[0].date+'T00:00:00');
-  } else {
-    startDate=new Date(today);
+    const firstHist=new Date(hist[0].date+'T00:00:00');
+    if(firstHist>sixDaysAgo) startDate=firstHist;
   }
 
-  // ถ้า snapshot span > 7 วัน ให้ใช้ 7 วันล่าสุด (นับจากวันแรก)
+  // สร้าง array 7 วัน จาก startDate
   const days7=[];
   for(let i=0;i<7;i++){
     const d=new Date(startDate);
     d.setDate(startDate.getDate()+i);
-    const iso=d.toISOString().split('T')[0];
+    const iso=localDateIso(d);
     const dd=String(d.getDate()).padStart(2,'0');
     const mm=String(d.getMonth()+1).padStart(2,'0');
-    const isToday=iso===todayIso;
-    const isFuture=iso>todayIso;
+    const isToday=iso===localDateIso(today);
+    const isFuture=d>today;
     days7.push({iso, label:`${dd}/${mm}`, isToday, isFuture});
   }
 
-  // ── map snapshot เข้า dict ──
-  const histMap={};
-  hist.forEach(h=>{histMap[h.date]=h.vs;});
-
   const labels=days7.map(d=>{
     if(d.isToday) return `${d.label} ◀`;
+    if(d.isFuture) return d.label;
     return d.label;
   });
 
-  // ── datasets: เส้นข้อมูลจริง (null สำหรับวันที่ยังไม่มี/ล่วงหน้า) ──
+  // map hist ข้อมูลเข้า index ของ 7 วัน
+  const histMap={};
+  hist.forEach(h=>{histMap[h.date]=h.vs;});
+
+  // ── datasets: one per series + target lines ──
   const datasets=JUP7_SERIES.map(s=>({
     label:s.label,
-    data:days7.map(d=>(!d.isFuture&&histMap[d.iso]!=null)?histMap[d.iso][s.idx]:null),
+    data:days7.map(d=>{
+      if(histMap[d.iso]) return histMap[d.iso][s.idx]||0;
+      return null; // ยังไม่มีข้อมูล = null (เส้นขาด)
+    }),
     borderColor:s.col,
     backgroundColor:s.col+'22',
     borderWidth:2.5,
-    pointRadius:days7.map(d=>(!d.isFuture&&histMap[d.iso]!=null)?5:0),
+    pointRadius:days7.map(d=>histMap[d.iso]?5:0),
     pointHoverRadius:9,
     pointBackgroundColor:s.col,
     pointBorderColor:'#080d14',
@@ -3859,7 +3887,7 @@ function renderJup7DayChart(){
     _tgt:s.tgt,
   }));
 
-  // เส้น target อ้างอิง (เส้นประ)
+  // Add target reference lines
   JUP7_SERIES.forEach(s=>{
     datasets.push({
       label:`เป้า ${s.label} (${s.tgt}%)`,
@@ -3875,6 +3903,7 @@ function renderJup7DayChart(){
     });
   });
 
+  // ── render chart ──
   if(_jup7Chart){_jup7Chart.destroy();}
   _jup7Chart=new Chart(canvas,{
     type:'line',
@@ -3885,6 +3914,7 @@ function renderJup7DayChart(){
       interaction:{mode:'index',intersect:false},
       plugins:{
         legend:{display:false},
+        // เส้นแนวตั้งแสดง "วันนี้"
         annotation:{annotations:{}},
         tooltip:{
           backgroundColor:'rgba(8,13,20,.96)',
@@ -3898,10 +3928,9 @@ function renderJup7DayChart(){
               const idx=ctx[0]?.dataIndex;
               const d=days7[idx];
               if(!d)return '';
-              const h=hist.find(x=>x.date===d.iso);
               if(d.isFuture) return `${d.label} (ยังไม่มีข้อมูล)`;
-              if(d.isToday) return `${d.label} (วันนี้)${h?' · '+h.ts:''}`;
-              return `${d.label}${h?' · '+h.ts:''}`;
+              if(d.isToday) return `${d.label} (วันนี้)`;
+              return d.label;
             },
             label:ctx=>{
               if(ctx.dataset._isTarget)return null;
@@ -3909,7 +3938,8 @@ function renderJup7DayChart(){
               if(v===null||v===undefined)return null;
               const s=JUP7_SERIES[ctx.datasetIndex];
               if(!s)return null;
-              return ` ${ctx.dataset.label}: ${v.toFixed(1)}% (${(v/s.tgt*100).toFixed(0)}% ของเป้า ${s.tgt}%)`;
+              const pctOfTgt=(v/s.tgt*100).toFixed(0);
+              return ` ${ctx.dataset.label}: ${v.toFixed(1)}% (${pctOfTgt}% ของเป้า ${s.tgt}%)`;
             }
           }
         }
@@ -3969,8 +3999,10 @@ function jup7ToggleLine(i){
 // ── overall% สูตรเดียวกับ Dashboard โดนัท ─────────────────────────────────
 const JUP7_TGTS=[100,100,50,100,80,50,40];
 function jup7Overall(vs){
+  // ใช้สูตรเดียวกับ Dashboard โดนัท: Σ(v/tgt)/n × 100
   if(!vs||!vs.length)return 0;
-  return parseFloat((vs.reduce((a,v,i)=>a+Math.min(1,v/(JUP7_TGTS[i]||100)),0)/vs.length*100).toFixed(2));
+  const tgts=JUP7_TGTS;
+  return parseFloat((vs.reduce((a,v,i)=>a+(v/(tgts[i]||100)),0)/vs.length*100).toFixed(2));
 }
 
 function jup7RenderDayCards(hist, days7){
@@ -3980,14 +4012,22 @@ function jup7RenderDayCards(hist, days7){
   (hist||[]).forEach(h=>{histMap[h.date]=h.vs;});
   if(!days7){
     const today=new Date();today.setHours(0,0,0,0);
-    const startDate=hist&&hist.length?new Date(hist[0].date+'T00:00:00'):new Date(today);
+    let startDate;
+    if(hist&&hist.length){
+      const firstHist=new Date(hist[0].date+'T00:00:00');
+      const sixAgo=new Date(today); sixAgo.setDate(today.getDate()-6);
+      startDate=firstHist<sixAgo?sixAgo:firstHist;
+    } else {
+      const sixAgo=new Date(today); sixAgo.setDate(today.getDate()-6);
+      startDate=sixAgo;
+    }
     days7=[];
     for(let i=0;i<7;i++){
       const d=new Date(startDate);d.setDate(startDate.getDate()+i);
-      const iso=d.toISOString().split('T')[0];
+      const iso=localDateIso(d);
       const dd=String(d.getDate()).padStart(2,'0');
       const mm=String(d.getMonth()+1).padStart(2,'0');
-      days7.push({iso,label:`${dd}/${mm}`,isToday:iso===today.toISOString().split('T')[0],isFuture:d>today});
+      days7.push({iso,label:`${dd}/${mm}`,isToday:iso===localDateIso(today),isFuture:d>today});
     }
   }
   el.innerHTML=days7.map((day,hi)=>{
@@ -4063,9 +4103,8 @@ async function jupShareA4Chart(){
 // Trigger initial auto-snapshot on page load
 window.addEventListener('load',function(){
   setTimeout(()=>{
-    jupAutoSaveSnapshot(false);
+    jupAutoSaveSnapshot();
     jup7SeedFromLatest();
-    jupSchedule1900(); // เริ่ม scheduler บันทึกอัตโนมัติ 19:00 น.
   },4000);
 });
 
@@ -4100,6 +4139,48 @@ function jupNlpClear() {
   if (st) st.textContent = '';
 }
 
+// ── Fast NLP parser (offline, instant) ──────────────────────────────────
+function quickParseNlp(txt, mode){
+  var text=(txt||'').trim();
+  var priceM=text.match(/(?:ราคา|เป็นเงิน|ยอด|รวม|เงิน)?\s*([\d,]+(?:\.\d+)?)\s*บาท/)
+           ||text.match(/([\d,]+(?:\.\d+)?)\s*บาท/)
+           ||text.match(/฿\s*([\d,]+(?:\.\d+)?)/);
+  var price=priceM?parseFloat(priceM[1].replace(/,/g,'')):0;
+  var order=(text.match(/(?:po|order|ใบสั่ง)\s*[-:#]?\s*([A-Z0-9\-]+)/i)||[])[1]||'';
+  var qty=(text.match(/(\d+[\d,.]*\s*(?:ก้อน|ถุง|เส้น|ม้วน|แผ่น|ชุด|ตัว|เมตร|kg|ลิตร|อัน|คัน|กล่อง))/i)||[])[1]||'';
+  var buyer=(text.match(/(?:จาก|ผู้ขาย|ร้าน|supplier)\s*([^\d,]{1,30})/i)||[])[1]||'';
+  if(buyer)buyer=buyer.trim();
+  var catMap=[
+    ['หลังคา','S1 หลังคา'],['เมทัล','S1 หลังคา'],['ชีท','S1 หลังคา'],
+    ['อิฐมวลเบา','S2 ก่ออิฐใน'],['ก่ออิฐใน','S2 ก่ออิฐใน'],['อิฐใน','S2 ก่ออิฐใน'],
+    ['ก่ออิฐนอก','S3 ก่ออิฐนอก'],['อิฐนอก','S3 ก่ออิฐนอก'],
+    ['ชั้น 1','S4 ก่ออิฐชั้น 1'],
+    ['ไฟฟ้า','S5 งานไฟฟ้า'],['สายไฟ','S5 งานไฟฟ้า'],['เดินสาย','S5 งานไฟฟ้า'],
+    ['ท่อน้ำ','S6 งานท่อน้ำดี'],['ประปา','S6 งานท่อน้ำดี'],
+    ['ฉาบ','S7 ฉาบผนัง'],['ปูน','S7 ฉาบผนัง'],['ทาสี','S7 ฉาบผนัง'],
+  ];
+  var cat='อื่นๆ';
+  for(var ci=0;ci<catMap.length;ci++){if(text.indexOf(catMap[ci][0])>=0){cat=catMap[ci][1];break;}}
+  var sm=text.match(/S\s*([1-7])/i);
+  if(sm){var sm2={'1':'S1 หลังคา','2':'S2 ก่ออิฐใน','3':'S3 ก่ออิฐนอก','4':'S4 ก่ออิฐชั้น 1','5':'S5 งานไฟฟ้า','6':'S6 งานท่อน้ำดี','7':'S7 ฉาบผนัง'};cat=sm2[sm[1]]||cat;}
+  var today=localDateIso();
+  var dm=text.match(/(\d{1,2})[\/\-\.](\d{1,2})(?:[\/\-\.](\d{2,4}))?/);
+  if(dm){var dy=dm[3]?(dm[3].length===2?'20'+dm[3]:dm[3]):new Date().getFullYear();today=dy+'-'+dm[2].padStart(2,'0')+'-'+dm[1].padStart(2,'0');}
+  var name='';
+  if(mode==='purchase'){
+    var nm=text.match(/(?:ซื้อ|สั่ง|เบิก)\s*([^\d]{1,40}?)(?=\s*(?:\d|ราคา|จาก|บาท|$))/i);
+    name=nm?nm[1].trim().slice(0,40):text.slice(0,30).trim();
+  } else {
+    var nm2=text.match(/(?:จ่าย|ให้|ค่าแรง|ผู้รับเหมา)\s*([^\d]{1,40}?)(?=\s*(?:\d|ราคา|บาท|$))/i);
+    name=nm2?nm2[1].trim().slice(0,40):text.slice(0,30).trim();
+  }
+  var missing=[];
+  if(!price)missing.push('ราคา');
+  if(!name||name.length<2)missing.push('ชื่อ');
+  var confidence=35+(price?30:0)+(name&&name.length>2?20:0)+(cat!=='อื่นๆ'?15:0);
+  return {name:name,cat:cat,price:price,quantity:qty,buyer:buyer,order:order,date:today,deliver:'',detail:text,confidence:confidence,missing:missing,note:'Fast parse (offline)',_fast:true};
+}
+
 async function jupNlpParse() {
   const inp = document.getElementById('jup-nlp-input');
   const txt = (inp?.value || '').trim();
@@ -4109,6 +4190,23 @@ async function jupNlpParse() {
   const btnIcon = document.getElementById('jup-nlp-btn-icon');
   const btnTxt = document.getElementById('jup-nlp-btn-txt');
   const st = document.getElementById('jup-nlp-status');
+
+  // ── Fast path: try offline parse first ──
+  const _fast=quickParseNlp(txt,_jupNlpMode);
+  if(_fast.confidence>=60){
+    _jupReviewData={mode:_jupNlpMode,parsed:_fast,original:txt};
+    jupShowReview(_jupNlpMode,_fast,txt);
+    if(st)st.textContent='⚡ วิเคราะห์แบบทันทีจากกฎในเครื่อง';
+    return;
+  }
+  // Check API key — if missing, use fast result anyway
+  const _apiKey=localStorage.getItem('cp_api_key')||'';
+  if(!_apiKey){
+    _jupReviewData={mode:_jupNlpMode,parsed:_fast,original:txt};
+    jupShowReview(_jupNlpMode,_fast,txt);
+    if(st)st.textContent='⚡ ใช้ตัวแยกในเครื่อง (ยังไม่ตั้ง API Key)';
+    return;
+  }
 
   // Loading state
   if (btn) btn.style.opacity = '0.7';
@@ -4233,7 +4331,7 @@ function jupShowReview(mode, parsed, original) {
       fields = [
         { label: '📦 ชื่อวัสดุ', key: 'name', id: 'rv-name', required: true, hint: '' },
         { label: '📂 หมวดงาน', key: 'cat', id: 'rv-cat', type: 'select',
-          options: ['S1 หลังคา','S2 ก่ออิฐใน','S3 ก่ออิฐนอก','S4 ก่ออิฐชั้น 1','S5 งานไฟฟ้า','S6 งานท่อน้ำดี','S7 ฉาบผนัง','อื่นๆ'] },
+          options: getAllCats() },
         { label: '💰 ราคา (฿)', key: 'price', id: 'rv-price', type: 'number', required: true },
         { label: '📏 จำนวน', key: 'quantity', id: 'rv-qty', hint: 'เช่น 500 ก้อน' },
         { label: '🏪 ผู้ขาย/ร้านค้า', key: 'buyer', id: 'rv-buyer' },
@@ -4245,7 +4343,7 @@ function jupShowReview(mode, parsed, original) {
       fields = [
         { label: '👷 ชื่อผู้รับเหมา', key: 'name', id: 'rv-name', required: true },
         { label: '📂 หมวดงาน', key: 'cat', id: 'rv-cat', type: 'select',
-          options: ['S1 หลังคา','S2 ก่ออิฐใน','S3 ก่ออิฐนอก','S4 ก่ออิฐชั้น 1','S5 งานไฟฟ้า','S6 งานท่อน้ำดี','S7 ฉาบผนัง','อื่นๆ'] },
+          options: getAllCats() },
         { label: '💰 จำนวนเงิน (฿)', key: 'price', id: 'rv-price', type: 'number', required: true },
         { label: '📅 วันที่จ่าย', key: 'date', id: 'rv-date', type: 'date' },
         { label: '📝 รายละเอียดงาน', key: 'detail', id: 'rv-detail' },
@@ -4261,7 +4359,8 @@ function jupShowReview(mode, parsed, original) {
 
       let input = '';
       if (f.type === 'select') {
-        input = `<select id="${f.id}" style="${inputStyle};background:#0d1525">${f.options.map(o => `<option value="${o}" ${o === val ? 'selected' : ''}>${o}</option>`).join('')}</select>`;
+        const selOpts=f.options.map(o=>'<option value="'+o+'"'+(o===val?' selected':'')+'>'+o+'</option>').join('');
+        input='<select id="'+f.id+'" style="'+inputStyle+';background:#0d1525" onchange="if(this.value===\'➕ สร้างหมวดงานใหม่\'){this.value=\'\';document.getElementById(\'new-cat-modal\').style.display=\'flex\';}">'+selOpts+'<option value="➕ สร้างหมวดงานใหม่">➕ สร้างหมวดงานใหม่</option></select>';
       } else if (f.type === 'date') {
         input = `<input type="date" id="${f.id}" value="${val}" style="${inputStyle};font-family:var(--m)">`;
       } else if (f.type === 'number') {
@@ -4439,5 +4538,322 @@ function jup7SeedFromLatest(){
   }catch(e){console.warn('jup7Seed:',e);}
 }
 </script>
+
+<script>
+// ════════════════════════════════════════════════════════════════════
+// 🧠 AI DECISION SYSTEM — Admin Only
+//    สูตร: Σ(v/tgt)/n×100  เหมือน Dashboard โดนัท
+// ════════════════════════════════════════════════════════════════════
+var ADS_DEADLINE=new Date(2026,3,22);
+var ADS_TGTS=[100,100,50,100,80,50,40];
+var ADS_NAMES=['S1 หลังคา','S2 ก่ออิฐใน','S3 ก่ออิฐนอก','S4 ก่ออิฐชั้น 1','S5 งานไฟฟ้า','S6 ท่อน้ำดี','S7 ฉาบผนัง'];
+var ADS_COLS=['#00e676','#00d4ff','#00bcd4','#ff9500','#ce93d8','#388bfd','#ffd600'];
+
+function isAdminMode(){
+  try{return !document.body.classList.contains('view-mode')&&sessionStorage.getItem('cp_edit_session')==='1';}catch(e){return false;}
+}
+function adsOverall(vs){return vs.reduce(function(a,v,i){return a+Math.min(1,v/ADS_TGTS[i]);},0)/vs.length*100;}
+function adsGetVs(){if(typeof getVals!=='function')return[0,0,0,0,0,0,0];var v=getVals();return[v.s1,v.f25,v.out,v.s4,v.s5,v.s6,v.s7];}
+function adsFmtDate(d){if(!d||isNaN(d))return'—';return d.toLocaleDateString('th-TH',{year:'numeric',month:'short',day:'numeric'});}
+function adsGetRates(){
+  try{
+    var hist=JSON.parse(localStorage.getItem('cp_jup_7day')||'[]').filter(function(h){return h.date&&h.date.startsWith('2026');});
+    if(hist.length<2)return null;
+    var o=hist[0],n=hist[hist.length-1];
+    var days=Math.max(1,(new Date(n.date)-new Date(o.date))/86400000);
+    var rates=ADS_TGTS.map(function(_,i){return((n.vs[i]||0)-(o.vs[i]||0))/days;});
+    return{rates:rates,days:days,oldest:o,newest:n};
+  }catch(e){return null;}
+}
+function adsPredict(vs,rates){
+  var today=new Date();
+  return ADS_TGTS.map(function(tgt,i){
+    var gap=Math.max(0,tgt-vs[i]);
+    if(gap<=0)return{done:true,date:null,daysLeft:0,late:false,daysLate:0,rateNeeded:0};
+    var r=rates?rates[i]:0;
+    if(r<=0)return{done:false,date:null,daysLeft:9999,late:true,daysLate:999,rateNeeded:gap/Math.max(1,(ADS_DEADLINE-today)/86400000)};
+    var dn=Math.ceil(gap/r);
+    var fin=new Date(today);fin.setDate(today.getDate()+dn);
+    var dl=Math.max(0,(fin-ADS_DEADLINE)/86400000);
+    return{done:false,date:fin,daysLeft:dn,late:fin>ADS_DEADLINE,daysLate:dl,rateActual:r,rateNeeded:gap/Math.max(1,(ADS_DEADLINE-today)/86400000)};
+  });
+}
+function adsRisk(pred,vs,i){
+  if(vs[i]>=ADS_TGTS[i])return'done';
+  if(!pred||pred[i].daysLeft>=9999)return'no-data';
+  if(pred[i].late)return'critical';
+  var dLeft=(ADS_DEADLINE-new Date())/86400000;
+  if(pred[i].daysLeft>dLeft*0.85)return'high';
+  if(pred[i].daysLeft>dLeft*0.6)return'medium';
+  return'ok';
+}
+function adsAnalyze(){
+  var vs=adsGetVs(),overall=adsOverall(vs),today=new Date();
+  var daysLeft=Math.ceil((ADS_DEADLINE-today)/86400000);
+  var ri=adsGetRates(),rates=ri?ri.rates:null,pred=adsPredict(vs,rates);
+  var tasks=ADS_NAMES.map(function(name,i){
+    var pct=vs[i],tgt=ADS_TGTS[i],gap=Math.max(0,tgt-pct),ratio=pct/tgt;
+    var risk=adsRisk(pred,vs,i);
+    var rn=gap/Math.max(1,daysLeft),ra=rates?rates[i]:null;
+    return{i:i,name:name,pct:pct,tgt:tgt,gap:gap,ratio:ratio,risk:risk,pred:pred[i],rateNeeded:rn,rateActual:ra,col:ADS_COLS[i],delay:pred[i]&&!pred[i].done&&pred[i].late};
+  });
+  var criticals=tasks.filter(function(t){return t.risk==='critical';});
+  var highs=tasks.filter(function(t){return t.risk==='high';});
+  var delayed=tasks.filter(function(t){return t.delay;});
+  var oFinDate=null;
+  if(rates){var oR=vs.reduce(function(a,v,i){return a+Math.min(1,rates[i]/ADS_TGTS[i]*100);},0)/vs.length;var oG=100-overall;if(oR>0){oFinDate=new Date(today);oFinDate.setDate(today.getDate()+Math.ceil(oG/oR));}}
+  return{vs:vs,overall:overall,daysLeft:daysLeft,tasks:tasks,criticals:criticals,highs:highs,delayed:delayed,rateInfo:ri,pred:pred,overallFinDate:oFinDate};
+}
+
+// ── Bell alert ──────────────────────────────────────────────────────────
+function adsCheckAlerts(){
+  if(!isAdminMode())return;
+  try{
+    var a=adsAnalyze();
+    if(!a.criticals.length)return;
+    var bell=document.getElementById('ads-bell');
+    if(bell){bell.textContent=a.criticals.length;bell.style.display='flex';}
+    showToast('⚠️ งานล่าช้า: '+a.criticals.map(function(t){return t.name;}).join(', '),'err',8000);
+  }catch(e){}
+}
+
+// ── Risk badge ─────────────────────────────────────────────────────────
+function adsRiskBadge(r){
+  var m={done:'<span style="background:rgba(0,230,118,.15);border:1px solid rgba(0,230,118,.4);color:var(--green);border-radius:20px;padding:2px 9px;font-size:10px;font-weight:700">✅ บรรลุ</span>',ok:'<span style="background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.3);color:var(--green);border-radius:20px;padding:2px 9px;font-size:10px;font-weight:700">🟢 ปกติ</span>',medium:'<span style="background:rgba(255,214,0,.12);border:1px solid rgba(255,214,0,.4);color:var(--gold);border-radius:20px;padding:2px 9px;font-size:10px;font-weight:700">🟡 ติดตาม</span>',high:'<span style="background:rgba(255,149,0,.15);border:1px solid rgba(255,149,0,.4);color:var(--orange);border-radius:20px;padding:2px 9px;font-size:10px;font-weight:700">🟠 เสี่ยง</span>',critical:'<span style="background:rgba(255,68,68,.15);border:1px solid rgba(255,68,68,.4);color:var(--red);border-radius:20px;padding:2px 9px;font-size:10px;font-weight:700">🔴 วิกฤต</span>','no-data':'<span style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#6b7a8d;border-radius:20px;padding:2px 9px;font-size:10px;font-weight:700">⚪ ไม่มีข้อมูล</span>'};
+  return m[r]||'';
+}
+
+// ── Render ADS panel ────────────────────────────────────────────────────
+function adsRenderPanel(){
+  var el=document.getElementById('ads-panel-content');if(!el)return;
+  if(!isAdminMode()){el.innerHTML='<div style="text-align:center;padding:40px;color:#6b7a8d">🔒 เฉพาะ Admin Mode</div>';return;}
+  var a=adsAnalyze();
+  var oCol=a.overall>=60?'var(--green)':a.overall>=30?'var(--orange)':'var(--red)';
+  var dCol=a.daysLeft<=7?'var(--red)':a.daysLeft<=14?'var(--orange)':'var(--gold)';
+  var predStr=a.overallFinDate?('<span style="color:'+(a.overallFinDate>ADS_DEADLINE?'var(--red)':'var(--green)')+'">'+adsFmtDate(a.overallFinDate)+(a.overallFinDate>ADS_DEADLINE?' ⚠️ เลยกำหนด':' ✓ ทันกำหนด')+'</span>'):'<span style="color:#6b7a8d">ต้องการ Snapshot ≥ 2 วัน</span>';
+  var out='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-bottom:20px">';
+  out+='<div style="background:linear-gradient(135deg,'+oCol+'18,'+oCol+'06);border:1px solid '+oCol+'44;border-radius:12px;padding:16px;text-align:center"><div style="font-size:10px;color:var(--tx3);font-weight:700;text-transform:uppercase;margin-bottom:8px">ภาพรวมโดนัท</div><div style="font-size:36px;font-weight:800;font-family:var(--m);color:'+oCol+'">'+a.overall.toFixed(1)+'%</div><div style="font-size:9px;color:'+oCol+';margin-top:4px">Σ(v/tgt)/7×100</div></div>';
+  out+='<div style="background:rgba(255,214,0,.08);border:1px solid rgba(255,214,0,.3);border-radius:12px;padding:16px;text-align:center"><div style="font-size:10px;color:var(--tx3);font-weight:700;text-transform:uppercase;margin-bottom:8px">เหลือเวลา</div><div style="font-size:36px;font-weight:800;font-family:var(--m);color:'+dCol+'">'+a.daysLeft+'</div><div style="font-size:9px;color:var(--tx3);margin-top:4px">วัน ถึง 22 เม.ย.</div></div>';
+  out+='<div style="background:rgba(255,68,68,.08);border:1px solid rgba(255,68,68,.3);border-radius:12px;padding:16px;text-align:center"><div style="font-size:10px;color:var(--tx3);font-weight:700;text-transform:uppercase;margin-bottom:8px">งานวิกฤต</div><div style="font-size:36px;font-weight:800;font-family:var(--m);color:var(--red)">'+a.criticals.length+'</div><div style="font-size:9px;color:var(--tx3);margin-top:4px">จาก 7 งาน</div></div>';
+  out+='<div style="background:rgba(56,139,253,.08);border:1px solid rgba(56,139,253,.3);border-radius:12px;padding:16px;text-align:center"><div style="font-size:10px;color:var(--tx3);font-weight:700;text-transform:uppercase;margin-bottom:8px">คาดว่าจะเสร็จ</div><div style="font-size:12px;font-weight:800;font-family:var(--m);line-height:1.5;margin-top:8px">'+predStr+'</div></div>';
+  out+='</div>';
+  if(a.delayed.length){
+    out+='<div style="background:rgba(255,68,68,.06);border:2px solid rgba(255,68,68,.4);border-radius:12px;padding:16px;margin-bottom:20px">';
+    out+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><span style="font-size:20px">🚨</span><div style="font-size:14px;font-weight:800;color:var(--red)">แจ้งเตือน Delay — '+a.delayed.length+' งานล่าช้า</div></div>';
+    for(var di=0;di<a.delayed.length;di++){var t=a.delayed[di];
+      out+='<div style="background:rgba(255,68,68,.08);border:1px solid rgba(255,68,68,.25);border-radius:8px;padding:12px 14px;margin-bottom:8px">';
+      out+='<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:8px"><span style="font-weight:700;color:'+t.col+'">'+t.name+'</span><span style="color:var(--red);font-family:var(--m);font-size:12px">⚠️ เลยกำหนด '+(t.pred&&t.pred.daysLate?t.pred.daysLate.toFixed(0):'?')+' วัน</span></div>';
+      out+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">';
+      out+='<div style="background:rgba(0,0,0,.2);border-radius:6px;padding:6px;text-align:center"><div style="color:var(--tx3);font-size:9px">ตอนนี้</div><div style="font-weight:800;font-family:var(--m);color:'+t.col+'">'+t.pct.toFixed(1)+'%</div></div>';
+      out+='<div style="background:rgba(0,0,0,.2);border-radius:6px;padding:6px;text-align:center"><div style="color:var(--tx3);font-size:9px">ต้องได้</div><div style="font-weight:800;font-family:var(--m);color:var(--tx2)">'+t.tgt+'%</div></div>';
+      out+='<div style="background:rgba(0,0,0,.2);border-radius:6px;padding:6px;text-align:center"><div style="color:var(--tx3);font-size:9px">ต้องทำ/วัน</div><div style="font-weight:800;font-family:var(--m);color:var(--red)">'+t.rateNeeded.toFixed(2)+'%</div></div>';
+      out+='</div>';
+      if(t.rateActual!==null)out+='<div style="margin-top:6px;font-size:10px;color:#ff9999">เพิ่มจาก '+t.rateActual.toFixed(2)+'%/วัน → '+t.rateNeeded.toFixed(2)+'%/วัน</div>';
+      out+='</div>';
+    }
+    out+='</div>';
+  }else{
+    out+='<div style="background:rgba(0,230,118,.05);border:1px solid rgba(0,230,118,.25);border-radius:10px;padding:14px 16px;margin-bottom:20px;display:flex;align-items:center;gap:10px"><span style="font-size:20px">✅</span><div style="font-size:13px;font-weight:700;color:var(--green)">ไม่มีงานที่คาดว่าจะ Delay</div></div>';
+  }
+  out+='<div style="background:rgba(255,255,255,.02);border:1px solid var(--bdr);border-radius:12px;overflow:hidden;margin-bottom:20px">';
+  out+='<div style="padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.06);font-size:13px;font-weight:800;color:var(--cyan)">🔮 ทำนายวันเสร็จแต่ละงาน</div>';
+  out+='<div style="display:grid;grid-template-columns:1fr 65px 65px 75px 75px 105px 85px;gap:4px;padding:8px 14px;background:rgba(255,255,255,.02);font-size:9px;font-weight:700;color:#6b7a8d;text-transform:uppercase"><div>งาน</div><div style="text-align:right">ตอนนี้</div><div style="text-align:right">เป้า</div><div style="text-align:right">%/วัน จริง</div><div style="text-align:right">%/วัน ต้องการ</div><div style="text-align:center">คาดเสร็จ</div><div style="text-align:center">สถานะ</div></div>';
+  for(var ti=0;ti<a.tasks.length;ti++){var tk=a.tasks[ti];
+    var finStr=tk.pred&&tk.pred.done?'เสร็จแล้ว':(!tk.pred||!tk.pred.date)?'ไม่ทราบ':adsFmtDate(tk.pred.date);
+    var finCol=tk.pred&&tk.pred.done?'var(--green)':(!tk.pred||!tk.pred.date)?'#6b7a8d':(tk.pred.late?'var(--red)':'var(--green)');
+    var raStr=tk.rateActual!==null?tk.rateActual.toFixed(2)+'%':'—';
+    var raCol=(tk.rateActual!==null&&tk.rateActual>=tk.rateNeeded)?'var(--green)':(tk.rateActual!==null&&tk.rateActual>0)?'var(--orange)':'var(--red)';
+    out+='<div style="display:grid;grid-template-columns:1fr 65px 65px 75px 75px 105px 85px;gap:4px;padding:9px 14px;border-bottom:1px solid rgba(255,255,255,.03);align-items:center">';
+    out+='<div><div style="font-size:11px;font-weight:700;color:'+tk.col+'">'+tk.name+'</div><div style="margin-top:3px;height:3px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden"><div style="height:100%;background:'+tk.col+';width:'+Math.min(100,tk.ratio*100).toFixed(1)+'%;border-radius:99px"></div></div></div>';
+    out+='<div style="text-align:right;font-family:var(--m);font-size:12px;font-weight:700;color:'+tk.col+'">'+tk.pct.toFixed(1)+'%</div>';
+    out+='<div style="text-align:right;font-family:var(--m);font-size:12px;color:#6b7a8d">'+tk.tgt+'%</div>';
+    out+='<div style="text-align:right;font-family:var(--m);font-size:12px;color:'+raCol+'">'+raStr+'</div>';
+    out+='<div style="text-align:right;font-family:var(--m);font-size:12px;color:'+(tk.gap>0?'var(--orange)':'var(--green)')+'">'+( tk.gap>0?tk.rateNeeded.toFixed(2)+'%':'—')+'</div>';
+    out+='<div style="text-align:center;font-family:var(--m);font-size:10px;font-weight:700;color:'+finCol+'">'+finStr+'</div>';
+    out+='<div style="text-align:center">'+adsRiskBadge(tk.risk)+'</div></div>';
+  }
+  out+='</div>';
+  // Decision cards
+  out+='<div style="background:linear-gradient(135deg,rgba(26,35,126,.3),rgba(255,214,0,.06));border:1px solid rgba(255,214,0,.3);border-radius:12px;padding:16px;margin-bottom:16px"><div style="font-size:13px;font-weight:800;color:var(--gold);margin-bottom:12px">🧠 AI Decision — คำแนะนำ</div>';
+  var cards=[];var days=a.daysLeft;
+  if(a.overall>=80)cards.push({icon:'🟢',title:'โครงการดีมาก',body:'ความคืบหน้า '+a.overall.toFixed(1)+'%',col:'#00e676'});
+  else if(a.overall>=50)cards.push({icon:'🟡',title:'ต้องเร่งงานวิกฤตก่อน',body:'ความคืบหน้า '+a.overall.toFixed(1)+'%',col:'#ffd600'});
+  else cards.push({icon:'🔴',title:'ต้องแก้ไขเร่งด่วน',body:'ความคืบหน้าเพียง '+a.overall.toFixed(1)+'%',col:'#ff4444'});
+  if(days<=7)cards.push({icon:'⏰',title:'เหลือ '+days+' วัน — ช่วงสุดท้าย',body:'ทำงานทุกวัน ทุก % สำคัญ',col:'#ff4444'});
+  else if(days<=14)cards.push({icon:'⚡',title:'เหลือ '+days+' วัน',body:'วางแผน Resource ตอนนี้',col:'#ff9500'});
+  for(var ci=0;ci<a.criticals.length;ci++){var ct=a.criticals[ci];cards.push({icon:'🚨',title:ct.name+' — ต้องเพิ่มทีมทันที',body:'ต้องทำ '+ct.rateNeeded.toFixed(2)+'%/วัน',col:'#ff4444'});}
+  for(var hi=0;hi<a.highs.length;hi++){var ht=a.highs[hi];cards.push({icon:'🟠',title:ht.name+' — ติดตามใกล้ชิด',body:'ต้องทำ '+ht.rateNeeded.toFixed(2)+'%/วัน',col:'#ff9500'});}
+  if(!cards.length)cards.push({icon:'✅',title:'ทุกระบบปกติ',body:'รักษาอัตราปัจจุบัน',col:'#00e676'});
+  for(var k=0;k<cards.length;k++){var c=cards[k];
+    out+='<div style="background:'+c.col+'10;border:1px solid '+c.col+'33;border-left:3px solid '+c.col+';border-radius:8px;padding:11px 14px;margin-bottom:8px;display:flex;gap:10px;align-items:flex-start"><span style="font-size:18px;flex-shrink:0">'+c.icon+'</span><div><div style="font-size:12px;font-weight:700;color:'+c.col+';margin-bottom:2px">'+c.title+'</div><div style="font-size:11px;color:var(--tx2);line-height:1.5">'+c.body+'</div></div></div>';
+  }
+  out+='</div>';
+  out+=a.rateInfo?('<div style="font-size:10px;color:#445566;text-align:center;font-family:var(--m)">อัตราจาก '+a.rateInfo.oldest.date+' → '+a.rateInfo.newest.date+' ('+a.rateInfo.days.toFixed(1)+' วัน)</div>'):('<div style="font-size:10px;color:#445566;text-align:center;font-family:var(--m)">ต้องการ Snapshot ≥ 2 วัน</div>');
+  el.innerHTML=out;
+}
+function openADS(){if(!isAdminMode()){showToast('เฉพาะ Admin Mode','err');return;}var o=document.getElementById('ads-overlay');if(o){o.style.display='block';adsRenderPanel();}}
+function closeADS(){var o=document.getElementById('ads-overlay');if(o)o.style.display='none';}
+
+// ════════════════════════════════════════════════════════════════════
+// 👷 WORKFORCE ADMIN — Personnel System
+// ════════════════════════════════════════════════════════════════════
+var WFA_CATS=[
+  {id:'management',lbl:'🎯 บริหาร',col:'#ffd600',roles:[{k:'pm',lbl:'ที่ปรึกษาโครงการ',icon:'👔'},{k:'architect',lbl:'สถาปนิก',icon:'🏛️'},{k:'eng_s',lbl:'วิศวกรโครงสร้าง',icon:'🔩'},{k:'eng_e',lbl:'วิศวกรไฟฟ้า',icon:'⚡'},{k:'supervisor',lbl:'ผู้ควบคุมงาน',icon:'📋'},{k:'foreman',lbl:'โฟร์แมน',icon:'🦺'},{k:'lead',lbl:'หัวหน้าช่าง',icon:'⭐'}]},
+  {id:'masonry',lbl:'🧱 ก่ออิฐ+ฉาบ',col:'#00bcd4',roles:[{k:'mason_in',lbl:'ช่างก่ออิฐใน',icon:'🧱'},{k:'mason_ext',lbl:'ช่างก่ออิฐนอก',icon:'🧱'},{k:'mason_f1',lbl:'ช่างก่ออิฐชั้น 1',icon:'🧱'},{k:'mason_plaster',lbl:'ช่างฉาบผนัง',icon:'🔧'},{k:'worker_m',lbl:'กรรมกร (ก่อ)',icon:'👷'}]},
+  {id:'electrical',lbl:'⚡ งานไฟฟ้า',col:'#ce93d8',roles:[{k:'elec_lead',lbl:'ช่างไฟฟ้าหัวหน้า',icon:'⚡'},{k:'elec_helper',lbl:'ช่างไฟฟ้าลูกมือ',icon:'🔌'},{k:'worker_e',lbl:'กรรมกร (ไฟฟ้า)',icon:'👷'}]},
+  {id:'plumbing',lbl:'💧 งานสุขาภิบาล',col:'#388bfd',roles:[{k:'plumb_lead',lbl:'ช่างสุขาฯหัวหน้า',icon:'💧'},{k:'plumb',lbl:'ช่างสุขาภิบาล',icon:'🔧'},{k:'worker_p',lbl:'กรรมกร (สุขา)',icon:'👷'}]},
+  {id:'roof',lbl:'⛺ งานหลังคา',col:'#00e676',roles:[{k:'roof_lead',lbl:'ช่างหลังคาหัวหน้า',icon:'⛺'},{k:'roof',lbl:'ช่างหลังคา',icon:'🔧'},{k:'worker_r',lbl:'กรรมกร (หลังคา)',icon:'👷'}]},
+  {id:'general',lbl:'🔧 แรงงานทั่วไป',col:'#ff9500',roles:[{k:'worker',lbl:'กรรมกรทั่วไป',icon:'👷'},{k:'driver',lbl:'คนขับรถ',icon:'🚛'},{k:'security',lbl:'ยาม',icon:'🔒'},{k:'cleaner',lbl:'ทำความสะอาด',icon:'🧹'}]},
+];
+var WFA_DEFAULTS={pm:1,architect:1,eng_s:1,eng_e:1,supervisor:1,foreman:1,lead:2,mason_in:6,mason_ext:2,mason_f1:2,mason_plaster:7,worker_m:4,elec_lead:2,elec_helper:3,worker_e:2,plumb_lead:1,plumb:3,worker_p:2,roof_lead:1,roof:2,worker_r:2,worker:4,driver:1,security:1,cleaner:1};
+
+function getPersonnel(){try{var s=localStorage.getItem('cp_personnel_v2');return s?Object.assign({},WFA_DEFAULTS,JSON.parse(s)):Object.assign({},WFA_DEFAULTS);}catch(e){return Object.assign({},WFA_DEFAULTS);}}
+function savePersonnel(p){
+  try{localStorage.setItem('cp_personnel_v2',JSON.stringify(p));}catch(e){}
+  cloudPutNode('personnel',p).catch(function(){});
+}
+function adjPersonnel(key,delta){
+  var p=getPersonnel();p[key]=Math.max(0,(p[key]||0)+delta);savePersonnel(p);
+  var el=document.getElementById('wfa-'+key);if(el)el.textContent=p[key];
+  wfaUpdateSummary();
+}
+function wfaUpdateSummary(){
+  var p=getPersonnel();
+  var total=Object.values(p).reduce(function(a,v){return a+(parseInt(v)||0);},0);
+  var el=document.getElementById('wfa-total');if(el)el.textContent=total+' คน';
+}
+function openWorkforceAdmin(){
+  if(!isAdminMode()){showToast('เฉพาะ Admin Mode','err');return;}
+  var ol=document.getElementById('wfa-overlay');
+  if(!ol)return;
+  ol.style.display='block';
+  renderWorkforceAdmin();
+}
+function closeWorkforceAdmin(){var ol=document.getElementById('wfa-overlay');if(ol)ol.style.display='none';}
+function renderWorkforceAdmin(){
+  var grid=document.getElementById('wfa-grid');var sumEl=document.getElementById('wfa-summary');
+  if(!grid)return;
+  var p=getPersonnel(),grand=0,catTotals=[];
+  var h='';
+  for(var ci=0;ci<WFA_CATS.length;ci++){
+    var cat=WFA_CATS[ci],col=cat.col,catSum=0;
+    for(var ri=0;ri<cat.roles.length;ri++)catSum+=p[cat.roles[ri].k]||0;
+    grand+=catSum;catTotals.push({cat:cat.lbl,total:catSum,col:col});
+    h+='<div style="background:rgba(255,255,255,.02);border:1px solid '+col+'33;border-top:3px solid '+col+';border-radius:12px;padding:16px;margin-bottom:14px">';
+    h+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><div style="font-size:13px;font-weight:800;color:'+col+'">'+cat.lbl+'</div><div style="font-size:12px;font-weight:700;font-family:var(--m);color:'+col+'">'+catSum+' คน</div></div>';
+    h+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:8px">';
+    for(var ri=0;ri<cat.roles.length;ri++){
+      var role=cat.roles[ri],val=p[role.k]||0;
+      h+='<div style="background:var(--bgc);border:1px solid '+col+'22;border-radius:8px;padding:10px 12px"><div style="font-size:10px;color:var(--tx2);margin-bottom:8px;font-weight:600">'+role.icon+' '+role.lbl+'</div>';
+      h+='<div style="display:flex;align-items:center;gap:5px">';
+      h+='<button onclick="adjPersonnel(\''+role.k+'\',-1)" style="width:28px;height:28px;border-radius:6px;background:rgba(255,68,68,.15);border:1px solid rgba(255,68,68,.3);color:var(--red);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;flex-shrink:0">-</button>';
+      h+='<span id="wfa-'+role.k+'" style="flex:1;text-align:center;font-size:18px;font-weight:800;font-family:var(--m);color:'+col+'">'+val+'</span>';
+      h+='<button onclick="adjPersonnel(\''+role.k+'\',1)" style="width:28px;height:28px;border-radius:6px;background:rgba(0,230,118,.15);border:1px solid rgba(0,230,118,.3);color:var(--green);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;flex-shrink:0">+</button>';
+      h+='</div></div>';
+    }
+    h+='</div></div>';
+  }
+  grid.innerHTML=h;
+  // Summary bar
+  if(sumEl){
+    var sh='<div style="font-size:11px;color:var(--tx3);align-self:center">รวมทั้งไซท์</div><div id="wfa-total" style="font-size:24px;font-weight:800;font-family:var(--m);color:var(--cyan);margin-right:12px">'+grand+' คน</div>';
+    for(var k=0;k<catTotals.length;k++){var ct=catTotals[k];if(!ct.total)continue;sh+='<div style="text-align:center;padding:4px 10px;background:'+ct.col+'15;border:1px solid '+ct.col+'33;border-radius:20px"><div style="font-size:9px;color:'+ct.col+';font-weight:700">'+ct.cat+'</div><div style="font-size:14px;font-weight:800;font-family:var(--m);color:'+ct.col+'">'+ct.total+'</div></div>';}
+    sumEl.innerHTML=sh;
+  }
+  // Also inject personnel into Jupiter AI analysis
+  wfaInjectToJupiter();
+}
+function wfaInjectToJupiter(){
+  // Adds workforce context for Jupiter to use
+  try{
+    var p=getPersonnel();
+    var total=Object.values(p).reduce(function(a,v){return a+(parseInt(v)||0);},0);
+    var lines=['กำลังพลปัจจุบันในไซท์: '+total+' คน'];
+    for(var ci=0;ci<WFA_CATS.length;ci++){
+      var cat=WFA_CATS[ci];
+      var sum=cat.roles.reduce(function(a,r){return a+(p[r.k]||0);},0);
+      if(sum>0)lines.push(cat.lbl+': '+sum+' คน ('+cat.roles.filter(function(r){return p[r.k]>0;}).map(function(r){return r.lbl+' '+p[r.k];}).join(', ')+')');
+    }
+    window._wfaContext=lines.join('\n');
+  }catch(e){}
+}
+function wfaGetContext(){return window._wfaContext||'';}
+
+// Patch ra() for ADS
+document.addEventListener('DOMContentLoaded',function(){
+  var _origRa=window.ra;
+  if(typeof _origRa==='function'&&!_origRa._adsPatch){
+    window.ra=function(){
+      _origRa.apply(this,arguments);
+      if(typeof adsCheckAlerts==='function'&&isAdminMode()){
+        clearTimeout(window._adsT);
+        window._adsT=setTimeout(adsCheckAlerts,2500);
+        var o=document.getElementById('ads-overlay');
+        if(o&&o.style.display!=='none'){clearTimeout(window._adsPT);window._adsPT=setTimeout(adsRenderPanel,400);}
+      }
+    };
+    window.ra._adsPatch=true;
+  }
+});
+</script>
+
+
+<!-- ═══ ADS Overlay (Admin Only) ═══ -->
+<div id="ads-overlay" style="display:none;position:fixed;inset:0;z-index:99994;background:rgba(4,8,16,.98);backdrop-filter:blur(16px);overflow-y:auto">
+  <div style="max-width:960px;margin:0 auto;padding:20px">
+    <div style="position:sticky;top:0;background:rgba(4,8,16,.98);border-bottom:1px solid rgba(255,149,0,.2);padding:14px 0;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;z-index:1">
+      <div style="display:flex;align-items:center;gap:12px"><span style="font-size:28px">🧠</span><div><div style="font-size:18px;font-weight:800;color:var(--orange)">AI Decision System</div><div style="font-size:10px;color:#6b7a8d;font-family:var(--m)">แจ้งเตือน Delay · ทำนายวันเสร็จ · Admin Only</div></div></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button onclick="adsRenderPanel()" class="btn" style="background:rgba(255,149,0,.15);border:1px solid rgba(255,149,0,.4);color:var(--orange);font-size:11px">🔄 รีเฟรช</button>
+        <button onclick="jupAutoSaveSnapshot(true);adsRenderPanel()" class="btn btn-g" style="font-size:11px">📸 Snapshot ตอนนี้</button>
+        <button onclick="closeADS()" class="btn btn-r">✕ ปิด</button>
+      </div>
+    </div>
+    <div id="ads-panel-content"><div style="text-align:center;padding:40px;color:#6b7a8d">กำลังโหลด...</div></div>
+  </div>
+</div>
+
+<!-- ═══ Workforce Admin Overlay ═══ -->
+<div id="wfa-overlay" style="display:none;position:fixed;inset:0;z-index:99993;background:rgba(4,8,16,.98);backdrop-filter:blur(16px);overflow-y:auto">
+  <div style="max-width:960px;margin:0 auto;padding:20px">
+    <div style="position:sticky;top:0;background:rgba(4,8,16,.98);border-bottom:1px solid rgba(0,188,212,.2);padding:14px 0;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;z-index:1">
+      <div style="display:flex;align-items:center;gap:12px"><span style="font-size:26px">👷</span><div><div style="font-size:17px;font-weight:800;color:var(--cyan)">จัดการกำลังพลในไซท์</div><div style="font-size:10px;color:#6b7a8d;font-family:var(--m)">แยกตามหมวดงาน · Sync Cloud อัตโนมัติ</div></div></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button onclick="savePersonnel(getPersonnel());showToast('บันทึกกำลังคน ☁️','ok')" class="btn btn-b" style="font-size:11px">☁️ บันทึก &amp; Sync</button>
+        <button onclick="closeWorkforceAdmin()" class="btn btn-r">✕ ปิด</button>
+      </div>
+    </div>
+    <div id="wfa-summary" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;background:rgba(0,188,212,.06);border:1px solid rgba(0,188,212,.2);border-radius:12px;padding:14px 18px;margin-bottom:20px"></div>
+    <div id="wfa-grid"></div>
+  </div>
+</div>
+
+<!-- ═══ New Category Modal ═══ -->
+<div id="new-cat-modal" style="display:none;position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:16px">
+  <div style="background:linear-gradient(135deg,#0a1020,#0d1a2e);border:1px solid rgba(56,139,253,.4);border-radius:16px;padding:24px;width:100%;max-width:380px">
+    <div style="font-size:15px;font-weight:800;color:var(--blue);margin-bottom:16px">➕ สร้างหมวดงานใหม่</div>
+    <div style="margin-bottom:16px"><div style="font-size:11px;color:var(--tx3);margin-bottom:5px">ชื่อหมวดงาน *</div><input id="new-cat-inp" placeholder="เช่น งานป้าย, งานราวบันได..." style="width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(56,139,253,.3);border-radius:8px;padding:10px;color:#e8f0fe;font-size:14px;font-family:var(--f);outline:none" onkeydown="if(event.key==='Enter')saveNewCatModal()"></div>
+    <div style="display:flex;gap:8px">
+      <button onclick="saveNewCatModal()" style="flex:1;padding:11px;background:rgba(56,139,253,.2);border:1px solid rgba(56,139,253,.5);color:var(--blue);border-radius:8px;font-weight:800;font-size:13px;cursor:pointer;font-family:var(--f)">✅ สร้าง</button>
+      <button onclick="document.getElementById('new-cat-modal').style.display='none'" style="padding:11px 16px;background:rgba(255,68,68,.1);border:1px solid rgba(255,68,68,.3);color:var(--red);border-radius:8px;font-size:12px;cursor:pointer;font-family:var(--f)">ยกเลิก</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function saveNewCatModal(){
+  var inp=document.getElementById('new-cat-inp');
+  var name=(inp?.value||'').trim();
+  if(!name){showToast('กรุณาใส่ชื่อหมวดงาน','err');return;}
+  saveCustomCat(name);
+  // Update any open cat dropdowns
+  document.querySelectorAll('#jup-review-fields select').forEach(function(sel){
+    var opt=document.createElement('option');opt.value=name;opt.textContent=name;opt.selected=true;sel.appendChild(opt);
+  });
+  document.getElementById('new-cat-modal').style.display='none';
+  showToast('เพิ่มหมวดงาน "'+name+'" แล้ว','ok');
+}
+</script>
+
 </body>
 </html>
