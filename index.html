@@ -646,6 +646,7 @@ body.view-mode .edit-only{display:none!important}
 </div>
 
 <div style="display:flex;justify-content:center;gap:12px;padding:16px 0 6px;flex-wrap:wrap">
+  <button onclick="showRealtimeGuide()" class="btn btn-b edit-only" style="padding:9px 20px;font-size:12px">🌐 คู่มือแชร์ Realtime</button>
   <button onclick="openJupiter()" class="edit-only" style="background:linear-gradient(135deg,rgba(26,35,126,.6),rgba(255,214,0,.2));color:var(--gold);border:1px solid rgba(255,214,0,.5);border-radius:10px;padding:12px 28px;font-size:14px;cursor:pointer;font-family:var(--f);font-weight:700;display:inline-flex;align-items:center;gap:8px;transition:all .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">🪐 Jupiter AI ↗</button>
 
   <button id="ai-insights-btn" onclick="openAIInsights()" class="edit-only" style="background:linear-gradient(135deg,rgba(76,175,80,.3),rgba(76,175,80,.1));color:#76ff03;border:1px solid rgba(118,255,3,.5);border-radius:10px;padding:12px 28px;font-size:14px;cursor:pointer;font-family:var(--f);font-weight:700;display:inline-flex;align-items:center;gap:8px;transition:all .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">🧠 AI Insights ↗</button>
@@ -881,7 +882,7 @@ function doChangePw(){
   showToast('เปลี่ยนรหัสผ่านสำเร็จ 🔑','ok');
 }
 
-let _fbUrl=localStorage.getItem('cp_fb_url')||'';
+let _fbUrl=localStorage.getItem('cp_fb_url')||'https://apartment-phase1-default-rtdb.firebaseio.com';
 let _saveTimer=null,_lastSavedAt='';
 function fbPath(){return _fbUrl.replace(/\/+$/,'')+'/construction_progress.json';}
 function fbNodePath(node){return _fbUrl.replace(/\/+$/,'')+'/'+node+'.json';}
@@ -985,7 +986,7 @@ function showFirebaseGuide(){
   else if(url===''){_fbUrl='';localStorage.removeItem('cp_fb_url');showToast('ลบ Firebase URL แล้ว','info');}
   else{showToast('URL ไม่ถูกต้อง ต้องขึ้นต้นด้วย https://','err');}
 }
-/* showRealtimeGuide removed */
+function showRealtimeGuide(){alert('📡 คู่มือแชร์ Realtime\n\n1. ไปที่ firebase.google.com → สร้าง Project ฟรี\n2. Realtime Database → สร้าง Database → โหมด Test\n3. คัดลอก URL (https://...firebaseio.com)\n4. กดปุ่ม ⚙️ Cloud → วาง URL\n5. กด 💾 บันทึก เพื่ออัพโหลดข้อมูล\n\n🔒 ทุกเครื่องที่ใส่ URL เดียวกัน\nจะแชร์ข้อมูลกัน Realtime!');}
 
 let _autoRefTimer=null;
 function startAutoRefresh(){
@@ -1810,15 +1811,9 @@ function init(){
   buildPlasterUI();updPlaster();
   setTimeout(()=>{
     buildPieChart();buildDonuts();buildS7Chart();ra();
-    // ── Auto-load: โหลด Cloud อัตโนมัติทุกครั้งที่เปิด ──
     if(isFirebaseReady()){
-      setSvStatus('saving','☁️ กำลังโหลดข้อมูลจาก Cloud...');
-      loadData().then(()=>{
-        setSvStatus('saved','☁️ โหลดสำเร็จ ✓');
-      }).catch(()=>{
-        // fallback to local backup
-        try{const bk=localStorage.getItem('cp_backup');if(bk){applyState(JSON.parse(bk));setSvStatus('saved','💾 Backup ท้องถิ่น');}}catch(e2){}
-      });
+      setSvStatus('saving','☁️ กำลังซิงค์ข้อมูล...');
+      loadData().catch(()=>{});
     }else{
       try{const bk=localStorage.getItem('cp_backup');if(bk){applyState(JSON.parse(bk));setSvStatus('saved','💾 โหลดจาก Backup ท้องถิ่น');}}catch(e){}
       setSvStatus('','💡 กด ⚙️ Cloud เพื่อตั้งค่า Firebase');
@@ -2609,26 +2604,7 @@ function jupBuildContext(){
   const deadline=new Date(2026,3,22);
   const daysLeft=Math.ceil((deadline-new Date())/(1000*60*60*24));
   const data=names.map((n,i)=>`${n}: ${vs[i].toFixed(1)}% / เป้า ${tgts[i]}% (${vs[i]>=tgts[i]?'✅ บรรลุ':vs[i]/tgts[i]<0.3?'🔴 ล่าช้ามาก':vs[i]/tgts[i]<0.6?'🟡 ล่าช้า':'🟢 กำลังดี'})`).join('\n');
-
-  // ── กำลังพลในไซท์ ──
-  const p=getPersonnel();
-  const LABELS={pm:'ผจก.โครงการ',architect:'สถาปนิก',eng_s:'วิศวกรโครงสร้าง',eng_e:'วิศวกรไฟฟ้า',supervisor:'หัวหน้าช่าง',foreman:'โฟร์แมน',lead:'ช่างนำทีม',mason_in:'ช่างก่ออิฐใน',mason_ext:'ช่างก่ออิฐนอก',mason_f1:'ช่างก่ออิฐชั้น1',mason_plaster:'ช่างฉาบ',worker_m:'ลูกมือก่อสร้าง',elec_lead:'ช่างไฟหัวหน้า',elec_helper:'ช่างไฟ',worker_e:'ลูกมือไฟฟ้า',plumb_lead:'ช่างประปาหัวหน้า',plumb:'ช่างประปา',worker_p:'ลูกมือประปา',roof_lead:'ช่างหลังคาหัวหน้า',roof:'ช่างหลังคา',worker_r:'ลูกมือหลังคา',worker:'แรงงานทั่วไป',driver:'คนขับรถ',security:'รปภ.',cleaner:'แม่บ้าน'};
-  const totalWorkers=Object.values(p).reduce((a,b)=>a+Number(b||0),0);
-
-  // จัดกลุ่มกำลังพลตามงาน
-  const grp={
-    'บริหาร/วิศวกร': (p.pm||0)+(p.architect||0)+(p.eng_s||0)+(p.eng_e||0)+(p.supervisor||0)+(p.foreman||0)+(p.lead||0),
-    'ก่ออิฐ (ใน+นอก+ชั้น1)': (p.mason_in||0)+(p.mason_ext||0)+(p.mason_f1||0)+(p.worker_m||0),
-    'ฉาบผนัง': (p.mason_plaster||0),
-    'งานไฟฟ้า': (p.elec_lead||0)+(p.elec_helper||0)+(p.worker_e||0),
-    'ประปา': (p.plumb_lead||0)+(p.plumb||0)+(p.worker_p||0),
-    'หลังคา': (p.roof_lead||0)+(p.roof||0)+(p.worker_r||0),
-    'แรงงาน/อื่นๆ': (p.worker||0)+(p.driver||0)+(p.security||0)+(p.cleaner||0)
-  };
-  const wfLines=Object.entries(grp).map(([k,n])=>`  - ${k}: ${n} คน`).join('\n');
-  const workforceCtx=`\n\n👷 กำลังพลในไซท์ (รวม ${totalWorkers} คน):\n${wfLines}`;
-
-  return `โครงการ: อาคารอพาร์ตเมนต์ 5 ชั้น | วันที่: ${today} | กำหนดส่ง: 22 เม.ย. 2569 | เหลือ: ${daysLeft} วัน\n\nความคืบหน้าปัจจุบัน:\n${data}${workforceCtx}${jupBuildHistoryContext()}`;
+  return `โครงการ: อาคารอพาร์ตเมนต์ 5 ชั้น | วันที่: ${today} | กำหนดส่ง: 22 เม.ย. 2569 | เหลือ: ${daysLeft} วัน\n\nความคืบหน้าปัจจุบัน:\n${data}${jupBuildHistoryContext()}`;
 }
 async function jupCallAPI(messages){
   const key=jupGetKey();
@@ -2652,8 +2628,7 @@ async function jupAnalyze(){
   res.innerHTML='<div style="display:flex;align-items:center;gap:10px;color:#8899aa;font-size:12px"><div style="width:16px;height:16px;border:2px solid var(--gold);border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;flex-shrink:0"></div>Jupiter กำลังวิเคราะห์...</div>';
   try{
     const ctx=jupBuildContext();
-    const daysLeft=Math.ceil((new Date(2026,3,22)-new Date())/(1000*60*60*24));
-    const text=await jupCallAPI([{role:'user',content:`${ctx}\n\nวิเคราะห์ให้ครบ 6 ข้อ:\n1. สถานะโดยรวม — จะส่งงานทันไหม?\n2. งานวิกฤตเร่งด่วนที่สุด + วิธีแก้\n3. ต้องทำ %/วัน แต่ละงาน\n4. 👷 วิเคราะห์กำลังพล — ทีมไหนขาด/เกิน? ควรเพิ่ม/ลดคน/ย้ายทีมอะไร? ระบุจำนวนที่แนะนำ\n5. แผนจัดสรรคนสำหรับ ${daysLeft} วันที่เหลือ\n6. ความเสี่ยงสำคัญ + วิธีป้องกัน`}]);
+    const text=await jupCallAPI([{role:'user',content:`${ctx}\n\nวิเคราะห์:\n1. สถานะโดยรวม — จะส่งงานทันไหม?\n2. งานวิกฤตเร่งด่วนที่สุด + วิธีแก้\n3. ต้องทำ %/วัน แต่ละงาน\n4. คำแนะนำจัดช่าง\n5. ความเสี่ยงสำคัญ`}]);
     if(!text)return;
     _jupHistory=[{role:'user',content:ctx},{role:'assistant',content:text}];
     res.innerHTML=`<div style="font-size:12px;color:#c8d8e8;line-height:1.9">${jupFmt(text)}</div>`;
