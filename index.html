@@ -882,10 +882,10 @@ function doChangePw(){
   showToast('เปลี่ยนรหัสผ่านสำเร็จ 🔑','ok');
 }
 
-let _fbUrl=localStorage.getItem('cp_fb_url')||'https://apartment-phase1-default-rtdb.firebaseio.com';
+let _fbUrl=localStorage.getItem('cp_fb_url')||'';
 let _saveTimer=null,_lastSavedAt='';
-function fbPath(){return _fbUrl.replace(/\/+$/,'')+'/construction_progress.json';}
-function fbNodePath(node){return _fbUrl.replace(/\/+$/,'')+'/'+node+'.json';}
+function fbPath(){return _fbUrl.replace(/\/+$/,'')+'/construction_progress.json?auth=zZDaQMRHAZAdRPAL4Bj2zklKkQjBopyO2eRFDI4k';}
+function fbNodePath(node){return _fbUrl.replace(/\/+$/,'')+'/'+node+'.json?auth=zZDaQMRHAZAdRPAL4Bj2zklKkQjBopyO2eRFDI4k';}
 async function cloudPutNode(node,payload){
   if(!isFirebaseReady())return false;
   try{const res=await fetch(fbNodePath(node),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});return res.ok;}catch(e){return false;}
