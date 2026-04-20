@@ -1416,18 +1416,63 @@ function buildDonuts(){
   const mk=(s,tgt,col)=>`<div class="DGrid" style="grid-template-columns:repeat(3,1fr)">${donutHTML(gv(s),tgt,col,'งานทั้งหมด','',true,`setBar('${s}','${s}b','${s}p');ra();scheduleAutoSave()`)}</div>`;
   const gs5=document.getElementById('g-s5');if(gs5)gs5.innerHTML=mk('s5',80,'#ce93d8');
   const gs6=document.getElementById('g-s6');if(gs6)gs6.innerHTML=mk('s6',50,'#388bfd');
-  const gs7=document.getElementById('g-s7');if(gs7)gs7.innerHTML=mk('s7',40,'#ffd600');
+  // s7: ค่ามาจาก updPlaster เท่านั้น — input ใน donut เป็น read-only
+  const gs7=document.getElementById('g-s7');if(gs7){
+    gs7.innerHTML=`<div class="DGrid" style="grid-template-columns:repeat(3,1fr)">${donutHTML(gv('s7'),40,'#ffd600','ฉาบผนัง','',false,'')}</div>`;
+  }
   updateDonuts();
 }
 function updateDonuts(){
   const vals=getVals(),vs=[vals.s1,vals.f25,vals.out,vals.s4,vals.s5,vals.s6,vals.s7];
-  const ga=document.getElementById('g-all');if(!ga)return;
-  ga.querySelectorAll('.DC').forEach((dc,i)=>{
-    if(i>=vs.length)return;const v=vs[i],tgt=SUMDEF[i].tgt,col=SUMDEF[i].col;
-    const fg=dc.querySelector('.DFG'),cp=dc.querySelector('.DC-pct');
-    if(fg){const d=(CIRC*Math.min(1,v/100)).toFixed(2);fg.setAttribute('stroke-dasharray',`${d} ${CIRC.toFixed(2)}`);fg.setAttribute('stroke',col);}
-    if(cp){cp.textContent=ceilTo2(v)+'%';cp.style.color=gcol(v/tgt);}
+  // อัพเดท tab ภาพรวม (g-all)
+  const ga=document.getElementById('g-all');if(ga){
+    ga.querySelectorAll('.DC').forEach((dc,i)=>{
+      if(i>=vs.length)return;const v=vs[i],tgt=SUMDEF[i].tgt,col=SUMDEF[i].col;
+      const fg=dc.querySelector('.DFG'),cp=dc.querySelector('.DC-pct');
+      if(fg){const d=(CIRC*Math.min(1,v/100)).toFixed(2);fg.setAttribute('stroke-dasharray',`${d} ${CIRC.toFixed(2)}`);fg.setAttribute('stroke',col);}
+      if(cp){cp.textContent=ceilTo2(v)+'%';cp.style.color=gcol(v/tgt);}
+    });
+  }
+  // อัพเดท donut แต่ละ section
+  const secMap=[
+    {gid:'g-s1',v:vs[0],tgt:SUMDEF[0].tgt,col:SUMDEF[0].col},
+    {gid:'g-s5',v:vs[4],tgt:SUMDEF[4].tgt,col:SUMDEF[4].col},
+    {gid:'g-s6',v:vs[5],tgt:SUMDEF[5].tgt,col:SUMDEF[5].col},
+    {gid:'g-s7',v:vs[6],tgt:SUMDEF[6].tgt,col:SUMDEF[6].col},
+  ];
+  secMap.forEach(({gid,v,tgt,col})=>{
+    const g=document.getElementById(gid);if(!g)return;
+    g.querySelectorAll('.DC').forEach(dc=>{
+      const fg=dc.querySelector('.DFG'),cp=dc.querySelector('.DC-pct');
+      if(fg){const d=(CIRC*Math.min(1,v/100)).toFixed(2);fg.setAttribute('stroke-dasharray',`${d} ${CIRC.toFixed(2)}`);fg.setAttribute('stroke',col);}
+      if(cp){cp.textContent=ceilTo2(v)+'%';cp.style.color=gcol(v/tgt);}
+      // อัพเดท input ใน donut ถ้ามี (ไม่ override ช่องที่กำลัง focus)
+      const inp=dc.querySelector('.DCI');
+      if(inp&&document.activeElement!==inp)inp.value=v;
+    });
   });
+  // อัพเดท g-s4 (weighted avg รวม)
+  const gs4=document.getElementById('g-s4');if(gs4){
+    const dcAll=gs4.querySelectorAll('.DC');
+    if(dcAll.length>0){
+      const lastDC=dcAll[dcAll.length-1]; // donut "รวม (Weighted)"
+      const fg=lastDC.querySelector('.DFG'),cp=lastDC.querySelector('.DC-pct');
+      const v=vs[3],col=SUMDEF[3].col,tgt=SUMDEF[3].tgt;
+      if(fg){const d=(CIRC*Math.min(1,v/100)).toFixed(2);fg.setAttribute('stroke-dasharray',`${d} ${CIRC.toFixed(2)}`);fg.setAttribute('stroke',col);}
+      if(cp){cp.textContent=ceilTo2(v)+'%';cp.style.color=gcol(v/tgt);}
+    }
+  }
+  // อัพเดท g-s2 (ก่ออิฐใน)
+  const gs2=document.getElementById('g-s2');if(gs2){
+    const s2c=['#00d4ff','#00bcd4','#26c6da','#4dd0e1'];
+    FD.forEach((f,i)=>{
+      const dc=gs2.children[i];if(!dc)return;
+      const col=s2c[i],dash=(CIRC*Math.min(1,f.pct/100)).toFixed(2);
+      const fg=dc.querySelector('.DFG');if(fg){fg.setAttribute('stroke-dasharray',`${dash} ${CIRC.toFixed(2)}`);fg.setAttribute('stroke',col);}
+      const pp=dc.querySelector('.DC-pct');if(pp){pp.textContent=ceilTo2(f.pct)+'%';pp.style.color=gcol(f.pct/100);}
+      const inp=dc.querySelector('.DCI');if(inp&&document.activeElement!==inp)inp.value=f.pct;
+    });
+  }
 }
 
 function showTab(id,btn){
