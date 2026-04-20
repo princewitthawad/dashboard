@@ -927,10 +927,8 @@ function applyState(s){
   buildS2(true);buildS3();
   ['s1','s4t','s5','s6','s7'].forEach(id=>setBar(id,id+'b',id+'p'));
   ['r41','r42','r43','r44','r45'].forEach(id=>setBar(id,id+'b',id+'p'));
-  // buildPlasterUI ก่อน จากนั้น restore ค่าห้องและทางเดิน เพราะ DOM ต้องมีก่อน
-  buildPlasterUI(true);
-  if(s.s7rooms)s.s7rooms.forEach((v,i)=>{const e=document.getElementById('s7r'+i);if(e)e.value=v;});
-  if(s.s7cor!==undefined){const e=document.getElementById('s7cor');if(e)e.value=s.s7cor;}
+  // buildPlasterUI พร้อมส่งค่า s7rooms และ s7cor โดยตรง — ไม่ต้องอ่านจาก DOM
+  buildPlasterUI(true, s.s7rooms||null, s.s7cor!==undefined?s.s7cor:null);
   updPlaster();buildDonuts();updS7Chart();ra();
 }
 async function saveData(){
@@ -970,7 +968,9 @@ async function loadData(){
 function scheduleAutoSave(){
   clearTimeout(_saveTimer);
   setSvStatus('unsaved','● มีการเปลี่ยนแปลง...');
-  // บันทึกอัตโนมัติ 5 วินาทีหลังเปลี่ยนแปลง (ไม่ต้องรอ Firebase)
+  // บันทึก localStorage ทันทีทุกครั้งที่มีการเปลี่ยนแปลง (ไม่รอ Firebase)
+  try{localStorage.setItem('cp_backup',JSON.stringify(collectState()));}catch(e){}
+  // บันทึก Firebase อัตโนมัติ 5 วินาทีหลังเปลี่ยนแปลง
   _saveTimer=setTimeout(saveData,5000);
 }
 function clearData(){
@@ -1214,7 +1214,7 @@ function updS3Area(){
 }
 function toggleS3Line(i){if(!_s3Chart)return;const meta=_s3Chart.getDatasetMeta(i);meta.hidden=!meta.hidden;_s3Chart.update();const el=document.getElementById('s3-leg-'+i);if(el)el.style.opacity=meta.hidden?'0.3':'1';}
 
-function buildPlasterUI(force=false){
+function buildPlasterUI(force=false, preloadRooms=null, preloadCor=null){
   const c=document.getElementById('prooms');if(!c)return;
   if(!force&&c.querySelector('#s7r0'))return;
   // ══ สูตรน้ำหนัก S7 ══════════════════════════════════════════
@@ -1233,7 +1233,8 @@ function buildPlasterUI(force=false){
   for(let i=0;i<TOTAL;i++){
     const isRoom = i<target2;
     if(isRoom){
-      const val=parseFloat(document.getElementById('s7r'+i)?.value||0)||0;
+      // ถ้ามี preloadRooms ให้ใช้ค่านั้น มิฉะนั้นอ่านจาก DOM
+      const val = preloadRooms ? (parseFloat(preloadRooms[i])||0) : (parseFloat(document.getElementById('s7r'+i)?.value||0)||0);
       const dn=val>=100;
       const contrib=(val*WTP_R_FULL/100).toFixed(2); // สมทบ % จริง (ไม่ cap)
       h+=`<div class="PB ${dn?'dn':'pd'}" style="width:88px;padding:8px 4px">
@@ -1249,8 +1250,8 @@ function buildPlasterUI(force=false){
       </div>`;
     }
   }
-  // ช่องทางเดิน
-  const cor2=parseFloat(document.getElementById('s7cor')?.value||0)||0;
+  // ช่องทางเดิน — ถ้ามี preloadCor ให้ใช้ค่านั้น มิฉะนั้นอ่านจาก DOM
+  const cor2 = preloadCor !== null ? parseFloat(preloadCor)||0 : (parseFloat(document.getElementById('s7cor')?.value||0)||0);
   const cor2Contrib=(cor2/COR_SQM*WTP_C_FULL);            // % สมทบจริง (ไม่ cap)
   const dnc2=cor2Contrib>=WTP_C_FULL;                      // เขียวเมื่อสมทบครบ 20%
   const cor2WeightDisp=cor2Contrib.toFixed(2);             // สมทบ % จริง
@@ -2313,7 +2314,7 @@ function downloadCurrentState(){
   // Build HTML with pre-filled values
   const html=document.documentElement.outerHTML;
   // Inject state as default values via script at end
-  const stateScript=`\n\u003cscript\u003e\n(function(){\n  var _preload=${JSON.stringify(state)};\n  window.addEventListener('load',function(){\n    if(typeof applyState==='function'){applyState(_preload);buildPlasterUI(true);updPlaster();buildDonuts();ra();}\n  },false);\n})();\n\u003c/script\u003e`;
+  const stateScript=`\n\u003cscript\u003e\n(function(){\n  var _preload=${JSON.stringify(state)};\n  window.addEventListener('load',function(){\n    if(typeof applyState==='function'){applyState(_preload);}\n  },false);\n})();\n\u003c/script\u003e`;
   const finalHtml=html.replace('</body>',stateScript+'</body>');
 
   const blob=new Blob([finalHtml],{type:'text/html;charset=utf-8'});
