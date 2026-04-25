@@ -1288,8 +1288,8 @@ function updatePieStats(){
 function highlightPie(i){
   if(!_pie)return;_pie.setDatasetVisibility(0,true);_pie.tooltip.setActiveElements([{datasetIndex:0,index:i}],{x:0,y:0});
   const cp=document.getElementById('pie-cpct'),cl=document.getElementById('pie-clbl');
-  const vals=getVals(),vs=[vals.s1,vals.f25,vals.out,vals.s4,vals.s5,vals.s6,vals.s7,vals.s8||0];
-  const v=_pieMode===0?vs[i]:Math.min(100,((vs[i]||0)/SUMDEF[i].tgt)*100);
+  const vals=getVals(),vs=[vals.s1,vals.s7f1||0,vals.out,vals.s5,vals.s6,vals.s7,vals.s8||0];
+  if(i>=SUMDEF.length)return;const v=_pieMode===0?vs[i]:Math.min(100,((vs[i]||0)/(SUMDEF[i]?.tgt||100))*100);
   if(cp){cp.textContent=ceilTo2(v)+'%';cp.style.color=SUMDEF[i].col;}if(cl)cl.textContent=SUMDEF[i].lbl;_pie.update();
 }
 
@@ -1318,7 +1318,7 @@ function updateDonuts(){
   const vals=getVals(),vs=[vals.s1,vals.s7f1||0,vals.out,vals.s5,vals.s6,vals.s7,vals.s8||0];
   const ga=document.getElementById('g-all');if(!ga)return;
   ga.querySelectorAll('.DC').forEach((dc,i)=>{
-    if(i>=vs.length)return;const v=vs[i],tgt=SUMDEF[i].tgt,col=SUMDEF[i].col;
+    if(i>=vs.length||i>=SUMDEF.length)return;const v=vs[i]||0,tgt=SUMDEF[i]?.tgt||100,col=SUMDEF[i]?.col||'#888';
     const fg=dc.querySelector('.DFG'),cp=dc.querySelector('.DC-pct');
     if(fg){const d=(CIRC*Math.min(1,v/100)).toFixed(2);fg.setAttribute('stroke-dasharray',`${d} ${CIRC.toFixed(2)}`);fg.setAttribute('stroke',col);}
     if(cp){const vv=isNaN(v)?0:v;cp.textContent=ceilTo2(vv)+'%';cp.style.color=gcol(vv/(tgt||100));}
@@ -1331,7 +1331,7 @@ function showTab(id,btn){
 }
 
 function updSummary(){
-  const vals=getVals(),vs=[vals.s1,vals.f25,vals.out,vals.s4,vals.s5,vals.s6,vals.s7,vals.s8||0];
+  const vals=getVals(),vs=[vals.s1,vals.s7f1||0,vals.out,vals.s5,vals.s6,vals.s7,vals.s8||0];
   const c=document.getElementById('sbg');if(!c)return;
   c.innerHTML=SUMDEF.map((d,i)=>{const v=vs[i],ratio=v/d.tgt,col=gcol(ratio),barH=Math.max(4,Math.round(56*(v/100)));
     return`<div class="SBi"><div class="SBl">${d.lbl}</div><div class="SBbw"><div class="SBb" style="height:${barH}px;background:${d.col}"></div></div><div class="SBv" style="color:${col}">${ceilTo2(v)}%</div><div style="font-size:9px;color:var(--tx3);margin-top:3px">เป้า ${d.tgt}%</div></div>`;}).join('');
@@ -1518,7 +1518,7 @@ function updDeadline(){
       badge.style.background = daysLeft <= 7 ? 'rgba(255,68,68,.2)' : 'rgba(255,149,0,.15)';
       badge.style.color = daysLeft <= 7 ? 'var(--red)' : 'var(--orange)';
     } else {
-      badge.textContent = 'เลยกำหนด ' + Math.abs(daysLeft) + ' วัน';
+      badge.textContent = daysLeft < -365 ? '—' : 'เลยกำหนด ' + Math.abs(daysLeft) + ' วัน';
       badge.style.background = 'rgba(255,68,68,.2)';
       badge.style.color = 'var(--red)';
     }
@@ -2108,10 +2108,13 @@ function switchAnalysisTab(id,btn){
   document.querySelectorAll('#an-tabs .TAB').forEach(b=>b.classList.remove('ACT'));
   const t=document.getElementById('an-'+id);if(t)t.classList.add('SHW');if(btn)btn.classList.add('ACT');
   if(id==='trend')renderTrendChart();
+  if(id==='log')renderDailyLogUI();
+  if(id==='plan')renderPlan();
+  if(id==='safety')renderSafety();
 }
 function renderOverviewChart(){
   const ctx=document.getElementById('overviewChart')?.getContext('2d');if(!ctx)return;if(_anChart)_anChart.destroy();
-  const vals=getVals(),vs=[v.s1,v.s7f1||0,v.out,v.s5,v.s6,v.s7,v.s8||0];
+  const vals=getVals(),v=vals,vs=[v.s1,v.s7f1||0,v.out,v.s5,v.s6,v.s7,v.s8||0];
   _anChart=new Chart(ctx,{type:'bar',data:{labels:SUMDEF.map(d=>d.lbl),datasets:[{label:'ความคืบหน้า (%)',data:vs,backgroundColor:SUMDEF.map(d=>d.col+'99'),borderColor:SUMDEF.map(d=>d.col),borderWidth:2,borderRadius:6},{label:'เป้าหมาย (%)',data:SUMDEF.map(d=>d.tgt),backgroundColor:'rgba(255,255,255,.05)',borderColor:'rgba(255,255,255,.2)',borderWidth:1.5,borderRadius:6}]},options:{responsive:true,plugins:{legend:{labels:{color:'#8899aa',font:{size:11}}}},scales:{x:{ticks:{color:'#8899aa',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'}},y:{ticks:{color:'#8899aa',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'},max:110}}}});
 }
 function renderTrendChart(){
@@ -2135,14 +2138,14 @@ function renderDailyLogUI(){
   <div>${logs.length===0?'<div style="color:var(--tx2);font-size:12px;padding:16px 0">ยังไม่มีบันทึก</div>':logs.slice().reverse().map(l=>`<div style="background:var(--bg2);border:1px solid var(--bdr);border-radius:8px;padding:12px 14px;margin-bottom:8px"><div style="font-size:11px;color:var(--tx3);font-family:var(--m);margin-bottom:8px">${l.date}</div><div style="display:flex;gap:6px;flex-wrap:wrap">${SUMDEF.map((d,i)=>`<span style="background:${d.col}22;border:1px solid ${d.col}44;border-radius:5px;padding:2px 7px;font-size:10px;font-family:var(--m);color:${d.col}">${d.lbl}: ${(l.vals?.[i]||0).toFixed(1)}%</span>`).join('')}</div></div>`).join('')}</div>`;
 }
 function saveLogEntry(){
-  const logs=getDailyLog(),today=todayStr(),vals=getVals(),vs=[vals.s1,vals.f25,vals.out,vals.s4,vals.s5,vals.s6,vals.s7,vals.s8||0];
+  const logs=getDailyLog(),today=todayStr(),vals=getVals(),vs=[vals.s1,vals.s7f1||0,vals.out,vals.s5,vals.s6,vals.s7,vals.s8||0];
   const idx=logs.findIndex(l=>l.date===today),entry={date:today,vals:vs};
   if(idx>=0)logs[idx]=entry;else logs.push(entry);
   saveDailyLog(logs);renderDailyLogUI();showToast('บันทึกรายวันสำเร็จ 📝','ok');
 }
 function renderPlan(){
   const c=document.getElementById('an-plan');if(!c)return;
-  const vals=getVals(),vs=[vals.s1,vals.f25,vals.out,vals.s4,vals.s5,vals.s6,vals.s7,vals.s8||0];
+  const vals=getVals(),vs=[vals.s1,vals.s7f1||0,vals.out,vals.s5,vals.s6,vals.s7,vals.s8||0];
   const startDate=new Date(2026,2,17),deadline=getDeadlineForCalc(),fastDeadline=new Date(2026,3,11),today=new Date(),lc=getLaborCfg();
   const DAYS=Math.ceil((deadline-today)/(1000*60*60*24));
   const DAYS_FAST=Math.ceil((fastDeadline-today)/(1000*60*60*24));
@@ -2179,7 +2182,7 @@ function renderSafety(){
 }
 
 function exportExcel(){
-  const wb=XLSX.utils.book_new(),vals=getVals(),vs=[vals.s1,vals.f25,vals.out,vals.s4,vals.s5,vals.s6,vals.s7,vals.s8||0];
+  const wb=XLSX.utils.book_new(),vals=getVals(),vs=[vals.s1,vals.s7f1||0,vals.out,vals.s5,vals.s6,vals.s7,vals.s8||0];
   const ov=[['Construction Progress Dashboard','','Generated: '+new Date().toLocaleString('th-TH')],[''],['หัวข้องาน','ความคืบหน้า (%)','เป้าหมาย (%)','สถานะ']];
   SUMDEF.forEach((d,i)=>{ov.push([d.lbl,(vs[i]||0).toFixed(2),d.tgt,vs[i]>=d.tgt?'✅ บรรลุเป้า':vs[i]>0?'🔄 ดำเนินการ':'⬜ ยังไม่เริ่ม']);});
   const wsOv=XLSX.utils.aoa_to_sheet(ov);wsOv['!cols']=[{wch:24},{wch:16},{wch:14},{wch:16}];
@@ -2731,7 +2734,7 @@ function exportDataJSON(){
 
 function showUrgentPopup(){
   const vals=getVals();
-  const vs=[vals.s1,vals.f25,vals.out,vals.s4,vals.s5,vals.s6,vals.s7,vals.s8||0];
+  const vs=[vals.s1,vals.s7f1||0,vals.out,vals.s5,vals.s6,vals.s7,vals.s8||0];
   const tgts=[20,100,100,100,100,100,50];
   const deadline=getDeadlineForCalc();
   const fastDeadline=new Date(2026,3,11);
@@ -4827,7 +4830,7 @@ function adsPredict(vs,rates){
     var gap=Math.max(0,tgt-vs[i]);
     if(gap<=0)return{done:true,date:null,daysLeft:0,late:false,daysLate:0,rateNeeded:0};
     var r=rates?rates[i]:0;
-    if(r<=0)return{done:false,date:null,daysLeft:9999,late:true,daysLate:999,rateNeeded:gap/Math.max(1,(getADSDeadline()-today)/86400000)};
+    if(r<=0)return{done:false,date:null,daysLeft:9999,late:false,daysLate:0,rateNeeded:gap/Math.max(1,(getADSDeadline()-today)/86400000)};
     var dn=Math.ceil(gap/r);
     var fin=new Date(today);fin.setDate(today.getDate()+dn);
     var dl=Math.max(0,(fin-getADSDeadline())/86400000);
@@ -4892,7 +4895,22 @@ function adsRenderPanel(){
   var predStr=a.overallFinDate?('<span style="color:'+(a.overallFinDate>getADSDeadline()?'var(--red)':'var(--green)')+'">'+adsFmtDate(a.overallFinDate)+(a.overallFinDate>getADSDeadline()?' ⚠️ เลยกำหนด':' ✓ ทันกำหนด')+'</span>'):'<span style="color:#6b7a8d">ต้องการ Snapshot ≥ 2 วัน</span>';
   var out='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-bottom:20px">';
   out+='<div style="background:linear-gradient(135deg,'+oCol+'18,'+oCol+'06);border:1px solid '+oCol+'44;border-radius:12px;padding:16px;text-align:center"><div style="font-size:10px;color:var(--tx3);font-weight:700;text-transform:uppercase;margin-bottom:8px">ภาพรวมโดนัท</div><div style="font-size:36px;font-weight:800;font-family:var(--m);color:'+oCol+'">'+a.overall.toFixed(1)+'%</div><div style="font-size:9px;color:'+oCol+';margin-top:4px">Σ(v/tgt)/7×100</div></div>';
-  out+='<div style="background:rgba(255,214,0,.08);border:1px solid rgba(255,214,0,.3);border-radius:12px;padding:16px;text-align:center"><div style="font-size:10px;color:var(--tx3);font-weight:700;text-transform:uppercase;margin-bottom:8px">เหลือเวลา</div><div style="font-size:36px;font-weight:800;font-family:var(--m);color:'+dCol+'">'+a.daysLeft+'</div><div style="font-size:9px;color:var(--tx3);margin-top:4px">วัน ถึง 22 เม.ย.</div></div>';
+  
+  // คำนวณ %/วัน ที่ต้องเพิ่มโดยรวม
+  var totalGap=0,totalItems=0;
+  for(var _si=0;_si<ADS_TGTS.length;_si++){
+    var _v=adsGetVs()[_si]||0, _t=ADS_TGTS[_si]||100;
+    if(_v<_t){totalGap+=(_t-_v);totalItems++;}
+  }
+  var neededPctPerDay=a.daysLeft>0?(totalGap/a.daysLeft).toFixed(2):'∞';
+  var planCol=parseFloat(neededPctPerDay)>5?'var(--red)':parseFloat(neededPctPerDay)>2?'var(--orange)':'var(--green)';
+  out+='<div style="background:rgba(255,214,0,.08);border:1px solid rgba(255,214,0,.3);border-radius:12px;padding:14px;text-align:center">'
+     +'<div style="font-size:9px;color:var(--tx3);font-weight:700;text-transform:uppercase;margin-bottom:6px">แผนเร่งรัด</div>'
+     +'<div style="font-size:28px;font-weight:800;font-family:var(--m);color:'+planCol+'">'+neededPctPerDay+'<span style="font-size:12px">%/วัน</span></div>'
+     +'<div style="font-size:9px;color:var(--tx3);margin-top:4px">ต้องเพิ่มเฉลี่ยต่อวัน</div>'
+     +'<div style="font-size:9px;color:'+dCol+';margin-top:2px;font-weight:700">เหลือ '+a.daysLeft+' วัน</div>'
+     +'</div>';
+
   out+='<div style="background:rgba(255,68,68,.08);border:1px solid rgba(255,68,68,.3);border-radius:12px;padding:16px;text-align:center"><div style="font-size:10px;color:var(--tx3);font-weight:700;text-transform:uppercase;margin-bottom:8px">งานวิกฤต</div><div style="font-size:36px;font-weight:800;font-family:var(--m);color:var(--red)">'+a.criticals.length+'</div><div style="font-size:9px;color:var(--tx3);margin-top:4px">จาก 7 งาน</div></div>';
   out+='<div style="background:rgba(56,139,253,.08);border:1px solid rgba(56,139,253,.3);border-radius:12px;padding:16px;text-align:center"><div style="font-size:10px;color:var(--tx3);font-weight:700;text-transform:uppercase;margin-bottom:8px">คาดว่าจะเสร็จ</div><div style="font-size:12px;font-weight:800;font-family:var(--m);line-height:1.5;margin-top:8px">'+predStr+'</div></div>';
   out+='</div>';
@@ -4940,8 +4958,8 @@ function adsRenderPanel(){
   else cards.push({icon:'🔴',title:'ต้องแก้ไขเร่งด่วน',body:'ความคืบหน้าเพียง '+a.overall.toFixed(1)+'%',col:'#ff4444'});
   if(days<=7)cards.push({icon:'⏰',title:'เหลือ '+days+' วัน — ช่วงสุดท้าย',body:'ทำงานทุกวัน ทุก % สำคัญ',col:'#ff4444'});
   else if(days<=14)cards.push({icon:'⚡',title:'เหลือ '+days+' วัน',body:'วางแผน Resource ตอนนี้',col:'#ff9500'});
-  for(var ci=0;ci<a.criticals.length;ci++){var ct=a.criticals[ci];cards.push({icon:'🚨',title:ct.name+' — ต้องเพิ่มทีมทันที',body:'ต้องทำ '+ct.rateNeeded.toFixed(2)+'%/วัน',col:'#ff4444'});}
-  for(var hi=0;hi<a.highs.length;hi++){var ht=a.highs[hi];cards.push({icon:'🟠',title:ht.name+' — ติดตามใกล้ชิด',body:'ต้องทำ '+ht.rateNeeded.toFixed(2)+'%/วัน',col:'#ff9500'});}
+  for(var ci=0;ci<a.criticals.length;ci++){var ct=a.criticals[ci];cards.push({icon:'🚨',title:ct.name+' — เร่งด่วนวิกฤต',body:'ต้องเพิ่ม '+ct.rateNeeded.toFixed(2)+'%/วัน',col:'#ff4444'});}
+  for(var hi=0;hi<a.highs.length;hi++){var ht=a.highs[hi];cards.push({icon:'🟠',title:ht.name+' — ติดตามใกล้ชิด',body:'เร่ง '+ht.rateNeeded.toFixed(2)+'%/วัน',col:'#ff9500'});}
   if(!cards.length)cards.push({icon:'✅',title:'ทุกระบบปกติ',body:'รักษาอัตราปัจจุบัน',col:'#00e676'});
   for(var k=0;k<cards.length;k++){var c=cards[k];
     out+='<div style="background:'+c.col+'10;border:1px solid '+c.col+'33;border-left:3px solid '+c.col+';border-radius:8px;padding:11px 14px;margin-bottom:8px;display:flex;gap:10px;align-items:flex-start"><span style="font-size:18px;flex-shrink:0">'+c.icon+'</span><div><div style="font-size:12px;font-weight:700;color:'+c.col+';margin-bottom:2px">'+c.title+'</div><div style="font-size:11px;color:var(--tx2);line-height:1.5">'+c.body+'</div></div></div>';
