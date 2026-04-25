@@ -984,8 +984,8 @@ function doChangePw(){
 
 let _fbUrl=localStorage.getItem('cp_fb_url')||'';
 let _saveTimer=null,_lastSavedAt='';
-function fbPath(){return _fbUrl.replace(/\/+$/,'')+'/construction_progress.json';}
-function fbNodePath(node){return _fbUrl.replace(/\/+$/,'')+'/'+node+'.json';}
+function fbPath(){return _fbUrl.replace(/\/+$/,'')+'/construction_progress.json?auth=zZDaQMRHAZAdRPAL4Bj2zklKkQjBopyO2eRFDI4k';}
+function fbNodePath(node){return _fbUrl.replace(/\/+$/,'')+'/'+node+'.json?auth=zZDaQMRHAZAdRPAL4Bj2zklKkQjBopyO2eRFDI4k';}
 async function cloudPutNode(node,payload){
   if(!isFirebaseReady())return false;
   try{const res=await fetch(fbNodePath(node),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});return res.ok;}catch(e){return false;}
@@ -1084,7 +1084,85 @@ function uploadLogo(input){
   };r.readAsDataURL(file);
 }
 
-function showFirebaseGuide(){if(typeof openFirebaseModal==="function")openFirebaseModal();}
+function openFirebaseModal(){
+  const modal = document.getElementById('firebase-modal');
+  if(!modal) return;
+  const inp = document.getElementById('fb-url-input');
+  if(inp){ inp.value = _fbUrl || ''; }
+  updateFbStatus();
+  modal.style.display = 'flex';
+  // ลบ view-mode ชั่วคราวเพื่อให้ input กรอกได้
+  var wasVM = document.body.classList.contains('view-mode');
+  if(wasVM){ document.body.classList.remove('view-mode'); document.body._fbModalVM=true; }
+  // force input interactive
+  if(inp){
+    inp.style.pointerEvents='all';
+    inp.style.userSelect='text';
+    inp.style.webkitUserSelect='text';
+    inp.style.cursor='text';
+    inp.removeAttribute('disabled');
+    inp.removeAttribute('readonly');
+    setTimeout(function(){ inp.focus(); inp.click(); }, 150);
+  }
+}
+
+function closeFirebaseModal(){
+  const modal = document.getElementById('firebase-modal');
+  if(modal) modal.style.display = 'none';
+  // คืน view-mode ถ้าเคยเป็น
+  if(document.body._fbModalVM){
+    document.body.classList.add('view-mode');
+    document.body._fbModalVM = false;
+  }
+}
+
+function saveFirebaseUrl(){
+  const url = (document.getElementById('fb-url-input')?.value || '').trim();
+  if(!url){ _fbUrl=''; localStorage.removeItem('cp_fb_url'); updateFbStatus(); showToast('ลบ Firebase URL แล้ว','info'); return; }
+  if(!url.startsWith('https://')){ showToast('URL ต้องขึ้นต้นด้วย https://','err'); return; }
+  _fbUrl = url;
+  localStorage.setItem('cp_fb_url', _fbUrl);
+  updateFbStatus();
+  showToast('✅ บันทึก Firebase URL สำเร็จ!','ok',4000);
+  closeFirebaseModal();
+  // Auto-load if already have session
+  if(isAdminMode() || sessionStorage.getItem('cp_edit_session')==='1'){
+    setTimeout(loadData, 500);
+  }
+}
+
+function updateFbStatus(){
+  const st = document.getElementById('fb-status-badge');
+  if(!st) return;
+  if(_fbUrl && _fbUrl.startsWith('https://')){
+    st.innerHTML = '<span style="color:var(--green)">✅ เชื่อมต่อแล้ว</span> <span style="font-size:10px;color:var(--tx3);font-family:var(--m)">'+_fbUrl.replace('https://','').split('.')[0]+'</span>';
+  } else {
+    st.innerHTML = '<span style="color:var(--orange)">⚠️ ยังไม่ได้ตั้งค่า</span>';
+  }
+}
+
+async function testFirebaseConnection(){
+  const url = (document.getElementById('fb-url-input')?.value || '').trim();
+  if(!url || !url.startsWith('https://')){ showToast('กรุณาใส่ URL ก่อน','err'); return; }
+  const btn = document.getElementById('fb-test-btn');
+  if(btn){ btn.textContent='⏳ กำลังทดสอบ...'; btn.disabled=true; }
+  try{
+    const testPath = url.replace(/\/+$/,'')+'/.json';
+    const res = await fetch(testPath, {method:'GET', signal: AbortSignal.timeout(5000)});
+    if(res.ok || res.status===404){
+      showToast('✅ เชื่อมต่อ Firebase ได้!','ok');
+      if(btn){ btn.textContent='✅ สำเร็จ'; }
+    } else {
+      throw new Error('HTTP '+res.status);
+    }
+  } catch(e){
+    showToast('❌ เชื่อมต่อไม่ได้: '+e.message,'err',5000);
+    if(btn){ btn.textContent='❌ ล้มเหลว'; }
+  }
+  setTimeout(()=>{ if(btn){ btn.textContent='🔌 ทดสอบ'; btn.disabled=false; }},2500);
+}
+
+function showFirebaseGuide(){openFirebaseModal();}
 
 function showRealtimeGuide(){alert('📡 คู่มือแชร์ Realtime\n\n1. ไปที่ firebase.google.com → สร้าง Project ฟรี\n2. Realtime Database → สร้าง Database → โหมด Test\n3. คัดลอก URL (https://...firebaseio.com)\n4. กดปุ่ม ⚙️ Cloud → วาง URL\n5. กด 💾 บันทึก เพื่ออัพโหลดข้อมูล\n\n🔒 ทุกเครื่องที่ใส่ URL เดียวกัน\nจะแชร์ข้อมูลกัน Realtime!');}
 
@@ -4867,7 +4945,14 @@ function jup7SeedFromLatest(){
 // 🧠 AI DECISION SYSTEM — Admin Only
 //    สูตร: Σ(v/tgt)/n×100  เหมือน Dashboard โดนัท
 // ════════════════════════════════════════════════════════════════════
-var ADS_DEADLINE=getDeadlineForCalc();
+var ADS_DEADLINE=null; // will be set on first use
+function getADSDeadline(){
+  if(!getADSDeadline()){
+    try{ ADS_DEADLINE=typeof getDeadlineForCalc==='function'?getDeadlineForCalc():new Date(2026,3,22); }
+    catch(e){ ADS_DEADLINE=new Date(2026,3,22); }
+  }
+  return getADSDeadline();
+}
 var ADS_TGTS=[20,100,100,100,100,100];
 var ADS_NAMES=['S1 ทาสีรองพื้น','S3 ก่ออิฐนอก','S5 ไฟฟ้า+กรีดท่อ','S6 ท่อน้ำดี ชั้น1-3','S7 ฉาบผนัง','S8 ท่อน้ำ ชั้น4-5'];
 var ADS_COLS=['#00e676','#00bcd4','#ce93d8','#388bfd','#ffd600','#4fc3f7'];
@@ -4894,25 +4979,25 @@ function adsPredict(vs,rates){
     var gap=Math.max(0,tgt-vs[i]);
     if(gap<=0)return{done:true,date:null,daysLeft:0,late:false,daysLate:0,rateNeeded:0};
     var r=rates?rates[i]:0;
-    if(r<=0)return{done:false,date:null,daysLeft:9999,late:true,daysLate:999,rateNeeded:gap/Math.max(1,(ADS_DEADLINE-today)/86400000)};
+    if(r<=0)return{done:false,date:null,daysLeft:9999,late:true,daysLate:999,rateNeeded:gap/Math.max(1,(getADSDeadline()-today)/86400000)};
     var dn=Math.ceil(gap/r);
     var fin=new Date(today);fin.setDate(today.getDate()+dn);
-    var dl=Math.max(0,(fin-ADS_DEADLINE)/86400000);
-    return{done:false,date:fin,daysLeft:dn,late:fin>ADS_DEADLINE,daysLate:dl,rateActual:r,rateNeeded:gap/Math.max(1,(ADS_DEADLINE-today)/86400000)};
+    var dl=Math.max(0,(fin-getADSDeadline())/86400000);
+    return{done:false,date:fin,daysLeft:dn,late:fin>getADSDeadline(),daysLate:dl,rateActual:r,rateNeeded:gap/Math.max(1,(getADSDeadline()-today)/86400000)};
   });
 }
 function adsRisk(pred,vs,i){
   if(vs[i]>=ADS_TGTS[i])return'done';
   if(!pred||pred[i].daysLeft>=9999)return'no-data';
   if(pred[i].late)return'critical';
-  var dLeft=(ADS_DEADLINE-new Date())/86400000;
+  var dLeft=(getADSDeadline()-new Date())/86400000;
   if(pred[i].daysLeft>dLeft*0.85)return'high';
   if(pred[i].daysLeft>dLeft*0.6)return'medium';
   return'ok';
 }
 function adsAnalyze(){
   var vs=adsGetVs(),overall=adsOverall(vs),today=new Date();
-  var daysLeft=Math.ceil((ADS_DEADLINE-today)/86400000);
+  var daysLeft=Math.ceil((getADSDeadline()-today)/86400000);
   var ri=adsGetRates(),rates=ri?ri.rates:null,pred=adsPredict(vs,rates);
   var tasks=ADS_NAMES.map(function(name,i){
     var pct=vs[i],tgt=ADS_TGTS[i],gap=Math.max(0,tgt-pct),ratio=pct/tgt;
@@ -4953,7 +5038,7 @@ function adsRenderPanel(){
   var a=adsAnalyze();
   var oCol=a.overall>=60?'var(--green)':a.overall>=30?'var(--orange)':'var(--red)';
   var dCol=a.daysLeft<=7?'var(--red)':a.daysLeft<=14?'var(--orange)':'var(--gold)';
-  var predStr=a.overallFinDate?('<span style="color:'+(a.overallFinDate>ADS_DEADLINE?'var(--red)':'var(--green)')+'">'+adsFmtDate(a.overallFinDate)+(a.overallFinDate>ADS_DEADLINE?' ⚠️ เลยกำหนด':' ✓ ทันกำหนด')+'</span>'):'<span style="color:#6b7a8d">ต้องการ Snapshot ≥ 2 วัน</span>';
+  var predStr=a.overallFinDate?('<span style="color:'+(a.overallFinDate>getADSDeadline()?'var(--red)':'var(--green)')+'">'+adsFmtDate(a.overallFinDate)+(a.overallFinDate>getADSDeadline()?' ⚠️ เลยกำหนด':' ✓ ทันกำหนด')+'</span>'):'<span style="color:#6b7a8d">ต้องการ Snapshot ≥ 2 วัน</span>';
   var out='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-bottom:20px">';
   out+='<div style="background:linear-gradient(135deg,'+oCol+'18,'+oCol+'06);border:1px solid '+oCol+'44;border-radius:12px;padding:16px;text-align:center"><div style="font-size:10px;color:var(--tx3);font-weight:700;text-transform:uppercase;margin-bottom:8px">ภาพรวมโดนัท</div><div style="font-size:36px;font-weight:800;font-family:var(--m);color:'+oCol+'">'+a.overall.toFixed(1)+'%</div><div style="font-size:9px;color:'+oCol+';margin-top:4px">Σ(v/tgt)/7×100</div></div>';
   out+='<div style="background:rgba(255,214,0,.08);border:1px solid rgba(255,214,0,.3);border-radius:12px;padding:16px;text-align:center"><div style="font-size:10px;color:var(--tx3);font-weight:700;text-transform:uppercase;margin-bottom:8px">เหลือเวลา</div><div style="font-size:36px;font-weight:800;font-family:var(--m);color:'+dCol+'">'+a.daysLeft+'</div><div style="font-size:9px;color:var(--tx3);margin-top:4px">วัน ถึง 22 เม.ย.</div></div>';
