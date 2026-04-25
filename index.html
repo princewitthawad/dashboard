@@ -61,7 +61,7 @@ body .bg-overlay{position:fixed;inset:0;background:rgba(0,0,0,.30);z-index:0;poi
 .o1{width:500px;height:500px;background:rgba(56,139,253,.06);top:-150px;right:-100px}
 .o2{width:400px;height:400px;background:rgba(0,212,255,.04);bottom:50px;left:-100px}
 .W{max-width:1600px;margin:0 auto;padding:24px;position:relative;z-index:1;padding-top:0}
-header{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;background:rgba(13,21,32,.97);border:1px solid var(--bdr);border-bottom:1px solid rgba(56,139,253,.12);border-radius:0;margin-bottom:0;backdrop-filter:blur(16px);position:fixed;top:0;left:0;right:0;z-index:960;overflow:hidden;flex-wrap:wrap;gap:12px;animation:none}
+header{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:rgba(13,21,32,.97);border:1px solid var(--bdr);border-bottom:1px solid rgba(56,139,253,.12);border-radius:0;margin-bottom:0;backdrop-filter:blur(16px);position:fixed;top:0;left:0;right:0;z-index:960;flex-wrap:wrap;gap:8px;animation:none;overflow:visible}
 header::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--blue),var(--cyan),transparent)}
 .hi{width:44px;height:44px;background:linear-gradient(135deg,#1a2d45,#1e3a5f);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
 .ht{font-size:20px;font-weight:800;letter-spacing:-.3px}
@@ -491,10 +491,10 @@ body.view-mode .edit-only{display:none!important}
     <div id="dl-days-badge" style="font-size:13px;font-weight:800;font-family:var(--m);padding:6px 18px;border-radius:20px;background:rgba(255,68,68,.15);border:1px solid rgba(255,68,68,.4);color:var(--red)">—</div>
   </div>
   <!-- Inputs Grid -->
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-bottom:14px">
     <!-- วันกำหนดส่ง -->
     <div style="background:rgba(255,68,68,.05);border:1px solid rgba(255,68,68,.2);border-radius:12px;padding:16px">
-      <div style="font-size:18px;font-weight:800;color:rgba(255,100,100,.9);margin-bottom:10px">วันกำหนดส่งงาน</div>
+      <div style="font-size:clamp(14px,2.5vw,18px);font-weight:800;color:rgba(255,100,100,.9);margin-bottom:10px">วันกำหนดส่งงาน</div>
       <div style="position:relative;display:flex;align-items:center;gap:8px">
         <input type="text" id="dl-date" placeholder="dd/mm/yyyy" maxlength="10"
           oninput="fmtDeadlineInput(this);updDeadline()"
@@ -525,7 +525,7 @@ body.view-mode .edit-only{display:none!important}
     </div>
     <!-- วันดีเลย์ -->
     <div style="background:rgba(255,149,0,.05);border:1px solid rgba(255,149,0,.25);border-radius:12px;padding:16px">
-      <div style="font-size:18px;font-weight:800;color:rgba(255,160,50,.9);margin-bottom:10px">จำนวนวันดีเลย์</div>
+      <div style="font-size:clamp(14px,2.5vw,18px);font-weight:800;color:rgba(255,160,50,.9);margin-bottom:10px">จำนวนวันดีเลย์</div>
       <div style="display:flex;align-items:baseline;gap:8px">
         <input type="number" id="dl-delay" min="0" placeholder="0" oninput="updDeadline()"
           style="width:90px;background:rgba(255,255,255,.06);border:1px solid rgba(255,149,0,.35);border-radius:8px;padding:9px 12px;color:var(--orange);font-size:26px;font-weight:800;font-family:var(--m);outline:none;transition:border .2s">
@@ -2227,6 +2227,46 @@ header{
   .kv{font-size:20px !important}
   #prooms{grid-template-columns:repeat(2,1fr)!important}
   #s1-grid{grid-template-columns:repeat(2,1fr)!important}
+}
+
+
+/* ── Header Responsive ── */
+header .ht{font-size:clamp(11px,1.8vw,18px);font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+header .hs{font-size:clamp(9px,1.2vw,12px);white-space:nowrap}
+#simon-logo{height:clamp(32px,4vw,48px)!important;width:auto!important}
+.hbtns{display:flex;align-items:center;gap:5px;flex-wrap:wrap;justify-content:flex-end}
+.hbtns .btn,.hbtns a{font-size:clamp(9px,1.1vw,11px)!important;padding:4px 8px!important;white-space:nowrap}
+.live-badge,.view-badge{font-size:clamp(9px,1vw,11px)!important;padding:4px 8px!important;white-space:nowrap}
+/* Logo + title block */
+header>div:first-child{flex:1;min-width:0;overflow:hidden}
+header>div:first-child>div:first-child{flex-shrink:0}
+
+/* iPad (768-1024px) */
+@media(min-width:768px) and (max-width:1024px){
+  header{padding:10px 16px}
+  header .ht{font-size:14px}
+  header .hs{font-size:10px}
+  #simon-logo{height:38px!important}
+  .hbtns .btn,.hbtns a{font-size:9px!important;padding:4px 7px!important}
+}
+
+/* Mobile (≤767px) */
+@media(max-width:767px){
+  header{
+    padding:8px 12px;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:6px;
+  }
+  header>div:first-child{
+    display:flex;align-items:center;gap:8px;width:100%
+  }
+  #simon-logo{height:32px!important}
+  header .ht{font-size:12px;white-space:normal;line-height:1.2}
+  header .hs{font-size:9px}
+  .hbtns{width:100%;justify-content:flex-start;gap:4px}
+  .hbtns .btn,.hbtns a{font-size:9px!important;padding:4px 6px!important}
+  .live-badge,.view-badge{font-size:8px!important;padding:3px 6px!important}
 }
 
 </style></head><body><div class="page">${pageHeader('Checklist (ต่อ)')}${p2cards}${rptHTML}${ftr}</div></body></html>`;
