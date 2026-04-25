@@ -610,7 +610,7 @@ body.view-mode .edit-only{display:none!important}
 <div class="card">
   <div class="SH"><div class="SN" style="background:#2e7d32">1</div><div class="ST">งานทาสีรองพื้น</div><div class="Stg" style="margin-left:auto">เป้า 20%</div><button onclick="if(confirm('รีเซ็ต S1 ทาสีรองพื้น เป็น 0% ?'))resetS1();" class="edit-only" style="margin-left:8px;background:rgba(255,68,68,.12);border:1px solid rgba(255,68,68,.3);color:var(--red);border-radius:6px;padding:3px 9px;cursor:pointer;font-size:10px">🔄 รีเซ็ต</button></div>
   <div class="C2" style="margin-bottom:10px">
-    <div class="MS"><span class="MSi">🎨</span><div><div class="MSl">รวมทั้งหมด</div><div class="MSv">62 ช่อง</div></div></div>
+    <div class="MS"><span class="MSi">🎨</span><div><div class="MSl">รวมทั้งหมด</div><div class="MSv">62 ช่อง · 1.61%/ช่อง</div></div></div>
     <div class="MS"><span class="MSi">📊</span><div><div class="MSl">ความคืบหน้า</div><div class="MSv"><span id="s1p" style="color:var(--red);font-weight:800">0%</span> / 20%</div></div></div>
   </div>
   <input type="hidden" id="s1" value="0">
@@ -1914,28 +1914,42 @@ function getDeadlineForCalc(){
 
 // ════ S1 Paint Primer — Floor Grid System ════
 const S1_GROUPS=[
-  {name:'ห้องพัก ชั้น 1', col:'var(--gold)',   slots:['ห้อง101','ห้อง102','ห้อง103','ร้านค้า','ห้องซักอบ']},
-  {name:'ห้องพัก ชั้น 2', col:'var(--cyan)',   slots:['ห้อง201','ห้อง202','ห้อง203','ห้อง204','ห้อง205','ห้อง206','ห้อง207','ห้อง208','ห้อง209','ห้อง210','ห้อง211']},
-  {name:'ห้องพัก ชั้น 3', col:'var(--green)',  slots:['ห้อง301','ห้อง302','ห้อง303','ห้อง304','ห้อง305','ห้อง306','ห้อง307','ห้อง308','ห้อง309','ห้อง310','ห้อง311']},
+  {name:'ห้องพัก ชั้น 1', col:'var(--gold)', slots:['ห้อง101','ห้อง102','ห้อง103','ร้านค้า','ห้องซักอบ']},
+  {name:'ห้องพัก ชั้น 2', col:'var(--cyan)', slots:['ห้อง201','ห้อง202','ห้อง203','ห้อง204','ห้อง205','ห้อง206','ห้อง207','ห้อง208','ห้อง209','ห้อง210','ห้อง211']},
+  {name:'ห้องพัก ชั้น 3', col:'var(--green)', slots:['ห้อง301','ห้อง302','ห้อง303','ห้อง304','ห้อง305','ห้อง306','ห้อง307','ห้อง308','ห้อง309','ห้อง310','ห้อง311']},
   {name:'ห้องพัก ชั้น 4', col:'var(--orange)', slots:['ห้อง401','ห้อง402','ห้อง403','ห้อง404','ห้อง405','ห้อง406','ห้อง407','ห้อง408','ห้อง409','ห้อง410','ห้อง411']},
-  {name:'ห้องพัก ชั้น 5', col:'#ce93d8',       slots:['ห้อง501','ห้อง502','ห้อง503','ห้อง504','ห้อง505','ห้อง506','ห้อง507','ห้อง508','ห้อง509','ห้อง510','ห้อง511']},
-  {name:'ทางเดิน+โถง',   col:'#4fc3f7',       slots:['ทางเดิน ชั้น1','โถง ชั้น1','ทางเดิน ชั้น2','โถง ชั้น2','ทางเดิน ชั้น3','โถง ชั้น3','ทางเดิน ชั้น4','โถง ชั้น4','ทางเดิน ชั้น5','โถง ชั้น5']},
-  {name:'ภายนอกอาคาร',  col:'var(--red)',     slots:['ด้านหน้า','ด้านหลัง','ด้านซ้าย','ด้านขวา']},
+  {name:'ห้องพัก ชั้น 5', col:'#ce93d8', slots:['ห้อง501','ห้อง502','ห้อง503','ห้อง504','ห้อง505','ห้อง506','ห้อง507','ห้อง508','ห้อง509','ห้อง510','ห้อง511']},
+  {name:'ทางเดิน+โถง',   col:'#4fc3f7', slots:['ทางเดิน ชั้น1','โถง ชั้น1','ทางเดิน ชั้น2','โถง ชั้น2','ทางเดิน ชั้น3','โถง ชั้น3','ทางเดิน ชั้น4','โถง ชั้น4','ทางเดิน ชั้น5','โถง ชั้น5']},
+  {name:'ภายนอกอาคาร',  col:'var(--red)', slots:['ด้านหน้า','ด้านหลัง','ด้านซ้าย','ด้านขวา']},
 ];
 const S1_TOTAL=62;
 const S1_TGT=20;
 
 
 function resetS1(){
-  // รีเซ็ต S1 ทั้งหมดเป็น 0
+  // 1. เคลียร์ grid ทิ้ง
+  const c=document.getElementById('s1-grid');
+  if(c) c.innerHTML='';
+
+  // 2. Rebuild grid (ตอนนี้ #s1r0 ไม่มีใน DOM → ค่า default=0)
+  buildS1UI(true);
+
+  // 3. ตั้งทุก input เป็น 0 ชัดเจน
   for(let i=0;i<S1_TOTAL;i++){
     const inp=document.getElementById('s1r'+i);
-    if(inp) inp.value=0;
+    if(inp){ inp.value='0'; }
   }
+
+  // 4. reset hidden + bar
   const hid=document.getElementById('s1');
   if(hid) hid.value='0';
+
+  // 5. อัพเดท display
   updS1();
-  scheduleAutoSave();
+
+  // 6. บันทึกลง Firebase (overwrite ข้อมูลเก่า)
+  saveData();
+
   showToast('รีเซ็ต S1 ทาสีรองพื้น เป็น 0% แล้ว','ok');
 }
 
@@ -1943,7 +1957,7 @@ function buildS1UI(force=false){
   const c=document.getElementById('s1-grid');
   if(!c)return;
   if(!force&&c.querySelector('#s1r0'))return;
-  const WTP=S1_TGT/S1_TOTAL;
+  const WTP=100/S1_TOTAL; // 1.61% ต่อช่อง
   let out=''; let idx=0;
   S1_GROUPS.forEach(g=>{
     out+=`<div style="grid-column:1/-1;padding:4px 0 2px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:2px"><span style="font-size:10px;font-weight:800;color:${g.col}">${g.name}</span></div>`;
@@ -1952,10 +1966,11 @@ function buildS1UI(force=false){
       const val=parseFloat(document.getElementById('s1r'+i)?.value||0)||0;
       const dn=val>=100;
       const bc=dn?'rgba(0,230,118,.5)':'var(--bdrh)';
+      const contrib=(Math.min(100,val)*WTP/100).toFixed(2);
       out+=`<div class="PB ${dn?'dn':'pd'}" style="width:100%;padding:5px 3px">`;
       out+=`<div style="font-size:7px;font-weight:700;color:var(--tx2);margin-bottom:3px;text-align:center;line-height:1.2">${lbl}</div>`;
       out+=`<input class="PI" type="text" inputmode="decimal" pattern="[0-9.]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="s1r${i}" value="${val}" oninput="updS1();scheduleAutoSave()" style="width:100%;font-size:12px;font-weight:700;text-align:center;padding:3px 2px;background:transparent;border:1px solid ${bc};-webkit-user-select:text;user-select:text;min-height:32px;box-sizing:border-box">`;
-      out+=`<div style="font-size:7px;color:var(--tx3);margin-top:2px;text-align:center">${(val*WTP/100).toFixed(2)}%</div>`;
+      out+=`<div style="font-size:7px;color:var(--tx3);margin-top:1px;text-align:center">${contrib}%</div>`;
       out+=`</div>`;
       idx++;
     });
@@ -1964,15 +1979,16 @@ function buildS1UI(force=false){
 }
 
 function updS1(){
-  const WTP=S1_TGT/S1_TOTAL;
+  const WTP=100/S1_TOTAL; // 100/62 = 1.61% ต่อช่อง
   let total=0,done=0;
   for(let i=0;i<S1_TOTAL;i++){
     const val=parseFloat(document.getElementById('s1r'+i)?.value||0)||0;
-    total+=val*WTP/100;
-    if(val>=100)done++;
+    const pct=Math.min(100,val);
+    total+=pct*WTP/100;
+    if(pct>=100)done++;
     const inp=document.getElementById('s1r'+i);
     if(inp){
-      const dn=val>=100;
+      const dn=pct>=100;
       const box=inp.closest('.PB');
       if(box)box.className='PB '+(dn?'dn':'pd');
       inp.style.borderColor=dn?'rgba(0,230,118,.5)':'var(--bdrh)';
@@ -2038,7 +2054,7 @@ function buildS1Chart(){
   const ctx=document.getElementById('s1LineChart')?.getContext('2d');if(!ctx){window._buildingS1=false;return;}
   if(_s1Chart){_s1Chart.destroy();_s1Chart=null;}
   const TOTAL=S1_TOTAL||62;
-  const TGT=S1_TGT||20;
+  const TGT=100; // 62 ช่อง = 100%
   const WTP=TGT/TOTAL;
   const labels=['ก่อนเริ่ม'];
   for(let i=1;i<=TOTAL;i++)labels.push('ช่อง '+i);
