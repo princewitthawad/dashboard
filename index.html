@@ -603,7 +603,7 @@ body.view-mode .edit-only{display:none!important}
   <div class="DP" id="tab-s5"><div style="font-size:12px;color:var(--tx2);margin-bottom:14px">งานไฟฟ้า กรีดผนัง+ฝังท่อ · 49 ห้อง (ชั้น1=3, ชั้น2-5=11/ชั้น) · เป้า 100%</div><div class="DGrid" style="grid-template-columns:repeat(5,1fr)" id="g-s5"></div></div>
   <div class="DP" id="tab-s6"><div style="font-size:12px;color:var(--tx2);margin-bottom:14px">งานท่อน้ำดี ชั้น1-3 · 26 ห้อง · เป้า 100%</div><div class="DGrid" style="grid-template-columns:repeat(4,1fr)" id="g-s6"></div></div>
   <div class="DP" id="tab-s8"><div style="font-size:12px;color:var(--tx2);margin-bottom:14px">งานเดินท่อน้ำดี ชั้น 4-5 · 22 ห้อง · เป้า 50%</div><div class="DGrid" style="grid-template-columns:repeat(5,1fr)" id="g-s8"></div></div>
-  <div class="DP" id="tab-s7"><div style="font-size:12px;color:var(--tx2);margin-bottom:14px">งานฉาบผนัง (ชั้น1/2/4) · 28 ช่อง · เป้า 100%</div><div class="DGrid" style="grid-template-columns:repeat(5,1fr)" id="g-s7"></div></div>
+  <div class="DP" id="tab-s7"><div style="font-size:12px;color:var(--tx2);margin-bottom:14px">งานฉาบผนัง (ชั้น1/2/4) · 30 ช่อง · เป้า 100%</div><div class="DGrid" style="grid-template-columns:repeat(5,1fr)" id="g-s7"></div></div>
 </div>
 
 <div id="zone-s1">
@@ -723,7 +723,7 @@ body.view-mode .edit-only{display:none!important}
   </div>
   <div class="G2" style="gap:16px;align-items:stretch">
     <div style="display:flex;flex-direction:column">
-      <div class="PW"><div class="PM"><span class="PL">เป้าหมาย (จำนวนห้อง)</span><div class="IG"><input type="hidden" id="s7" value="18.2"><input class="PI" type="text" inputmode="decimal" pattern="[0-9.]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="s7r-inp" maxlength="4" value="9" oninput="updS7Target(this.value)" style="width:54px"><span class="Ps">ห้อง</span><span class="PP" id="s7p" style="color:var(--orange);font-size:18px;font-weight:800">18.2%</span><span style="font-size:11px;color:var(--tx3);margin-left:3px" id="s7-tgt-bar">/100%</span></div></div><div class="PBG"><div class="PF o" id="s7b" style="width:18.2%"></div></div></div>
+      <div class="PW"><div class="PM"><span class="PL">เป้าหมาย (จำนวนห้อง)</span><div class="IG"><input type="hidden" id="s7" value="18.2"><input class="PI" type="text" inputmode="decimal" pattern="[0-9.]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="s7r-inp" maxlength="4" value="30" oninput="updS7Target(this.value)" style="width:54px"><span class="Ps">ห้อง</span><span class="PP" id="s7p" style="color:var(--orange);font-size:18px;font-weight:800">18.2%</span><span style="font-size:11px;color:var(--tx3);margin-left:3px" id="s7-tgt-bar">/100%</span></div></div><div class="PBG"><div class="PF o" id="s7b" style="width:18.2%"></div></div></div>
       <div style="margin-top:9px;padding:9px 12px;background:var(--bg2);border-radius:7px;border:1px solid var(--bdr)"><div style="display:flex;justify-content:space-between"><span style="font-size:11px;color:var(--tx2)">ทำแล้ว: <span style="color:var(--green);font-weight:700;font-family:var(--m)" id="s7dr">4 ห้อง</span></span><span style="font-size:11px;color:var(--tx2)">ยังต้องทำ: <span style="color:var(--orange);font-weight:700;font-family:var(--m)" id="s7r">21.8%</span></span></div></div>
       <div style="margin-top:6px;background:var(--bg2);border:1px solid var(--bdr);border-radius:9px;padding:12px 14px;flex:1;display:flex;flex-direction:column">
         <div style="font-size:11px;font-weight:700;color:var(--orange);margin-bottom:8px;flex-shrink:0">📈 กราฟความคืบหน้า vs เป้าหมาย</div>
@@ -1009,7 +1009,7 @@ function setSvStatus(st,msg,time=''){
 }
 
 function collectState(){
-  return{s1:gv('s1'),s1rooms:Array.from({length:62},(_,i)=>parseFloat(document.getElementById('s1r'+i)?.value||0)||0),s5:gv('s5'),s6:gv('s6'),s7:gv('s7'),s7rooms:Array.from({length:30},(_,i)=>parseFloat(document.getElementById('s7r'+i)?.value||0)||0),s7cor:parseFloat(document.getElementById('s7cor')?.value||0)||0,s5r:parseFloat(document.getElementById('s5r-inp')?.value||0),s5rooms:Array.from({length:49},(_,i)=>parseFloat(document.getElementById('s5r'+i)?.value||0)||0),s6r:parseFloat(document.getElementById('s6r-inp')?.value||0),s8:gv('s8'),s8r:parseFloat(document.getElementById('s8r-inp')?.value||0),s7r:parseFloat(document.getElementById('s7r-inp')?.value||0),
+  return{s1:gv('s1'),s1rooms:Array.from({length:62},(_,i)=>parseFloat(document.getElementById('s1r'+i)?.value||0)||0),s5:gv('s5'),s6:gv('s6'),s7:gv('s7'),s7rooms:Array.from({length:FLOORS.reduce((a,f)=>a+f.slots,0)},(_,i)=>parseFloat(document.getElementById('s7r'+i)?.value||0)||0),s7cor:parseFloat(document.getElementById('s7cor')?.value||0)||0,s5r:parseFloat(document.getElementById('s5r-inp')?.value||0),s5rooms:Array.from({length:49},(_,i)=>parseFloat(document.getElementById('s5r'+i)?.value||0)||0),s6r:parseFloat(document.getElementById('s6r-inp')?.value||0),s8:gv('s8'),s8r:parseFloat(document.getElementById('s8r-inp')?.value||0),s7r:parseFloat(document.getElementById('s7r-inp')?.value||0),
     fd:FD.map(f=>f.pct),od:OD.map(o=>({fd:o.fd,bd:o.bd,sld:o.sld,srd:o.srd})),savedAt:new Date().toISOString()};
 }
 function applyState(s){
@@ -1374,15 +1374,16 @@ function updS3Area(){
 }
 function toggleS3Line(i){if(!_s3Chart)return;const meta=_s3Chart.getDatasetMeta(i);meta.hidden=!meta.hidden;_s3Chart.update();const el=document.getElementById('s3-leg-'+i);if(el)el.style.opacity=meta.hidden?'0.3':'1';}
 
+const FLOORS=[
+  {name:'ชั้น 1',slots:6, labels:['ห้อง101','ห้อง102','ห้อง103','ร้านค้า','ห้องซักอบ','โถงบันได']},
+  {name:'ชั้น 2',slots:12,labels:['ห้อง201','ห้อง202','ห้อง203','ห้อง204','ห้อง205','ห้อง206','ห้อง207','ห้อง208','ห้อง209','ห้อง210','ห้อง211','โถงบันได']},
+  {name:'ชั้น 4',slots:12,labels:['ห้อง401','ห้อง402','ห้อง403','ห้อง404','ห้อง405','ห้อง406','ห้อง407','ห้อง408','ห้อง409','ห้อง410','ห้อง411','โถงบันได']},
+];
 function buildPlasterUI(force=false){
   const c=document.getElementById('prooms');
   if(!c)return;
   if(!force&&c.querySelector('#s7r0'))return;
-  const FLOORS=[
-    {name:'ชั้น 1',slots:6, labels:['ห้อง101','ห้อง102','ห้อง103','ร้านค้า','ห้องซักอบ','โถงบันได']},
-    {name:'ชั้น 2',slots:12,labels:['ห้อง201','ห้อง202','ห้อง203','ห้อง204','ห้อง205','ห้อง206','ห้อง207','ห้อง208','ห้อง209','ห้อง210','ห้อง211','โถงบันได']},
-    {name:'ชั้น 4',slots:12,labels:['ห้อง401','ห้อง402','ห้อง403','ห้อง404','ห้อง405','ห้อง406','ห้อง407','ห้อง408','ห้อง409','ห้อง410','ห้อง411','โถงบันได']},
-  ];
+
   const WTP_R=100/30;
   let out='';
   let roomIdx=0;
@@ -1409,19 +1410,21 @@ function buildPlasterUI(force=false){
 }
 
 function updS7Target(v){
-  const t=Math.min(28,Math.max(0,parseInt(v)||0));
+  const TOTAL=FLOORS.reduce((a,f)=>a+f.slots,0)||30;
+  const t=Math.min(TOTAL,Math.max(0,parseInt(v)||0));
   const inp=document.getElementById('s7r-inp');if(inp)inp.value=t;
-  // คำนวณ % เป้าใหม่ (22 ห้อง = 100%)
-  const tgtPct=parseFloat((t/28*100).toFixed(2));
+  const tgtPct=parseFloat((t/TOTAL*100).toFixed(2));
   const e1=document.getElementById('s7-tgt-pct');if(e1)e1.textContent=tgtPct+'%';
-  const e2=document.getElementById('s7-tgt-lbl');if(e2)e2.textContent='('+tgtPct+'% ของ 22 ห้อง)';
+  const e2=document.getElementById('s7-tgt-lbl');if(e2)e2.textContent='('+t+'/'+TOTAL+' ช่อง = '+tgtPct+'%)';
   const e3=document.getElementById('s7-tgt-bar');if(e3)e3.textContent='/'+tgtPct+'%';
   buildPlasterUI(true);updPlaster();ra();scheduleAutoSave();
 }
 function updPlaster(){
-  const WTP_R=100/30;
+  const TOTAL=FLOORS.reduce((a,f)=>a+f.slots,0);
+  const target=TOTAL;
+  const WTP_R=100/TOTAL;
   let total=0,doneCount=0;
-  for(let i=0;i<30;i++){
+  for(let i=0;i<target;i++){
     const val=parseFloat(document.getElementById('s7r'+i)?.value||0)||0;
     total+=val*WTP_R/100;
     if(val>=100)doneCount++;
@@ -1670,11 +1673,12 @@ function buildS7Chart(){
   const WTP_R=100/30;
   // แกน X: ก่อนเริ่ม + 28 ช่อง
   const labels=['ก่อนเริ่ม'];
-  for(let i=1;i<=30;i++)labels.push('ช่อง '+i);
+  const S7T=FLOORS.reduce((a,f)=>a+f.slots,0);
+  for(let i=1;i<=S7T;i++)labels.push('ช่อง '+i);
   // actual
   const actual=[0];
   let cumActual=0;
-  for(let i=0;i<30;i++){
+  for(let i=0;i<S7T;i++){
     const v=parseFloat(document.getElementById('s7r'+i)?.value||0)||0;
     cumActual+=v*WTP_R/100;
     actual.push(parseFloat(Math.min(100,cumActual).toFixed(2)));
