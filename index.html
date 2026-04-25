@@ -603,7 +603,7 @@ body.view-mode .edit-only{display:none!important}
   <div class="DP" id="tab-s5"><div style="font-size:12px;color:var(--tx2);margin-bottom:14px">งานไฟฟ้า กรีดผนัง+ฝังท่อ · 49 ห้อง (ชั้น1=3, ชั้น2-5=11/ชั้น) · เป้า 100%</div><div class="DGrid" style="grid-template-columns:repeat(5,1fr)" id="g-s5"></div></div>
   <div class="DP" id="tab-s6"><div style="font-size:12px;color:var(--tx2);margin-bottom:14px">งานท่อน้ำดี ชั้น1-3 · 26 ห้อง · เป้า 100%</div><div class="DGrid" style="grid-template-columns:repeat(4,1fr)" id="g-s6"></div></div>
   <div class="DP" id="tab-s8"><div style="font-size:12px;color:var(--tx2);margin-bottom:14px">งานเดินท่อน้ำดี ชั้น 4-5 · 22 ห้อง · เป้า 50%</div><div class="DGrid" style="grid-template-columns:repeat(5,1fr)" id="g-s8"></div></div>
-  <div class="DP" id="tab-s7"><div style="font-size:12px;color:var(--tx2);margin-bottom:14px">งานฉาบผนัง (ชั้น1/2/4) · 30 ช่อง · เป้า 100%</div><div class="DGrid" style="grid-template-columns:repeat(5,1fr)" id="g-s7"></div></div>
+  <div class="DP" id="tab-s7"><div style="font-size:12px;color:var(--tx2);margin-bottom:14px">งานฉาบผนัง (ชั้น 2 และ 4) · 30 ช่อง · เป้า 100%</div><div class="DGrid" style="grid-template-columns:repeat(5,1fr)" id="g-s7"></div></div>
 </div>
 
 <div id="zone-s1">
@@ -627,262 +627,17 @@ body.view-mode .edit-only{display:none!important}
   </div>
 </div>
 
-
-
-
-<div class="card" id="zone-s3">
-  <div class="SH">
-    <div class="SN" style="background:var(--cyan);color:#000">3</div>
-    <div class="ST">งานก่ออิฐภายนอก</div>
-    <div class="Stg">เป้า 100%</div>
-    <span style="font-size:10px;color:var(--tx3);background:var(--bg2);border:1px solid var(--bdr);padding:2px 7px;border-radius:4px">พื้นที่รวม 980 ตร.ม.</span>
-    <div style="margin-left:auto;display:flex;align-items:center;gap:7px"><span style="font-size:11px;color:var(--tx2)">รวม:</span><span style="font-size:18px;font-weight:800;font-family:var(--m);color:var(--orange)" id="s3tp">—</span></div>
-  </div>
-  <div class="PBG" style="height:7px;margin-bottom:18px"><div class="PF o" id="s3bar" style="width:0%"></div></div>
-  <div class="s2-desktop"><div style="overflow-x:auto"><table style="width:100%;border-collapse:separate;border-spacing:0 5px"><thead><tr>
-    <th style="font-size:10px;color:var(--tx3);font-weight:600;padding:0 8px 6px;text-align:left;text-transform:uppercase">ชั้น</th>
-    <th style="font-size:10px;color:var(--tx3);font-weight:600;padding:0 8px 6px;text-align:center;text-transform:uppercase">น้ำหนัก</th>
-    <th style="font-size:10px;color:var(--tx3);font-weight:600;padding:0 8px 6px;text-align:center;text-transform:uppercase">ด้านหน้า (ตร.ม.)</th>
-    <th style="font-size:10px;color:var(--tx3);font-weight:600;padding:0 8px 6px;text-align:center;text-transform:uppercase">ด้านหลัง (ตร.ม.)</th>
-    <th style="font-size:10px;color:var(--tx3);font-weight:600;padding:0 8px 6px;text-align:center;text-transform:uppercase">ด้านซ้าย (ตร.ม.)</th>
-    <th style="font-size:10px;color:var(--tx3);font-weight:600;padding:0 8px 6px;text-align:center;text-transform:uppercase">ด้านขวา (ตร.ม.)</th>
-    <th style="font-size:10px;color:var(--tx3);font-weight:600;padding:0 8px 6px;text-align:center;text-transform:uppercase">ทำแล้ว (ตร.ม.)</th>
-    <th style="font-size:10px;color:var(--tx3);font-weight:600;padding:0 8px 6px;text-align:center;text-transform:uppercase">%คืบหน้า</th>
-  </tr></thead><tbody id="s3body"></tbody></table></div></div>
-  <div class="s2-mobile" id="s3cards"></div>
-  <div style="margin-top:16px;border-top:1px solid var(--bdr);padding-top:14px">
-    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-      <div style="font-size:12px;font-weight:700;color:var(--cyan)">📐 สรุปพื้นที่รวม</div>
-      <div style="display:flex;gap:16px;flex-wrap:wrap">
-        <div style="display:flex;align-items:baseline;gap:4px"><span style="font-size:9px;color:var(--tx3)">ทำแล้ว</span><span style="font-size:16px;font-weight:800;font-family:var(--m);color:var(--cyan)" id="s3-done">—</span><span style="font-size:9px;color:var(--tx3)">ตร.ม.</span></div>
-        <div style="display:flex;align-items:baseline;gap:4px"><span style="font-size:9px;color:var(--tx3)">ทั้งหมด</span><span style="font-size:16px;font-weight:800;font-family:var(--m);color:var(--tx2)" id="s3-all">—</span><span style="font-size:9px;color:var(--tx3)">ตร.ม.</span></div>
-        <div style="display:flex;align-items:baseline;gap:4px"><span style="font-size:9px;color:var(--tx3)">เหลือ</span><span style="font-size:16px;font-weight:800;font-family:var(--m);color:var(--orange)" id="s3-rem">—</span><span style="font-size:9px;color:var(--tx3)">ตร.ม.</span></div>
-      </div>
-      <button id="s3-toggle-btn" onclick="toggleS3Detail()" style="margin-left:auto;background:rgba(0,212,255,.1);color:var(--cyan);border:1px solid rgba(0,212,255,.3);border-radius:7px;padding:5px 12px;font-size:11px;cursor:pointer;font-family:var(--f);font-weight:600;display:flex;align-items:center;gap:5px;transition:all .2s">
-        <span id="s3-ico">▼</span> รายละเอียดชั้น
-      </button>
-    </div>
-    <div id="s3-detail" class="s3-ext"><div id="s3-area-tbl" style="margin-top:12px"></div></div>
-  </div>
-</div>
-
-<div class="C2" id="zone-s5s6">
+<div class="C2" id="zone-s7f1">
 <div class="card">
-  <div class="SH"><div class="SN" style="background:#9c27b0">5</div><div class="ST">งานไฟฟ้า กรีดผนัง+ฝังท่อ</div><div class="Stg" style="margin-left:auto">เป้า 100%</div></div>
-  <div class="C2" style="margin-bottom:10px">
-    <div class="MS"><span class="MSi">🔌</span><div><div class="MSl">ห้องทั้งหมด</div><div class="MSv">49 ห้อง</div></div></div>
-    <div class="MS"><span class="MSi">📊</span><div><div class="MSl">ความคืบหน้า</div><div class="MSv"><span id="s5p" style="color:var(--red);font-weight:800">0%</span></div></div></div>
+  <div class="SH"><div class="SN" style="background:#e64a19">2</div><div class="ST">งานฉาบผนัง ชั้น 1</div><div class="Stg" style="margin-left:auto">เป้า 100%</div></div>
+  <input type="hidden" id="s7f1" value="0">
+  <div id="prooms-f1" style="display:grid;grid-template-columns:repeat(6,1fr);gap:5px;width:100%;margin-top:10px"></div>
+  <div style="margin-top:10px;padding:8px 12px;background:var(--bg2);border-radius:7px;border:1px solid var(--bdr)">
+    <div style="font-size:11px;color:var(--tx2)">ความคืบหน้า: <span id="s7f1p" style="color:var(--orange);font-weight:700">0%</span> / 100%</div>
   </div>
-  <input type="hidden" id="s5" value="0">
-  <div id="s5-floors" style="display:grid;grid-template-columns:repeat(6,1fr);gap:5px;width:100%"></div>
-  <div style="margin-top:10px;padding:9px 12px;background:var(--bg2);border-radius:7px;border:1px solid var(--bdr)">
-    <div style="font-size:11px;color:var(--tx2)">ยังต้องทำ: <span style="color:var(--orange);font-weight:700;font-family:var(--m)" id="s5r">—</span></div>
-    <div style="font-size:11px;color:var(--tx2);margin-top:3px">ห้องที่ทำแล้ว: <span style="color:var(--tx);font-weight:700;font-family:var(--m)" id="s5rm">—</span></div>
-  </div>
-  <div id="s5b-bar" style="margin-top:8px"><div class="PBG"><div class="PF r" id="s5b" style="width:0%"></div></div></div>
-  <div style="margin-top:12px;background:var(--bg2);border:1px solid var(--bdr);border-radius:9px;padding:12px">
-    <div style="font-size:11px;font-weight:700;color:var(--purple);margin-bottom:8px">📈 กราฟความคืบหน้า vs เป้าหมาย</div>
-    <div style="position:relative;height:160px"><canvas id="s5LineChart"></canvas></div>
-  </div>
-</div>
-<div class="card">
-  <div class="SH"><div class="SN" style="background:#00838f">6</div><div class="ST">งานเดินท่อน้ำดี ชั้น 1-3</div><div class="Stg" style="margin-left:auto">เป้า 100%</div></div>
-  <div class="C2" style="margin-bottom:12px"><div class="MS"><span class="MSi">💧</span><div><div class="MSl">ห้องทั้งหมด</div><div class="MSv">26 ห้อง</div></div></div><div class="MS"><span class="MSi">⚖️</span><div><div class="MSl">น้ำหนักต่อห้อง</div><div class="MSv">3.85%</div></div></div></div>
-  <div class="PW"><div class="PM"><span class="PL">ชั้น 1–3</span><div class="IG"><input type="hidden" id="s6" value="0"><input class="PI" type="text" inputmode="decimal" pattern="[0-9.]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="s6r-inp" maxlength="4" value="0" oninput="updRooms('s6',this.value,26)" style="width:54px"><span class="Ps">ห้อง</span><span class="PP" id="s6p" style="color:var(--red);font-size:18px;font-weight:800">0%</span><span style="font-size:11px;color:var(--tx3);margin-left:3px">/100%</span></div></div><div class="PBG"><div class="PF r" id="s6b" style="width:0%"></div></div></div>
-  <div style="margin-top:10px;padding:9px 12px;background:var(--bg2);border-radius:7px;border:1px solid var(--bdr)"><div style="font-size:11px;color:var(--tx2)">ยังต้องทำ: <span style="color:var(--orange);font-weight:700;font-family:var(--m)" id="s6r">—</span></div><div style="font-size:11px;color:var(--tx2);margin-top:3px">ห้องที่ทำแล้ว: <span style="color:var(--tx);font-weight:700;font-family:var(--m)" id="s6rm">—</span></div></div>
-</div>
-</div>
-
-
-<div class="C2" id="zone-s8">
-<div class="card">
-  <div class="SH"><div class="SN" style="background:#0277bd">8</div><div class="ST">งานเดินท่อน้ำดี ชั้น 4-5</div><div class="Stg" style="margin-left:auto">เป้า 100%</div></div>
-  <div class="C2" style="margin-bottom:12px">
-    <div class="MS"><span class="MSi">🔵</span><div><div class="MSl">ห้องทั้งหมด</div><div class="MSv">22 ห้อง</div></div></div>
-    <div class="MS"><span class="MSi">⚖️</span><div><div class="MSl">น้ำหนักต่อห้อง</div><div class="MSv">4.55%</div></div></div>
-  </div>
-  <div class="PW"><div class="PM"><span class="PL">ชั้น 4-5</span><div class="IG">
-    <input type="hidden" id="s8" value="0">
-    <input class="PI" type="text" inputmode="decimal" pattern="[0-9.]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="s8r-inp" maxlength="4" value="0" oninput="updRooms('s8',this.value,22)" style="width:54px">
-    <span class="Ps">ห้อง</span>
-    <span class="PP" id="s8p" style="color:var(--red);font-size:18px;font-weight:800">0%</span>
-    <span style="font-size:11px;color:var(--tx3);margin-left:3px">/50%</span>
-  </div></div><div class="PBG"><div class="PF r" id="s8b" style="width:0%"></div></div></div>
-  <div style="margin-top:10px;padding:9px 12px;background:var(--bg2);border-radius:7px;border:1px solid var(--bdr)">
-    <div style="font-size:11px;color:var(--tx2)">ยังต้องทำ: <span style="color:var(--orange);font-weight:700;font-family:var(--m)" id="s8r">—</span></div>
-    <div style="font-size:11px;color:var(--tx2);margin-top:3px">ห้องที่ทำแล้ว: <span style="color:var(--tx);font-weight:700;font-family:var(--m)" id="s8rm">—</span></div>
-  </div>
+  <div class="PBG" style="margin-top:8px"><div class="PF r" id="s7f1b" style="width:0%"></div></div>
 </div>
 <div></div>
-</div>
-<div class="card" id="zone-s7">
-  <div class="SH"><div class="SN" style="background:#f57c00">7</div><div class="ST">งานฉาบผนังภายใน (ชั้น 1, 2 และ 4)</div><div class="Stg" style="margin-left:auto">เป้า <span id="s7-tgt-pct">100%</span></div><span style="font-size:10px;color:var(--tx3);background:var(--bg2);border:1px solid var(--bdr);padding:2px 7px;border-radius:4px">รวม 28 ช่อง</span></div>
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;padding:10px 14px;background:rgba(255,149,0,.07);border:1px solid rgba(255,149,0,.25);border-radius:8px">
-    <span style="font-size:22px">🎯</span>
-    <div><div style="font-size:11px;color:var(--tx3);margin-bottom:2px">จำนวนเป้าหมาย</div><div style="font-size:20px;font-weight:800;font-family:var(--m);color:var(--orange)">30 ช่อง <span id="s7-tgt-lbl" style="font-size:13px;font-weight:600;color:var(--tx3)">(ชั้น1=6, ชั้น2=12, ชั้น4=12)</span></div></div>
-  </div>
-  <div class="G2" style="gap:16px;align-items:stretch">
-    <div style="display:flex;flex-direction:column">
-      <div class="PW"><div class="PM"><span class="PL">เป้าหมาย (จำนวนห้อง)</span><div class="IG"><input type="hidden" id="s7" value="18.2"><input class="PI" type="text" inputmode="decimal" pattern="[0-9.]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="s7r-inp" maxlength="4" value="30" oninput="updS7Target(this.value)" style="width:54px"><span class="Ps">ห้อง</span><span class="PP" id="s7p" style="color:var(--orange);font-size:18px;font-weight:800">18.2%</span><span style="font-size:11px;color:var(--tx3);margin-left:3px" id="s7-tgt-bar">/100%</span></div></div><div class="PBG"><div class="PF o" id="s7b" style="width:18.2%"></div></div></div>
-      <div style="margin-top:9px;padding:9px 12px;background:var(--bg2);border-radius:7px;border:1px solid var(--bdr)"><div style="display:flex;justify-content:space-between"><span style="font-size:11px;color:var(--tx2)">ทำแล้ว: <span style="color:var(--green);font-weight:700;font-family:var(--m)" id="s7dr">4 ห้อง</span></span><span style="font-size:11px;color:var(--tx2)">ยังต้องทำ: <span style="color:var(--orange);font-weight:700;font-family:var(--m)" id="s7r">21.8%</span></span></div></div>
-      <div style="margin-top:6px;background:var(--bg2);border:1px solid var(--bdr);border-radius:9px;padding:12px 14px;flex:1;display:flex;flex-direction:column">
-        <div style="font-size:11px;font-weight:700;color:var(--orange);margin-bottom:8px;flex-shrink:0">📈 กราฟความคืบหน้า vs เป้าหมาย</div>
-        <div style="position:relative;flex:1"><canvas id="s7LineChart"></canvas></div>
-      </div>
-    </div>
-    <div>
-      <div style="font-size:11px;color:var(--tx2);margin-bottom:9px">สถานะห้อง (แต่ละช่อง = 4.55%)</div>
-      <div id="prooms" style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;width:100%"></div>
-
-    </div>
-  </div>
-</div>
-
-<div class="SB" id="zone-summary">
-  <div class="SBt">สรุปภาพรวมโครงการ</div>
-  <div class="SBg" id="sbg"></div>
-  <div class="LU" id="lu"></div>
-</div>
-
-<div style="display:flex;justify-content:center;gap:12px;padding:16px 0 6px;flex-wrap:wrap">
-  <button onclick="showRealtimeGuide()" class="btn btn-b edit-only" style="padding:9px 20px;font-size:12px">🌐 คู่มือแชร์ Realtime</button>
-  <button onclick="openJupiter()" class="edit-only" style="background:linear-gradient(135deg,rgba(26,35,126,.6),rgba(255,214,0,.2));color:var(--gold);border:1px solid rgba(255,214,0,.5);border-radius:10px;padding:12px 28px;font-size:14px;cursor:pointer;font-family:var(--f);font-weight:700;display:inline-flex;align-items:center;gap:8px;transition:all .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">🪐 Jupiter AI ↗</button>
-
-  <button id="ai-insights-btn" onclick="openAIInsights()" class="edit-only" style="background:linear-gradient(135deg,rgba(76,175,80,.3),rgba(76,175,80,.1));color:#76ff03;border:1px solid rgba(118,255,3,.5);border-radius:10px;padding:12px 28px;font-size:14px;cursor:pointer;font-family:var(--f);font-weight:700;display:inline-flex;align-items:center;gap:8px;transition:all .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">🧠 AI Insights ↗</button>
-
-  <button onclick="openChecklistPage()" class="edit-only" style="background:linear-gradient(135deg,rgba(0,60,120,.6),rgba(56,139,253,.2));color:var(--blue);border:1px solid rgba(56,139,253,.5);border-radius:10px;padding:12px 28px;font-size:14px;cursor:pointer;font-family:var(--f);font-weight:700;display:inline-flex;align-items:center;gap:8px;transition:all .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">📋 Checklist ประสานงานหน้างาน ↗</button>
-
-  <button onclick="openAnalysisPage()" class="edit-only" style="background:linear-gradient(135deg,rgba(0,100,60,.6),rgba(0,230,118,.2));color:var(--green);border:1px solid rgba(0,230,118,.4);border-radius:10px;padding:12px 28px;font-size:14px;cursor:pointer;font-family:var(--f);font-weight:700;display:inline-flex;align-items:center;gap:8px;transition:all .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">📈 วิเคราะห์ — กราฟ & แผนรายวัน ↗</button>
-
-  <button onclick="openWorkforceAdmin()" class="edit-only" style="background:linear-gradient(135deg,rgba(0,188,212,.3),rgba(0,188,212,.1));color:var(--cyan);border:1px solid rgba(0,188,212,.5);border-radius:10px;padding:12px 28px;font-size:14px;cursor:pointer;font-family:var(--f);font-weight:700;display:inline-flex;align-items:center;gap:8px;transition:all .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">👷 กำลังพลในไซท์ ↗</button>
-
-  <button onclick="openADS()" class="edit-only" style="background:linear-gradient(135deg,rgba(255,68,68,.25),rgba(255,149,0,.15));color:var(--orange);border:1px solid rgba(255,149,0,.5);border-radius:10px;padding:12px 28px;font-size:14px;cursor:pointer;font-family:var(--f);font-weight:700;display:inline-flex;align-items:center;gap:8px;transition:all .2s;position:relative" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">🧠 AI Decision<span id="ads-bell" style="display:none;position:absolute;top:-6px;right:-6px;background:var(--red);color:#fff;border-radius:50%;width:18px;height:18px;font-size:10px;font-weight:800;align-items:center;justify-content:center">0</span></button>
-</div>
-
-<div id="checklist-overlay" class="overlay">
-  <button class="ov-close" onclick="document.getElementById('checklist-overlay').classList.remove('show')">✕ ปิด</button>
-  <div class="ov-inner" style="max-width:860px">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:10px">
-      <div>
-        <div style="font-size:18px;font-weight:800">📋 Checklist การประสานงานหน้างาน</div>
-        <div style="font-size:11px;color:var(--tx2);margin-top:3px;font-family:var(--m)">ภายในและภายนอกองค์กร · ติ๊กรายการที่ดำเนินการแล้ว</div>
-      </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button onclick="resetChecklist()" class="btn btn-r" style="font-size:11px">🔄 รีเซ็ต</button>
-        <button onclick="exportChecklistPDF()" class="btn edit-only" style="background:rgba(220,38,38,.15);color:#ff4444;border:1px solid rgba(220,38,38,.4);font-size:11px">📄 Export PDF</button>
-        <button onclick="shareChecklistLine()" class="btn edit-only" style="background:rgba(0,185,0,.15);color:#00b900;border:1px solid rgba(0,185,0,.4);font-size:11px">💚 แชร์ไป Line</button>
-      </div>
-    </div>
-    <div style="display:none">
-      <span id="cl-done-count">0</span>
-      <span id="cl-total-count">0</span>
-      <div id="cl-progress-bar"></div>
-      <span id="cl-pct">0%</span>
-    </div>
-    <div style="margin-bottom:20px">
-      <div style="font-size:13px;font-weight:700;color:var(--tx);margin-bottom:8px">📝 รายงานความคืบหน้า</div>
-      <textarea id="cl-report-text" class="cl-report" maxlength="1000" placeholder="พิมพ์รายงานความคืบหน้าที่นี่... (ไม่เกิน 1,000 ตัวอักษร)" autocomplete="off" autocorrect="off" spellcheck="false" inputmode="text"></textarea>
-      <div style="display:flex;justify-content:space-between;margin-top:5px"><span style="font-size:10px;color:var(--tx3)" id="cl-report-count">0 / 1,000</span><span style="font-size:10px;color:var(--tx3)">รองรับคำสั่งเสียง 🎤</span></div>
-    </div>
-    <div id="checklist-body"></div>
-  </div>
-</div>
-
-<div id="lock-modal">
-  <div class="lm-card">
-    <div class="lm-acc"></div>
-    <div class="lm-body">
-      <div class="lm-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2a6cb8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><line x1="12" y1="15" x2="12" y2="17"/></svg></div>
-      <div class="lm-h">Restricted Access</div>
-      <div class="lm-dots" id="lm-dots">
-        <div class="lm-dot-inp" id="d0"></div><div class="lm-dot-inp" id="d1"></div><div class="lm-dot-inp" id="d2"></div>
-        <div class="lm-dot-inp" id="d3"></div><div class="lm-dot-inp" id="d4"></div><div class="lm-dot-inp" id="d5"></div>
-        <div class="lm-dot-inp" id="d6"></div><div class="lm-dot-inp" id="d7"></div>
-      </div>
-      <div style="display:none"><input id="lm-pw" type="password" maxlength="30" autocomplete="current-password" onkeydown="if(event.key==='Enter'){event.preventDefault();doUnlock();}"></div>
-      <div id="biometric-btn" style="display:none;margin-bottom:16px">
-        <button onclick="loginBiometric()" style="width:100%;padding:12px;background:linear-gradient(135deg,rgba(76,175,80,.3),rgba(76,175,80,.1));color:#76ff03;border:1px solid rgba(118,255,3,.5);border-radius:8px;font-family:var(--f);font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px">👆 ล็อกอินด้วย Face ID / Fingerprint</button>
-        <button onclick="registerBiometric()" style="width:100%;padding:8px;background:rgba(56,139,253,.12);color:var(--blue);border:1px solid rgba(56,139,253,.3);border-radius:8px;font-family:var(--f);font-size:11px;cursor:pointer">⚙️ ลงทะเบียน Face ID / Fingerprint</button>
-      </div>
-      <div class="lm-numgrid">
-        <button class="lm-num" ontouchstart="nmDown(this,'1');event.preventDefault()" ontouchend="nmUp(this)" ontouchcancel="nmUp(this)" onmousedown="nmDown(this,'1')" onmouseup="nmUp(this)" onmouseleave="nmUp(this)">1</button>
-        <button class="lm-num" ontouchstart="nmDown(this,'2');event.preventDefault()" ontouchend="nmUp(this)" ontouchcancel="nmUp(this)" onmousedown="nmDown(this,'2')" onmouseup="nmUp(this)" onmouseleave="nmUp(this)">2</button>
-        <button class="lm-num" ontouchstart="nmDown(this,'3');event.preventDefault()" ontouchend="nmUp(this)" ontouchcancel="nmUp(this)" onmousedown="nmDown(this,'3')" onmouseup="nmUp(this)" onmouseleave="nmUp(this)">3</button>
-        <button class="lm-num" ontouchstart="nmDown(this,'4');event.preventDefault()" ontouchend="nmUp(this)" ontouchcancel="nmUp(this)" onmousedown="nmDown(this,'4')" onmouseup="nmUp(this)" onmouseleave="nmUp(this)">4</button>
-        <button class="lm-num" ontouchstart="nmDown(this,'5');event.preventDefault()" ontouchend="nmUp(this)" ontouchcancel="nmUp(this)" onmousedown="nmDown(this,'5')" onmouseup="nmUp(this)" onmouseleave="nmUp(this)">5</button>
-        <button class="lm-num" ontouchstart="nmDown(this,'6');event.preventDefault()" ontouchend="nmUp(this)" ontouchcancel="nmUp(this)" onmousedown="nmDown(this,'6')" onmouseup="nmUp(this)" onmouseleave="nmUp(this)">6</button>
-        <button class="lm-num" ontouchstart="nmDown(this,'7');event.preventDefault()" ontouchend="nmUp(this)" ontouchcancel="nmUp(this)" onmousedown="nmDown(this,'7')" onmouseup="nmUp(this)" onmouseleave="nmUp(this)">7</button>
-        <button class="lm-num" ontouchstart="nmDown(this,'8');event.preventDefault()" ontouchend="nmUp(this)" ontouchcancel="nmUp(this)" onmousedown="nmDown(this,'8')" onmouseup="nmUp(this)" onmouseleave="nmUp(this)">8</button>
-        <button class="lm-num" ontouchstart="nmDown(this,'9');event.preventDefault()" ontouchend="nmUp(this)" ontouchcancel="nmUp(this)" onmousedown="nmDown(this,'9')" onmouseup="nmUp(this)" onmouseleave="nmUp(this)">9</button>
-        <button class="lm-num lm-num-s" ontouchstart="nmDown(this,null,'c');event.preventDefault()" ontouchend="nmUp(this)" ontouchcancel="nmUp(this)" onmousedown="nmDown(this,null,'c')" onmouseup="nmUp(this)" onmouseleave="nmUp(this)">ล้าง</button>
-        <button class="lm-num" ontouchstart="nmDown(this,'0');event.preventDefault()" ontouchend="nmUp(this)" ontouchcancel="nmUp(this)" onmousedown="nmDown(this,'0')" onmouseup="nmUp(this)" onmouseleave="nmUp(this)">0</button>
-        <button class="lm-num lm-num-s" ontouchstart="nmDown(this,null,'d');event.preventDefault()" ontouchend="nmUp(this)" ontouchcancel="nmUp(this)" onmousedown="nmDown(this,null,'d')" onmouseup="nmUp(this)" onmouseleave="nmUp(this)">&#x232B;</button>
-      </div>
-      <div class="lm-err" id="lm-err"></div>
-      <button class="lm-submit" onclick="doUnlock()">เข้าสู่ระบบ</button>
-      <button class="lm-ghost" onclick="closeLockModal()">ดูข้อมูลอย่างเดียว (Read Only)</button>
-      <div class="lm-foot"><div style="width:5px;height:5px;border-radius:50%;background:#0d1a28"></div>Construction Dashboard · Secured<div style="width:5px;height:5px;border-radius:50%;background:#0d1a28"></div></div>
-    </div>
-  </div>
-</div>
-
-<div id="pwc-modal">
-  <div class="pwc-card">
-    <div class="pwc-h">🔑 เปลี่ยนรหัสผ่าน</div>
-    <div class="pwc-s">รหัสผ่านใหม่จะบันทึกในเบราว์เซอร์นี้</div>
-    <div class="pwc-fld"><label class="pwc-lbl">รหัสผ่านปัจจุบัน</label><input class="pwc-inp" type="password" id="pwc-old" placeholder="รหัสผ่านเดิม" autocomplete="current-password"></div>
-    <div class="pwc-fld"><label class="pwc-lbl">รหัสผ่านใหม่ (4–20 ตัวอักษร)</label><input class="pwc-inp" type="password" id="pwc-new" placeholder="รหัสผ่านใหม่" maxlength="20" oninput="checkPwStrength(this.value)" autocomplete="new-password"><div class="pwc-str"><div class="pwc-str-b" id="pwc-bar" style="width:0%"></div></div><div class="pwc-hint" id="pwc-hint"></div></div>
-    <div class="pwc-fld"><label class="pwc-lbl">ยืนยันรหัสผ่านใหม่</label><input class="pwc-inp" type="password" id="pwc-confirm" placeholder="ยืนยันรหัสผ่าน" maxlength="20" autocomplete="new-password" onkeydown="if(event.key==='Enter')doChangePw()"></div>
-    <div class="pwc-err" id="pwc-err"></div>
-    <div class="pwc-btns"><button class="btn btn-b" style="flex:1" onclick="doChangePw()">✅ เปลี่ยนรหัสผ่าน</button><button class="btn btn-r" onclick="document.getElementById('pwc-modal').classList.remove('show')">ยกเลิก</button></div>
-  </div>
-</div>
-
-<div id="analysis-overlay" class="overlay">
-  <button class="ov-close" onclick="document.getElementById('analysis-overlay').classList.remove('show')">✕ ปิด</button>
-  <div class="ov-inner">
-    <div style="margin-bottom:20px"><div style="font-size:18px;font-weight:800">📈 วิเคราะห์ & แผนการทำงาน</div><div style="font-size:12px;color:var(--tx2);margin-top:4px">กราฟความคืบหน้า · บันทึกรายวัน · ความปลอดภัย</div></div>
-    <div class="TABS" id="an-tabs" style="margin-bottom:20px">
-      <button class="TAB ACT" onclick="switchAnalysisTab('overview',this)">📊 ภาพรวม</button>
-      <button class="TAB" onclick="switchAnalysisTab('trend',this)">📈 แนวโน้ม</button>
-      <button class="TAB" onclick="switchAnalysisTab('log',this)">📝 บันทึกรายวัน</button>
-      <button class="TAB" onclick="switchAnalysisTab('plan',this)">📅 แผนงาน</button>
-      <button class="TAB" onclick="switchAnalysisTab('safety',this)">🦺 ความปลอดภัย</button>
-    </div>
-    <div id="an-overview" class="DP SHW"><canvas id="overviewChart" height="320"></canvas></div>
-    <div id="an-trend" class="DP"><canvas id="trendChart" height="320"></canvas></div>
-    <div id="an-log" class="DP"></div>
-    <div id="an-plan" class="DP"></div>
-    <div id="an-safety" class="DP"></div>
-  </div>
-</div>
-
-<div id="api-key-modal" style="position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.8);backdrop-filter:blur(8px);padding:16px">
-  <div style="background:#08111e;border:1px solid rgba(56,139,253,.3);border-radius:16px;padding:28px;width:100%;max-width:420px;box-shadow:0 16px 48px rgba(0,0,0,.8)">
-    <div style="margin-bottom:20px">
-      <div style="font-size:18px;font-weight:800;color:#00d4ff;margin-bottom:6px">🔑 ตั้งค่า Claude API Key</div>
-      <div style="font-size:12px;color:var(--tx2);font-family:var(--m)">ใส่ API Key จาก Anthropic Console เพื่อใช้ Jupiter AI</div>
-    </div>
-    <div style="margin-bottom:16px">
-      <label style="display:block;font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;font-weight:600">Claude API Key</label>
-      <input id="api-key-input" type="password" placeholder="sk-ant-api03-..." style="width:100%;background:#040b14;border:1.5px solid #101e2e;border-radius:8px;padding:12px 14px;color:#e8f0fe;font-size:13px;font-family:monospace;outline:none;transition:border .2s;box-sizing:border-box;-webkit-user-select:text;user-select:text" onkeydown="if(event.key==='Enter'){doSaveAPIKey();}" onfocus="this.type='text'" onblur="this.type='password'">
-      <div style="font-size:10px;color:var(--tx3);margin-top:6px;font-family:var(--m)">✓ บันทึกในเบราว์เซอร์เท่านั้น (ไม่ส่งตรวจสอบ)</div>
-    </div>
-    <div id="api-key-err" style="font-size:11px;color:#ff6666;margin-bottom:12px;min-height:16px;font-family:var(--m)"></div>
-    <div style="display:flex;gap:10px">
-      <button onclick="doSaveAPIKey()" style="flex:1;padding:12px;background:linear-gradient(135deg,#1740b8,#1e90d4);color:#fff;border:none;border-radius:8px;font-family:var(--f);font-size:14px;font-weight:700;cursor:pointer;transition:filter .15s" onmouseover="this.style.filter='brightness(1.1)'" onmouseout="this.style.filter=''">✅ บันทึก API Key</button>
-      <button onclick="document.getElementById('api-key-modal').style.display='none'" style="padding:12px 16px;background:rgba(255,255,255,.04);color:var(--tx2);border:1px solid rgba(255,255,255,.1);border-radius:8px;font-family:var(--f);font-size:14px;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background='rgba(255,255,255,.04)'">ยกเลิก</button>
-    </div>
-    <div style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,.08);font-size:10px;color:var(--tx3);line-height:1.6">
-      <strong style="color:#00d4ff">ได้ API Key ยังไง?</strong><br>
-      1. ไปที่ <strong>https://console.anthropic.com</strong><br>
-      2. Sign Up / เข้าสู่ระบบ<br>
-      3. ไป API Keys → สร้าง New Key<br>
-      4. Copy Key ที่ขึ้นมา (เริ่มด้วย sk-ant-api03-)
-    </div>
-  </div>
-</div>
-
 </div>
 <script>
 const FD=[
@@ -906,12 +661,13 @@ const S4R=[
   {id:'r45',lbl:'ห้องซักอบ', wt:10},
 ];
 const SUMDEF=[
-  {lbl:'ทาสีรองพื้น',  key:'s1',  tgt:20, col:'#00e676'},
-  {lbl:'ก่ออิฐนอก',    key:'out', tgt:100,col:'#00bcd4'},
-  {lbl:'ไฟฟ้า+กรีดท่อ',key:'s5',  tgt:100,col:'#ce93d8'},
-  {lbl:'ท่อน้ำดี 1-3',  key:'s6',  tgt:100,col:'#388bfd'},
-  {lbl:'ฉาบผนัง',       key:'s7',  tgt:100,col:'#ffd600'},
-  {lbl:'ท่อน้ำ ชั้น4-5', key:'s8',  tgt:50, col:'#4fc3f7'},
+  {lbl:'S1 ทาสีรองพื้น',  key:'s1',  tgt:20, col:'#00e676'},
+  {lbl:'S2 ฉาบผนัง ชั้น1', key:'s7f1',tgt:100,col:'#ff7043'},
+  {lbl:'S3 ก่ออิฐนอก',    key:'out', tgt:100,col:'#00bcd4'},
+  {lbl:'S4 ไฟฟ้า+กรีดท่อ',key:'s5',  tgt:100,col:'#ce93d8'},
+  {lbl:'S5 ท่อน้ำดี 1-3',  key:'s6',  tgt:100,col:'#388bfd'},
+  {lbl:'S6 ฉาบผนัง ชั้น2+4',key:'s7', tgt:100,col:'#ffd600'},
+  {lbl:'S7 ท่อน้ำ ชั้น4-5', key:'s8',  tgt:50, col:'#4fc3f7'},
 ];
 
 const DEFAULT_HASH='7f2680e7a06147bb5e6ac4615d87265d0ca4fc52f2f1172cdea2f6dc860e0013';
@@ -1009,7 +765,7 @@ function setSvStatus(st,msg,time=''){
 }
 
 function collectState(){
-  return{s1:gv('s1'),s1rooms:Array.from({length:62},(_,i)=>parseFloat(document.getElementById('s1r'+i)?.value||0)||0),s5:gv('s5'),s6:gv('s6'),s7:gv('s7'),s7rooms:Array.from({length:FLOORS.reduce((a,f)=>a+f.slots,0)},(_,i)=>parseFloat(document.getElementById('s7r'+i)?.value||0)||0),s7cor:parseFloat(document.getElementById('s7cor')?.value||0)||0,s5r:parseFloat(document.getElementById('s5r-inp')?.value||0),s5rooms:Array.from({length:49},(_,i)=>parseFloat(document.getElementById('s5r'+i)?.value||0)||0),s6r:parseFloat(document.getElementById('s6r-inp')?.value||0),s8:gv('s8'),s8r:parseFloat(document.getElementById('s8r-inp')?.value||0),s7r:parseFloat(document.getElementById('s7r-inp')?.value||0),
+  return{s1:gv('s1'),s1rooms:Array.from({length:62},(_,i)=>parseFloat(document.getElementById('s1r'+i)?.value||0)||0),s5:gv('s5'),s6:gv('s6'),s7:gv('s7'),s7rooms:Array.from({length:FLOORS.reduce((a,f)=>a+f.slots,0)},(_,i)=>parseFloat(document.getElementById('s7r'+i)?.value||0)||0),f1rooms:Array.from({length:6},(_,i)=>parseFloat(document.getElementById('f1r'+i)?.value||0)||0),s7cor:parseFloat(document.getElementById('s7cor')?.value||0)||0,s5r:parseFloat(document.getElementById('s5r-inp')?.value||0),s5rooms:Array.from({length:49},(_,i)=>parseFloat(document.getElementById('s5r'+i)?.value||0)||0),s6r:parseFloat(document.getElementById('s6r-inp')?.value||0),s8:gv('s8'),s8r:parseFloat(document.getElementById('s8r-inp')?.value||0),s7r:parseFloat(document.getElementById('s7r-inp')?.value||0),
     fd:FD.map(f=>f.pct),od:OD.map(o=>({fd:o.fd,bd:o.bd,sld:o.sld,srd:o.srd})),savedAt:new Date().toISOString()};
 }
 function applyState(s){
@@ -1201,8 +957,8 @@ function calcOut(o){
 function getVals(){
   const s1=gv('s1'),s8=gv('s8');
   let out=0;OD.forEach(o=>{out+=calcOut(o).wp;});
-  const s5=gv('s5'),s6=gv('s6'),s7=gv('s7');
-  return{s1,out,s5,s6,s7,s8};
+  const s5=gv('s5'),s6=gv('s6'),s7=gv('s7'),s7f1=gv('s7f1');
+  return{s1,out,s5,s6,s7,s7f1,s8};
 }
 function buildS2(force){
   const tb=document.getElementById('s2body'),mc=document.getElementById('s2cards');
@@ -1359,7 +1115,7 @@ function updS3Area(){
   datasets.push({label:'สุขาภิบาล',data:OD.map(()=>parseFloat(gv('s6').toFixed(1))),borderColor:'#4dd0e1',backgroundColor:'#4dd0e120',fill:false,tension:0,pointRadius:4,pointHoverRadius:7,pointBackgroundColor:'#4dd0e1',pointBorderColor:'#080d14',pointBorderWidth:2,borderWidth:2,borderDash:[4,6]});
   datasets.push({label:'ฉาบผนัง',data:OD.map(()=>parseFloat(gv('s7').toFixed(1))),borderColor:'#ffcc02',backgroundColor:'#ffcc0220',fill:false,tension:0,pointRadius:4,pointHoverRadius:7,pointBackgroundColor:'#ffcc02',pointBorderColor:'#080d14',pointBorderWidth:2,borderWidth:2,borderDash:[3,4]});
   datasets.push({label:'เป้า 50%',data:OD.map(()=>50),borderColor:'#ff444866',backgroundColor:'transparent',fill:false,tension:0,pointRadius:0,borderWidth:1.5,borderDash:[6,4]});
-  const legItems=[...sides,{lbl:'ก่ออิฐนอก รวม',col:'#ffd600'},{lbl:'ก่ออิฐใน',col:'#00d4ff',dash:true},{lbl:'งานไฟฟ้า',col:'#f48fb1',dash:true},{lbl:'สุขาภิบาล',col:'#4dd0e1',dash:true},{lbl:'ฉาบผนัง',col:'#ffcc02',dash:true},{lbl:'เป้า 50%',col:'#ff4444',dash:true}];
+  const legItems=[...sides,{lbl:'ก่ออิฐนอก รวม',col:'#ffd600'},{lbl:'ก่ออิฐใน',col:'#00d4ff',dash:true},{lbl:'งานไฟฟ้า',col:'#f48fb1',dash:true},{lbl:'สุขาภิบาล',col:'#4dd0e1',dash:true},{lbl:'S6 ฉาบผนัง ชั้น2+4',col:'#ffcc02',dash:true},{lbl:'เป้า 50%',col:'#ff4444',dash:true}];
   c.innerHTML=`<div style="background:var(--bg2);border:1px solid var(--bdr);border-radius:10px;padding:16px;margin-top:4px">
     <div style="margin-bottom:12px"><div style="font-size:13px;font-weight:800;color:var(--cyan)">📊 กราฟเส้นความคืบหน้า — ทุกงานแยกชั้น</div><div style="font-size:10px;color:var(--tx3);margin-top:3px;font-family:var(--m)">แกน X = ชั้น 1–5 · แกน Y = % · คลิก Legend เพื่อซ่อน/แสดงเส้น</div></div>
     <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px" id="s3-legend">${legItems.map((s,i)=>`<div onclick="toggleS3Line(${i})" id="s3-leg-${i}" style="display:flex;align-items:center;gap:4px;padding:3px 8px;background:${s.col}18;border:1px solid ${s.col}44;border-radius:20px;cursor:pointer;font-size:10px;font-weight:600;color:${s.col};transition:opacity .2s"><div style="width:14px;height:2px;background:${s.col};border-radius:2px;flex-shrink:0;${s.dash?'background:repeating-linear-gradient(90deg,'+s.col+' 0,'+s.col+' 4px,transparent 4px,transparent 7px)':''}"></div>${s.lbl}</div>`).join('')}</div>
@@ -1374,15 +1130,21 @@ function updS3Area(){
 }
 function toggleS3Line(i){if(!_s3Chart)return;const meta=_s3Chart.getDatasetMeta(i);meta.hidden=!meta.hidden;_s3Chart.update();const el=document.getElementById('s3-leg-'+i);if(el)el.style.opacity=meta.hidden?'0.3':'1';}
 
+// S6 ฉาบผนัง ชั้น 2+4
 const FLOORS=[
-  {name:'ชั้น 1',slots:6, labels:['ห้อง101','ห้อง102','ห้อง103','ร้านค้า','ห้องซักอบ','โถงบันได']},
   {name:'ชั้น 2',slots:12,labels:['ห้อง201','ห้อง202','ห้อง203','ห้อง204','ห้อง205','ห้อง206','ห้อง207','ห้อง208','ห้อง209','ห้อง210','ห้อง211','โถงบันได']},
   {name:'ชั้น 4',slots:12,labels:['ห้อง401','ห้อง402','ห้อง403','ห้อง404','ห้อง405','ห้อง406','ห้อง407','ห้อง408','ห้อง409','ห้อง410','ห้อง411','โถงบันได']},
 ];
+// S2: ฉาบผนัง ชั้น 1 (แยกออกมา)
+const FLOORS_F1=[
+  {name:'ชั้น 1',slots:6, labels:['ห้อง101','ห้อง102','ห้อง103','ร้านค้า','ห้องซักอบ','โถงบันได']},
+];
 function buildPlasterUI(force=false){
+  if(window._buildingPlaster)return;window._buildingPlaster=true;
+  try{
   const c=document.getElementById('prooms');
-  if(!c)return;
-  if(!force&&c.querySelector('#s7r0'))return;
+  if(!c){window._buildingPlaster=false;return;}
+  if(!force&&c.querySelector('#s7r0')){window._buildingPlaster=false;return;}
 
   const WTP_R=100/30;
   let out='';
@@ -1400,15 +1162,15 @@ function buildPlasterUI(force=false){
       const bc=dn?'rgba(0,230,118,.5)':'var(--bdrh)';
       out+=`<div class="PB ${dn?'dn':'pd'}" style="width:100%;padding:6px 4px;${isStair?'border:1px dashed rgba(255,214,0,.4);':''}">`;
       out+=`<div style="font-size:8px;font-weight:700;color:${isStair?'var(--gold)':'var(--tx2)'};margin-bottom:3px;text-align:center;line-height:1.2">${lbl}</div>`;
-      out+=`<input class="PI" type="text" inputmode="decimal" pattern="[0-9.]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="s7r${i}" value="${val}" oninput="updPlaster();ra();scheduleAutoSave()" style="width:100%;font-size:13px;font-weight:700;text-align:center;padding:3px 2px;background:transparent;border:1px solid ${bc};-webkit-user-select:text;user-select:text;min-height:34px;box-sizing:border-box">`;
+      out+=`<input class="PI" type="text" inputmode="decimal" pattern="[0-9.]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="s7r${i}" value="${val}" oninput="updPlaster();scheduleAutoSave()" style="width:100%;font-size:13px;font-weight:700;text-align:center;padding:3px 2px;background:transparent;border:1px solid ${bc};-webkit-user-select:text;user-select:text;min-height:34px;box-sizing:border-box">`;
       out+=`<div style="font-size:7px;color:var(--tx3);margin-top:2px;text-align:center">${(val*WTP_R/100).toFixed(1)}%</div>`;
       out+=`</div>`;
       roomIdx++;
     }
   }
   c.innerHTML=out;
+  }finally{window._buildingPlaster=false;}
 }
-
 function updS7Target(v){
   const TOTAL=FLOORS.reduce((a,f)=>a+f.slots,0)||30;
   const t=Math.min(TOTAL,Math.max(0,parseInt(v)||0));
@@ -1446,6 +1208,11 @@ function updPlaster(){
   if(r)r.textContent=(100-total).toFixed(2)+'%';
   const s7p=document.getElementById('s7p');
   if(s7p){s7p.textContent=ceilTo2(total)+'%';s7p.style.color=total>=100?'var(--green)':total>=50?'var(--orange)':'var(--red)';}
+  // อัพเดท charts โดยตรง ไม่เรียก ra() เพื่อป้องกัน circular
+  if(typeof updateDonuts==='function')updateDonuts();
+  if(typeof updSummary==='function')updSummary();
+  if(typeof updKPI==='function')updKPI();
+  updS7Chart();
 }
 
 function updPlaster2(rooms,total){
@@ -1461,11 +1228,14 @@ function updPlaster2(rooms,total){
 
 
 function updKPI(){
-  const v=getVals(),tgts=[20,100,100,100,100,50],vals=[v.s1,v.out,v.s5,v.s6,v.s7,v.s8||0];
-  let done=0,inprog=0,notstarted=0,sum=0;
-  vals.forEach((x,i)=>{const r=x/tgts[i];if(r>=1)done++;else if(x>0)inprog++;else notstarted++;sum+=r;});
-  const ovr=sum/vals.length*100;
-  const s=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  const v=getVals();
+  const tgts=[20,100,100,100,100,100,50];
+  const vals=[v.s1,v.s7f1||0,v.out,v.s5,v.s6,v.s7,v.s8||0];
+  let done=0,inprog=0,notstarted=0;
+  vals.forEach((x,i)=>{const t=tgts[i]||100;if(x>=t)done++;else if(x>0)inprog++;else notstarted++;});
+  // สูตรเดียวกับ pie: เฉลี่ย % ทำได้ต่อเป้า
+  const ovr=vals.reduce((a,x,i)=>a+Math.min(1,x/(tgts[i]||100)),0)/vals.length*100;
+  const s=(id,val)=>{const e=document.getElementById(id);if(e)e.textContent=val;};
   s('kp-d',done);s('kp-p',inprog);s('kp-o',ceilTo2(ovr)+'%');s('kp-n',notstarted);
 }
 
@@ -1479,7 +1249,7 @@ function buildPieChart(){
   if(sq)sq.id='pie-square-wrap';
   const ctx=canvas?.getContext('2d');if(!ctx)return;if(_pie)_pie.destroy();
   const vals=getVals();
-  const _pieVals=[vals.s1,vals.out,vals.s5,vals.s6,vals.s7,vals.s8||0];
+  const _pieVals=[vals.s1,vals.s7f1||0,vals.out,vals.s5,vals.s6,vals.s7,vals.s8||0];
   const data=SUMDEF.map((d,i)=>{const v=_pieVals[i]||0;return _pieMode===0?v:Math.min(100,(v/d.tgt)*100);});
   const shadow=data.map(v=>v*0.08);
   _pie=new Chart(ctx,{type:'doughnut',data:{datasets:[{data,backgroundColor:SUMDEF.map(d=>d.col+'cc'),borderColor:SUMDEF.map(d=>d.col),borderWidth:2,hoverOffset:6},{data:shadow,backgroundColor:SUMDEF.map(d=>d.col+'33'),borderWidth:0,hoverOffset:0}],labels:SUMDEF.map(d=>d.lbl)},options:{responsive:true,maintainAspectRatio:false,cutout:'62%',layout:{padding:8},plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>{if(ctx.datasetIndex!==0)return null;const v=ctx.dataset.data[ctx.dataIndex];return ` ${ctx.label}: ${v.toFixed(1)}%`;}}}},animation:{animateRotate:true,duration:900}}});
@@ -1490,7 +1260,7 @@ function buildPieChart(){
 }
 function updatePieChart(){
   if(!_pie)return;const vals=getVals();
-  const data=SUMDEF.map((d,i)=>{const v=[vals.s1,vals.f25,vals.out,vals.s4,vals.s5,vals.s6,vals.s7,vals.s8||0][i];return _pieMode===0?v:Math.min(100,(v/d.tgt)*100);});
+  const _pv2=[vals.s1,vals.s7f1||0,vals.out,vals.s5,vals.s6,vals.s7,vals.s8||0];const data=SUMDEF.map((d,i)=>{const v=_pv2[i]||0;return _pieMode===0?v:Math.min(100,(v/d.tgt)*100);});
   _pie.data.datasets[0].data=data;_pie.data.datasets[1].data=data.map(v=>v*0.08);_pie.update('active');buildPieLegend();updatePieStats();
 }
 function togglePieMode(){
@@ -1499,15 +1269,19 @@ function togglePieMode(){
 }
 function buildPieLegend(){
   const c=document.getElementById('pie-legend');if(!c)return;
-  const vals=getVals(),vs=[vals.s1,vals.out,vals.s5,vals.s6,vals.s7,vals.s8||0];
-  c.innerHTML=SUMDEF.map((d,i)=>`<div class="leg-item" onclick="highlightPie(${i})"><div class="leg-dot" style="background:${d.col}"></div><div class="leg-name">${d.lbl}</div><div class="leg-val" style="color:${d.col}">${ceilTo2(_pieMode===0?vs[i]:Math.min(100,(vs[i]/d.tgt)*100))}%</div></div>`).join('');
+  const vals=getVals(),vs=[vals.s1,vals.s7f1||0,vals.out,vals.s5,vals.s6,vals.s7,vals.s8||0];
+  c.innerHTML=SUMDEF.map((d,i)=>`<div class="leg-item" onclick="highlightPie(${i})"><div class="leg-dot" style="background:${d.col}"></div><div class="leg-name">${d.lbl}</div><div class="leg-val" style="color:${d.col}">${ceilTo2(_pieMode===0?vs[i]:Math.min(100,((vs[i]||0)/d.tgt)*100))}%</div></div>`).join('');
 }
 function updatePieStats(){
-  const vals=getVals(),vs=[vals.s1,vals.out,vals.s5,vals.s6,vals.s7,vals.s8||0],tgts=[20,100,100,100,100,50];
-  let done=0;vs.forEach((v,i)=>{if(v/tgts[i]>=1)done++;});
-  const ovr=vs.reduce((a,v,i)=>a+v/tgts[i],0)/vs.length*100;
+  const vals=getVals();
+  const vs=[vals.s1,vals.s7f1||0,vals.out,vals.s5,vals.s6,vals.s7,vals.s8||0];
+  const tgts=[20,100,100,100,100,100,50];
+  let done=0;
+  vs.forEach((v,i)=>{if(v>=(tgts[i]||100))done++;});
+  const ovr=vs.reduce((a,v,i)=>a+Math.min(1,v/(tgts[i]||100)),0)/vs.length*100;
   const s=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
   s('stat-done',done);s('stat-rem',vs.length-done);s('stat-ovr',ceilTo2(ovr)+'%');
+  s('stat-total',vs.length);
   const cp=document.getElementById('pie-cpct'),cl=document.getElementById('pie-clbl');
   if(cp)cp.textContent=ceilTo2(ovr)+'%';if(cl)cl.textContent='ภาพรวม';
 }
@@ -1515,7 +1289,7 @@ function highlightPie(i){
   if(!_pie)return;_pie.setDatasetVisibility(0,true);_pie.tooltip.setActiveElements([{datasetIndex:0,index:i}],{x:0,y:0});
   const cp=document.getElementById('pie-cpct'),cl=document.getElementById('pie-clbl');
   const vals=getVals(),vs=[vals.s1,vals.f25,vals.out,vals.s4,vals.s5,vals.s6,vals.s7,vals.s8||0];
-  const v=_pieMode===0?vs[i]:Math.min(100,(vs[i]/SUMDEF[i].tgt)*100);
+  const v=_pieMode===0?vs[i]:Math.min(100,((vs[i]||0)/SUMDEF[i].tgt)*100);
   if(cp){cp.textContent=ceilTo2(v)+'%';cp.style.color=SUMDEF[i].col;}if(cl)cl.textContent=SUMDEF[i].lbl;_pie.update();
 }
 
@@ -1528,9 +1302,10 @@ function donutHTML(pct,tgt,col,lbl,sub,showInput,inputId){
 }
 function buildDonuts(){
   const vals=getVals();
-  const all=[{v:vals.s1,tgt:20,col:'#00e676',lbl:'ทาสีรองพื้น'},{v:vals.out,tgt:100,col:'#00bcd4',lbl:'ก่ออิฐนอก'},{v:vals.s5,tgt:100,col:'#ce93d8',lbl:'ไฟฟ้า+กรีดท่อ'},{v:vals.s6,tgt:100,col:'#388bfd',lbl:'ท่อน้ำดี 1-3'},{v:vals.s7,tgt:100,col:'#ffd600',lbl:'ฉาบผนัง'},{v:vals.s8||0,tgt:50,col:'#4fc3f7',lbl:'ท่อ ชั้น4-5'}];
+  const all=[{v:vals.s1,tgt:20,col:'#00e676',lbl:'S1 ทาสีรองพื้น'},{v:vals.s7f1||0,tgt:100,col:'#ff7043',lbl:'S2 ฉาบ ชั้น1'},{v:vals.out,tgt:100,col:'#00bcd4',lbl:'S3 ก่ออิฐนอก'},{v:vals.s5,tgt:100,col:'#ce93d8',lbl:'S4 ไฟฟ้า+กรีดท่อ'},{v:vals.s6,tgt:100,col:'#388bfd',lbl:'S5 ท่อน้ำดี 1-3'},{v:vals.s7,tgt:100,col:'#ffd600',lbl:'ฉาบผนัง'},{v:vals.s8||0,tgt:50,col:'#4fc3f7',lbl:'S7 ท่อ ชั้น4-5'}];
   const ga=document.getElementById('g-all');if(ga)ga.innerHTML=all.map(x=>donutHTML(x.v,x.tgt,x.col,x.lbl,'',false,'')).join('');
   const gs1=document.getElementById('g-s1');if(gs1)gs1.innerHTML=`<div class="DGrid" style="grid-template-columns:repeat(3,1fr)">${donutHTML(vals.s1,20,'#00e676','ทาสีรองพื้น','62 ช่อง',false,'')}</div>`;
+  const gs7f1=document.getElementById('g-s7f1');if(gs7f1)gs7f1.innerHTML=mk('s7f1',100,'#ff7043');
   const gs3=document.getElementById('g-s3');if(gs3){let h='',totWp=0;OD.forEach(o=>{const{da,ta,fp}=calcOut(o);totWp+=calcOut(o).wp;h+=donutHTML(fp,100,'#00bcd4',o.label,`${da.toFixed(0)}/${ta.toFixed(0)}ม²`,false,'');});h+=donutHTML(totWp,100,'#ff9500','รวมทุกชั้น','เป้า 100%',false,'');gs3.innerHTML=h;}
   const mk=(s,tgt,col)=>`<div class="DGrid" style="grid-template-columns:repeat(3,1fr)">${donutHTML(gv(s),tgt,col,'งานทั้งหมด','',true,`setBar('${s}','${s}b','${s}p');ra();scheduleAutoSave()`)}</div>`;
   const gs5=document.getElementById('g-s5');if(gs5)gs5.innerHTML=mk('s5',100,'#ce93d8');
@@ -1540,7 +1315,7 @@ function buildDonuts(){
   updateDonuts();
 }
 function updateDonuts(){
-  const vals=getVals(),vs=[vals.s1,vals.out,vals.s5,vals.s6,vals.s7,vals.s8||0];
+  const vals=getVals(),vs=[vals.s1,vals.s7f1||0,vals.out,vals.s5,vals.s6,vals.s7,vals.s8||0];
   const ga=document.getElementById('g-all');if(!ga)return;
   ga.querySelectorAll('.DC').forEach((dc,i)=>{
     if(i>=vs.length)return;const v=vs[i],tgt=SUMDEF[i].tgt,col=SUMDEF[i].col;
@@ -2009,6 +1784,44 @@ function updS1(){
   updS1Chart();
 }
 
+// ════ S2: ฉาบผนัง ชั้น 1 ════
+function buildF1UI(force=false){
+  const c=document.getElementById('prooms-f1');
+  if(!c)return;
+  if(!force&&c.querySelector('#f1r0'))return;
+  const WTP=100/6;
+  let out='';
+  const fl=FLOORS_F1[0];
+  fl.labels.forEach((lbl,si)=>{
+    const i=si;
+    const val=parseFloat(document.getElementById('f1r'+i)?.value||0)||0;
+    const dn=val>=100;
+    const isStair=lbl.startsWith('โถง');
+    const bc=dn?'rgba(0,230,118,.5)':'var(--bdrh)';
+    out+=`<div class="PB ${dn?'dn':'pd'}" style="width:100%;padding:5px 3px;${isStair?'border:1px dashed rgba(255,214,0,.4);':''}">`;
+    out+=`<div style="font-size:8px;font-weight:700;color:${isStair?'var(--gold)':'var(--tx2)'};margin-bottom:3px;text-align:center;line-height:1.2">${lbl}</div>`;
+    out+=`<input class="PI" type="text" inputmode="decimal" pattern="[0-9.]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="f1r${i}" value="${val}" oninput="updF1();scheduleAutoSave()" style="width:100%;font-size:12px;font-weight:700;text-align:center;padding:3px 2px;background:transparent;border:1px solid ${bc};-webkit-user-select:text;user-select:text;min-height:32px;box-sizing:border-box">`;
+    out+=`<div style="font-size:7px;color:var(--tx3);margin-top:2px;text-align:center">${(val*WTP/100).toFixed(1)}%</div>`;
+    out+=`</div>`;
+  });
+  c.innerHTML=out;
+}
+function updF1(){
+  const WTP=100/6;
+  let total=0;
+  for(let i=0;i<6;i++){
+    const val=parseFloat(document.getElementById('f1r'+i)?.value||0)||0;
+    total+=Math.min(100,val)*WTP/100;
+    const inp=document.getElementById('f1r'+i);
+    if(inp){const dn=val>=100;const box=inp.closest('.PB');if(box)box.className='PB '+(dn?'dn':'pd');inp.style.borderColor=dn?'rgba(0,230,118,.5)':'var(--bdrh)';}
+  }
+  total=Math.min(100,total);
+  const hid=document.getElementById('s7f1');if(hid)hid.value=total.toFixed(4);
+  setBar('s7f1','s7f1b','s7f1p');
+  if(typeof updateDonuts==='function')updateDonuts();
+  if(typeof updSummary==='function')updSummary();
+}
+
 // ════ S5 Line Chart ════
 let _s5Chart=null;
 function buildS5Chart(){
@@ -2263,7 +2076,7 @@ function getLaborCfg(){try{const s=localStorage.getItem('cp_labor');return s?{..
 function saveLaborCfg(cfg){try{localStorage.setItem('cp_labor',JSON.stringify(cfg));}catch(e){}}
 
 function openJupiterPage(){
-  const v=getVals(),vs=[v.s1,v.f25,v.out,v.s4,v.s5,v.s6,v.s7,v.s8||0],tgts=[20,100,100,100,100,50],today=new Date(),DAYS=Math.ceil((getDeadlineForCalc()-today)/(1000*60*60*24));
+  const v=getVals(),vs=[v.s1,v.s7f1||0,v.out,v.s5,v.s6,v.s7,v.s8||0],tgts=[20,100,100,100,100,100,50],today=new Date(),DAYS=Math.ceil((getDeadlineForCalc()-today)/(1000*60*60*24));
   let doneCount=0,urgentCount=0,sumRatio=0;
   vs.forEach((x,i)=>{const r=x/tgts[i];sumRatio+=Math.min(1,r);if(r>=1)doneCount++;else if(x>0)urgentCount++;});
   const overallPct=(sumRatio/vs.length*100).toFixed(1);
@@ -2298,7 +2111,7 @@ function switchAnalysisTab(id,btn){
 }
 function renderOverviewChart(){
   const ctx=document.getElementById('overviewChart')?.getContext('2d');if(!ctx)return;if(_anChart)_anChart.destroy();
-  const vals=getVals(),vs=[vals.s1,vals.f25,vals.out,vals.s4,vals.s5,vals.s6,vals.s7,vals.s8||0];
+  const vals=getVals(),vs=[v.s1,v.s7f1||0,v.out,v.s5,v.s6,v.s7,v.s8||0];
   _anChart=new Chart(ctx,{type:'bar',data:{labels:SUMDEF.map(d=>d.lbl),datasets:[{label:'ความคืบหน้า (%)',data:vs,backgroundColor:SUMDEF.map(d=>d.col+'99'),borderColor:SUMDEF.map(d=>d.col),borderWidth:2,borderRadius:6},{label:'เป้าหมาย (%)',data:SUMDEF.map(d=>d.tgt),backgroundColor:'rgba(255,255,255,.05)',borderColor:'rgba(255,255,255,.2)',borderWidth:1.5,borderRadius:6}]},options:{responsive:true,plugins:{legend:{labels:{color:'#8899aa',font:{size:11}}}},scales:{x:{ticks:{color:'#8899aa',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'}},y:{ticks:{color:'#8899aa',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'},max:110}}}});
 }
 function renderTrendChart(){
@@ -2316,9 +2129,9 @@ function getDailyLog(){try{return JSON.parse(localStorage.getItem('cp_daily_log'
 function saveDailyLog(logs){try{localStorage.setItem('cp_daily_log',JSON.stringify(logs));}catch(e){}}
 function renderDailyLogUI(){
   const c=document.getElementById('an-log');if(!c)return;
-  const logs=getDailyLog(),vals=getVals(),vs=[vals.s1,vals.out,vals.s5,vals.s6,vals.s7,vals.s8||0];
+  const logs=getDailyLog(),vals=getVals(),vs=[vals.s1,vals.s7f1||0,vals.out,vals.s5,vals.s6,vals.s7,vals.s8||0];
   c.innerHTML=`<div style="margin-bottom:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap"><div style="font-size:14px;font-weight:800">📝 บันทึกรายวัน</div><button onclick="saveLogEntry()" class="btn btn-g edit-only" style="font-size:11px;padding:6px 12px">💾 บันทึกวันนี้</button><span style="font-size:11px;color:var(--tx3);font-family:var(--m)">${todayStr()}</span></div>
-  <div style="margin-bottom:16px;padding:12px;background:var(--bg2);border:1px solid var(--bdr);border-radius:8px"><div style="font-size:11px;color:var(--tx2);margin-bottom:8px">ข้อมูลปัจจุบัน</div><div style="display:flex;gap:8px;flex-wrap:wrap">${SUMDEF.map((d,i)=>`<span style="background:${d.col}22;border:1px solid ${d.col}55;border-radius:6px;padding:3px 8px;font-size:11px;font-family:var(--m);color:${d.col}">${d.lbl}: ${vs[i].toFixed(1)}%</span>`).join('')}</div></div>
+  <div style="margin-bottom:16px;padding:12px;background:var(--bg2);border:1px solid var(--bdr);border-radius:8px"><div style="font-size:11px;color:var(--tx2);margin-bottom:8px">ข้อมูลปัจจุบัน</div><div style="display:flex;gap:8px;flex-wrap:wrap">${SUMDEF.map((d,i)=>`<span style="background:${d.col}22;border:1px solid ${d.col}55;border-radius:6px;padding:3px 8px;font-size:11px;font-family:var(--m);color:${d.col}">${d.lbl}: ${(vs[i]||0).toFixed(1)}%</span>`).join('')}</div></div>
   <div>${logs.length===0?'<div style="color:var(--tx2);font-size:12px;padding:16px 0">ยังไม่มีบันทึก</div>':logs.slice().reverse().map(l=>`<div style="background:var(--bg2);border:1px solid var(--bdr);border-radius:8px;padding:12px 14px;margin-bottom:8px"><div style="font-size:11px;color:var(--tx3);font-family:var(--m);margin-bottom:8px">${l.date}</div><div style="display:flex;gap:6px;flex-wrap:wrap">${SUMDEF.map((d,i)=>`<span style="background:${d.col}22;border:1px solid ${d.col}44;border-radius:5px;padding:2px 7px;font-size:10px;font-family:var(--m);color:${d.col}">${d.lbl}: ${(l.vals?.[i]||0).toFixed(1)}%</span>`).join('')}</div></div>`).join('')}</div>`;
 }
 function saveLogEntry(){
@@ -2368,7 +2181,7 @@ function renderSafety(){
 function exportExcel(){
   const wb=XLSX.utils.book_new(),vals=getVals(),vs=[vals.s1,vals.f25,vals.out,vals.s4,vals.s5,vals.s6,vals.s7,vals.s8||0];
   const ov=[['Construction Progress Dashboard','','Generated: '+new Date().toLocaleString('th-TH')],[''],['หัวข้องาน','ความคืบหน้า (%)','เป้าหมาย (%)','สถานะ']];
-  SUMDEF.forEach((d,i)=>{ov.push([d.lbl,vs[i].toFixed(2),d.tgt,vs[i]>=d.tgt?'✅ บรรลุเป้า':vs[i]>0?'🔄 ดำเนินการ':'⬜ ยังไม่เริ่ม']);});
+  SUMDEF.forEach((d,i)=>{ov.push([d.lbl,(vs[i]||0).toFixed(2),d.tgt,vs[i]>=d.tgt?'✅ บรรลุเป้า':vs[i]>0?'🔄 ดำเนินการ':'⬜ ยังไม่เริ่ม']);});
   const wsOv=XLSX.utils.aoa_to_sheet(ov);wsOv['!cols']=[{wch:24},{wch:16},{wch:14},{wch:16}];
   XLSX.utils.book_append_sheet(wb,wsOv,'ภาพรวม');
   const s2d=[['งานก่ออิฐภายใน ชั้น 2-5'],['ชั้น','ห้องทั้งหมด','ห้องที่ทำแล้ว','ความคืบหน้า (%)']];
@@ -2379,7 +2192,7 @@ function exportExcel(){
   XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(s3d),'ก่ออิฐนอก');
   const s4d=[['งานก่ออิฐภายใน ชั้น 1'],['ห้อง','น้ำหนัก (%)','ความคืบหน้า (%)','% สมทบ']];
   S4R.forEach(r=>s4d.push([r.lbl,r.wt,gv(r.id),(gv(r.id)*r.wt/100).toFixed(2)]));
-  s4d.push(['รวม (Weighted avg)','100%',vals.s4.toFixed(2),'']);
+  s4d.push(['รวม (Weighted avg)','100%',(vals.s4||0).toFixed(2),'']);
   XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(s4d),'ก่ออิฐ ชั้น1');
   const logs=getDailyLog(),logD=[['บันทึกรายวัน'],['วันที่',...SUMDEF.map(d=>d.lbl)]];
   logs.forEach(l=>logD.push([l.date,...SUMDEF.map((_,i)=>(l.vals?.[i]||0).toFixed(1))]));
@@ -2455,7 +2268,7 @@ function init(){
   buildS2(true);buildS3();
   ['s1','s4t','s5','s6','s7'].forEach(id=>setBar(id,id+'b',id+'p'));
   ['r41','r42','r43','r44','r45'].forEach(id=>setBar(id,id+'b',id+'p'));
-  buildS5UI();updS5();buildS1UI();updS1();buildPlasterUI();updPlaster();
+  buildS5UI();updS5();buildS1UI();updS1();buildF1UI();updF1();buildPlasterUI();updPlaster();
   setTimeout(()=>{
     buildPieChart();buildDonuts();buildS7Chart();buildS5Chart();buildS1Chart();ra();initDeadlineWidget();
     if(isFirebaseReady()){
@@ -2695,9 +2508,9 @@ window.addEventListener('load',fixHeaderSpacer);
 window.addEventListener('resize',fixHeaderSpacer);
 
 function openJupiterPageAI(isLoginPopup){
-  const v=getVals(),vs=[v.s1,v.f25,v.out,v.s4,v.s5,v.s6,v.s7,v.s8||0];
-  const tgts=[20,100,100,100,100,50];
-  const names=['S1 หลังคา','S3 ก่ออิฐนอก','S4 ก่ออิฐชั้น 1','S5 งานไฟฟ้า','S6 ท่อน้ำดี','S7 ฉาบผนัง'];
+  const v=getVals(),vs=[v.s1,v.s7f1||0,v.out,v.s5,v.s6,v.s7,v.s8||0];
+  const tgts=[20,100,100,100,100,100,50];
+  const names=['S1 ทาสีรองพื้น','S2 ฉาบ ชั้น1','S3 ก่ออิฐนอก','S4 ไฟฟ้า+กรีดท่อ','S5 ท่อน้ำดี ชั้น1-3','S6 ฉาบผนัง ชั้น2+4','S7 ท่อน้ำ ชั้น4-5'];
   const today=new Date().toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'});
 
   // Build data summary for AI
@@ -2726,7 +2539,7 @@ ${dataSummary}
 - S3 ก่ออิฐภายนอก: 50%
 - S4 ก่ออิฐชั้น 1 (3 ห้อง): 100%
 - S5 งานไฟฟ้า (กรีดผนัง+ฝังท่อ): 80%
-- S6 งานท่อน้ำดี: 50%
+- S5 ท่อน้ำดี ชั้น1-3: 50%
 - S7 ฉาบผนัง: 40%
 - ทำความสะอาด เคลียร์ขยะหลังเลิกงานทุกวัน
 
@@ -2844,11 +2657,11 @@ function runJupiterAI(){
   if(!result)return;
   result.innerHTML='<div style="display:flex;align-items:center;gap:10px;color:#8899aa;font-size:12px"><div style="width:16px;height:16px;border:2px solid #ffd600;border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;flex-shrink:0"></div>Jupiter กำลังวิเคราะห์...</div>';
   if(!document.getElementById('_spin_style')){const st=document.createElement('style');st.id='_spin_style';st.textContent='@keyframes spin{to{transform:rotate(360deg)}}';document.head.appendChild(st);}
-  const v=getVals(),vs=[v.s1,v.out,v.s5,v.s6,v.s7,v.s8||0];
-  const names=['S1 ทาสีรองพื้น','S3 ก่ออิฐนอก','S5 ไฟฟ้า+กรีดท่อ','S6 ท่อน้ำดี ชั้น1-3','S7 ฉาบผนัง','S8 ท่อน้ำ ชั้น4-5'];
-  const tgts=[20,100,100,100,100,50];
+  const v=getVals(),vs=[v.s1,v.s7f1||0,v.out,v.s5,v.s6,v.s7,v.s8||0];
+  const names=['S1 ทาสีรองพื้น','S2 ฉาบ ชั้น1','S3 ก่ออิฐนอก','S4 ไฟฟ้า+กรีดท่อ','S5 ท่อน้ำดี ชั้น1-3','S6 ฉาบผนัง ชั้น2+4','S7 ท่อน้ำ ชั้น4-5'];
+  const tgts=[20,100,100,100,100,100,50];
   const today=new Date().toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'});
-  const dataSummary=names.map((n,i)=>`${n}: ${vs[i].toFixed(1)}% / เป้า ${tgts[i]}% (${vs[i]>=tgts[i]?'บรรลุเป้า':vs[i]/tgts[i]<0.3?'ล่าช้ามาก':vs[i]/tgts[i]<0.6?'ล่าช้า':'กำลังดี'})`).join('\n');
+  const dataSummary=names.map((n,i)=>`${n}: ${(vs[i]||0).toFixed(1)}% / เป้า ${tgts[i]}% (${vs[i]>=tgts[i]?'บรรลุเป้า':(vs[i]||0)/tgts[i]<0.3?'ล่าช้ามาก':(vs[i]||0)/tgts[i]<0.6?'ล่าช้า':'กำลังดี'})`).join('\n');
   const deadline2=getDeadlineForCalc();
   const daysLeft2=Math.ceil((deadline2-new Date())/(1000*60*60*24));
   const prompt=`คุณคือ Jupiter ที่ปรึกษาก่อสร้างอาวุโส มีประสบการณ์ 20 ปี\n\n📋 โครงการ: อาคารอพาร์ตเมนต์ 5 ชั้น (ชั้น 2-5 ชั้นละ 11 ห้อง, ชั้น 1 มี 3 ห้อง)\nวันนี้: ${today} | กำหนดส่งงาน: 22 เมษายน 2569 | เหลือ: ${daysLeft2} วัน\n\n📊 ความคืบหน้า:\n${dataSummary}\n\n🎯 เป้าหมาย: S1 100%, S2 100%, S3 100%, S4 100%, S5 100%, S6 100%, S7 100%, ทำความสะอาดทุกวัน\n\nวิเคราะห์:\n1. สถานะโดยรวม — ส่งงานทันหรือไม่?\n2. งานวิกฤตและวิธีแก้ไขเร่งด่วน\n3. แผนงาน ${daysLeft2} วัน (ต้องทำ%/วัน ของแต่ละงาน)\n4. การจัดช่างและทีม\n5. ความเสี่ยงและการป้องกัน\n\nตอบภาษาไทย กระชับ ปฏิบัติได้จริง`;
@@ -2919,7 +2732,7 @@ function exportDataJSON(){
 function showUrgentPopup(){
   const vals=getVals();
   const vs=[vals.s1,vals.f25,vals.out,vals.s4,vals.s5,vals.s6,vals.s7,vals.s8||0];
-  const tgts=[20,100,100,100,100,50];
+  const tgts=[20,100,100,100,100,100,50];
   const deadline=getDeadlineForCalc();
   const fastDeadline=new Date(2026,3,11);
   const today=new Date();
@@ -2934,7 +2747,7 @@ function showUrgentPopup(){
     {type:'sqm',   total:979.7,unit:'ตร.ม.',tgt_sqm:979.7*0.5}, // S3 ก่ออิฐนอก
     {type:'room',  total:5,    unit:'ห้อง', wt:100/5},   // S4 ก่ออิฐชั้น1
     {type:'room',  total:44,   unit:'ห้อง', wt:80/44},   // S5 ไฟฟ้า
-    {type:'room',  total:26,   unit:'ห้อง', wt:50/26},   // S6 ท่อน้ำดี
+    {type:'room',  total:26,   unit:'ห้อง', wt:50/26},   // S5 ท่อน้ำดี
     {type:'room',  total:22,   unit:'ห้อง', wt:40/22},   // S7 ฉาบผนัง (22 ห้อง เป้า 40%)
   ];
   function toUnit(ui,gapPct){
@@ -3072,13 +2885,13 @@ function jupSaveKey(){
 function jupGetKey(){return localStorage.getItem('cp_jup_key')||'';}
 function jupSetKey(k){localStorage.setItem('cp_jup_key',k);showToast('✅ API Key บันทึกแล้ว','ok');}
 function jupBuildContext(){
-  const v=getVals(),vs=[v.s1,v.f25,v.out,v.s4,v.s5,v.s6,v.s7,v.s8||0];
-  const names=['S1 หลังคา','S3 ก่ออิฐนอก','S4 ก่ออิฐชั้น 1','S5 งานไฟฟ้า','S6 ท่อน้ำดี','S7 ฉาบผนัง'];
-  const tgts=[20,100,100,100,100,50];
+  const v=getVals(),vs=[v.s1,v.s7f1||0,v.out,v.s5,v.s6,v.s7,v.s8||0];
+  const names=['S1 หลังคา','S3 ก่ออิฐนอก','S4 ก่ออิฐชั้น 1','S5 งานไฟฟ้า','S5 ท่อน้ำดี','S7 ฉาบผนัง'];
+  const tgts=[20,100,100,100,100,100,50];
   const today=new Date().toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'});
   const deadline=getDeadlineForCalc();
   const daysLeft=Math.ceil((deadline-new Date())/(1000*60*60*24));
-  const data=names.map((n,i)=>`${n}: ${vs[i].toFixed(1)}% / เป้า ${tgts[i]}% (${vs[i]>=tgts[i]?'✅ บรรลุ':vs[i]/tgts[i]<0.3?'🔴 ล่าช้ามาก':vs[i]/tgts[i]<0.6?'🟡 ล่าช้า':'🟢 กำลังดี'})`).join('\n');
+  const data=names.map((n,i)=>`${n}: ${(vs[i]||0).toFixed(1)}% / เป้า ${tgts[i]}% (${vs[i]>=tgts[i]?'✅ บรรลุ':(vs[i]||0)/tgts[i]<0.3?'🔴 ล่าช้ามาก':(vs[i]||0)/tgts[i]<0.6?'🟡 ล่าช้า':'🟢 กำลังดี'})`).join('\n');
   return `โครงการ: อาคารอพาร์ตเมนต์ 5 ชั้น | วันที่: ${today} | กำหนดส่ง: 22 เม.ย. 2569 | เหลือ: ${daysLeft} วัน\n\nความคืบหน้าปัจจุบัน:\n${data}${jupBuildHistoryContext()}`;
 }
 async function jupCallAPI(messages){
@@ -3161,9 +2974,9 @@ function doSaveAPIKey(){
 }
 
 function getAIInsights(){
-  const v=getVals(),vs=[v.s1,v.f25,v.out,v.s4,v.s5,v.s6,v.s7,v.s8||0];
+  const v=getVals(),vs=[v.s1,v.s7f1||0,v.out,v.s5,v.s6,v.s7,v.s8||0];
   const names=['หลังคา','ก่ออิฐใน','ก่ออิฐนอก','ก่ออิฐชั้น1','ไฟฟ้า','ท่อน้ำดี','ฉาบผนัง'];
-  const tgts=[20,100,100,100,100,50];
+  const tgts=[20,100,100,100,100,100,50];
   const deadline=getDeadlineForCalc(),today=new Date(),daysLeft=Math.ceil((deadline-today)/(1000*60*60*24));
   const issues=[],bottlenecks=[],critical=[];
   vs.forEach((pct,i)=>{
@@ -3224,7 +3037,7 @@ function openAIInsights(){
         </div>`).join('')}</div>`:``}
       <div style="background:rgba(56,139,253,.08);border:1px solid rgba(56,139,253,.3);border-radius:12px;padding:20px">
         <div style="font-size:14px;font-weight:800;color:var(--blue);margin-bottom:14px">📋 ต้องทำ/วัน (${daysLeft} วัน)</div>
-        <div style="font-size:12px;color:var(--tx);">${names.map((n,i)=>{const pd=(tgts[i]-vs[i])/daysLeft;return `<div style="padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04)"><strong>${n}</strong>: ${pd.toFixed(2)}%/วัน (${vs[i].toFixed(1)}% → ${tgts[i]}%)</div>`;}).join('')}</div>
+        <div style="font-size:12px;color:var(--tx);">${names.map((n,i)=>{const pd=(tgts[i]-vs[i])/daysLeft;return `<div style="padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04)"><strong>${n}</strong>: ${pd.toFixed(2)}%/วัน (${(vs[i]||0).toFixed(1)}% → ${tgts[i]}%)</div>`;}).join('')}</div>
       </div>
       <div style="background:linear-gradient(135deg,rgba(76,175,80,.1),transparent);border:1px solid rgba(118,255,3,.4);border-radius:12px;padding:20px">
         <div style="font-size:13px;color:var(--tx);line-height:1.8">
@@ -3247,13 +3060,13 @@ const JUP_MAX_SNAPS=30;
 function jupSaveSnapshot(){
   try{
     const v=getVals();
-    const vs=[v.s1,v.f25,v.out,v.s4,v.s5,v.s6,v.s7,v.s8||0];
-    const names=['S1 หลังคา','S3 ก่ออิฐนอก','S4 ก่ออิฐชั้น 1','S5 งานไฟฟ้า','S6 ท่อน้ำดี','S7 ฉาบผนัง'];
-    const tgts=[20,100,100,100,100,50];
+    const vs=[v.s1,v.s7f1||0,v.out,v.s5,v.s6,v.s7,v.s8||0];
+    const names=['S1 หลังคา','S3 ก่ออิฐนอก','S4 ก่ออิฐชั้น 1','S5 งานไฟฟ้า','S5 ท่อน้ำดี','S7 ฉาบผนัง'];
+    const tgts=[20,100,100,100,100,100,50];
     const snap={
       ts:new Date().toISOString(),
       date:new Date().toLocaleDateString('th-TH',{year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}),
-      data:names.map((n,i)=>({name:n,pct:parseFloat(vs[i].toFixed(2)),tgt:tgts[i]})),
+      data:names.map((n,i)=>({name:n,pct:parseFloat((vs[i]||0).toFixed(2)),tgt:tgts[i]})),
       overall:parseFloat((vs.reduce((a,v,i)=>a+Math.min(1,v/tgts[i]),0)/vs.length*100).toFixed(2))
     };
     let snaps=jupGetSnapshots();
@@ -3603,7 +3416,7 @@ function jupRenderSnapshots(){
     <div style="font-size:16px;font-weight:800;color:var(--orange);margin-bottom:20px">🛒 สั่งซื้อวัสดุใหม่</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
       <div style="grid-column:1/-1"><div style="font-size:11px;color:var(--tx3);margin-bottom:4px">ชื่อวัสดุ *</div><input id="pur-name" placeholder="เช่น อิฐมวลเบา" style="width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,149,0,.3);border-radius:8px;padding:10px;color:#e8f0fe;font-size:13px;font-family:var(--f);outline:none"></div>
-      <div><div style="font-size:11px;color:var(--tx3);margin-bottom:4px">หมวดงาน *</div><select id="pur-cat" style="width:100%;background:#0d1525;border:1px solid rgba(255,149,0,.3);border-radius:8px;padding:10px;color:#e8f0fe;font-size:13px;font-family:var(--f);outline:none"><option>S1 หลังคา</option><option>S3 ก่ออิฐนอก</option><option>S4 ก่ออิฐชั้น 1</option><option>S5 งานไฟฟ้า</option><option>S6 งานท่อน้ำดี</option><option>S7 ฉาบผนัง</option><option>อื่นๆ</option></select></div>
+      <div><div style="font-size:11px;color:var(--tx3);margin-bottom:4px">หมวดงาน *</div><select id="pur-cat" style="width:100%;background:#0d1525;border:1px solid rgba(255,149,0,.3);border-radius:8px;padding:10px;color:#e8f0fe;font-size:13px;font-family:var(--f);outline:none"><option>S1 หลังคา</option><option>S3 ก่ออิฐนอก</option><option>S4 ก่ออิฐชั้น 1</option><option>S5 งานไฟฟ้า</option><option>S5 ท่อน้ำดี ชั้น1-3</option><option>S7 ฉาบผนัง</option><option>อื่นๆ</option></select></div>
       <div><div style="font-size:11px;color:var(--tx3);margin-bottom:4px">ราคาสั่งซื้อ (฿) *</div><input id="pur-price" type="number" min="0" placeholder="0.00" style="width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,149,0,.3);border-radius:8px;padding:10px;color:#e8f0fe;font-size:13px;font-family:var(--m);outline:none"></div>
       <div><div style="font-size:11px;color:var(--tx3);margin-bottom:4px">เลข Order</div><input id="pur-order" placeholder="PO-2026-001" style="width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,149,0,.3);border-radius:8px;padding:10px;color:#e8f0fe;font-size:13px;font-family:var(--f);outline:none"></div>
       <div><div style="font-size:11px;color:var(--tx3);margin-bottom:4px">ผู้สั่งซื้อ</div><input id="pur-buyer" placeholder="ชื่อผู้สั่งซื้อ" style="width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,149,0,.3);border-radius:8px;padding:10px;color:#e8f0fe;font-size:13px;font-family:var(--f);outline:none"></div>
@@ -3628,7 +3441,7 @@ function jupRenderSnapshots(){
     <div style="font-size:16px;font-weight:800;color:var(--teal);margin-bottom:20px">👷 บันทึกจ่ายค่าแรง</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
       <div style="grid-column:1/-1"><div style="font-size:11px;color:var(--tx3);margin-bottom:4px">ชื่อผู้รับเหมา *</div><input id="lab-name" placeholder="เช่น ทีมช่างก่ออิฐ" style="width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(0,188,212,.3);border-radius:8px;padding:10px;color:#e8f0fe;font-size:13px;font-family:var(--f);outline:none"></div>
-      <div><div style="font-size:11px;color:var(--tx3);margin-bottom:4px">หมวดงาน *</div><select id="lab-cat" style="width:100%;background:#0d1525;border:1px solid rgba(0,188,212,.3);border-radius:8px;padding:10px;color:#e8f0fe;font-size:13px;font-family:var(--f);outline:none"><option>S1 หลังคา</option><option>S3 ก่ออิฐนอก</option><option>S4 ก่ออิฐชั้น 1</option><option>S5 งานไฟฟ้า</option><option>S6 งานท่อน้ำดี</option><option>S7 ฉาบผนัง</option><option>อื่นๆ</option></select></div>
+      <div><div style="font-size:11px;color:var(--tx3);margin-bottom:4px">หมวดงาน *</div><select id="lab-cat" style="width:100%;background:#0d1525;border:1px solid rgba(0,188,212,.3);border-radius:8px;padding:10px;color:#e8f0fe;font-size:13px;font-family:var(--f);outline:none"><option>S1 หลังคา</option><option>S3 ก่ออิฐนอก</option><option>S4 ก่ออิฐชั้น 1</option><option>S5 งานไฟฟ้า</option><option>S5 ท่อน้ำดี ชั้น1-3</option><option>S7 ฉาบผนัง</option><option>อื่นๆ</option></select></div>
       <div><div style="font-size:11px;color:var(--tx3);margin-bottom:4px">ราคาค่าแรง (฿) *</div><input id="lab-price" type="number" min="0" placeholder="0.00" style="width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(0,188,212,.3);border-radius:8px;padding:10px;color:#e8f0fe;font-size:13px;font-family:var(--m);outline:none"></div>
       <div style="grid-column:1/-1"><div style="font-size:11px;color:var(--tx3);margin-bottom:4px">วันที่จ่าย</div><input id="lab-date" type="date" style="width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(0,188,212,.3);border-radius:8px;padding:10px;color:#e8f0fe;font-size:13px;font-family:var(--f);outline:none"></div>
     </div>
@@ -3650,7 +3463,7 @@ function jupRenderSnapshots(){
     <div style="font-size:15px;font-weight:800;color:var(--blue);margin-bottom:16px">🔵 เพิ่ม BG ค่าวัสดุ</div>
     <div style="display:grid;gap:10px;margin-bottom:16px">
       <div><div style="font-size:11px;color:var(--tx3);margin-bottom:4px">ชื่อวัสดุ *</div><input id="bgm-name" placeholder="เช่น อิฐมวลเบา, เหล็ก, ปูน" style="width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(56,139,253,.3);border-radius:8px;padding:10px;color:#e8f0fe;font-size:13px;font-family:var(--f);outline:none"></div>
-      <div><div style="font-size:11px;color:var(--tx3);margin-bottom:4px">หมวดงาน</div><select id="bgm-cat" style="width:100%;background:#0d1525;border:1px solid rgba(56,139,253,.3);border-radius:8px;padding:10px;color:#e8f0fe;font-size:13px;font-family:var(--f);outline:none"><option>S1 หลังคา</option><option>S3 ก่ออิฐนอก</option><option>S4 ก่ออิฐชั้น 1</option><option>S5 งานไฟฟ้า</option><option>S6 งานท่อน้ำดี</option><option>S7 ฉาบผนัง</option><option>อื่นๆ</option></select></div>
+      <div><div style="font-size:11px;color:var(--tx3);margin-bottom:4px">หมวดงาน</div><select id="bgm-cat" style="width:100%;background:#0d1525;border:1px solid rgba(56,139,253,.3);border-radius:8px;padding:10px;color:#e8f0fe;font-size:13px;font-family:var(--f);outline:none"><option>S1 หลังคา</option><option>S3 ก่ออิฐนอก</option><option>S4 ก่ออิฐชั้น 1</option><option>S5 งานไฟฟ้า</option><option>S5 ท่อน้ำดี ชั้น1-3</option><option>S7 ฉาบผนัง</option><option>อื่นๆ</option></select></div>
       <div><div style="font-size:11px;color:var(--tx3);margin-bottom:4px">ต้นทุน BG (฿) *</div><input id="bgm-cost" type="number" min="0" placeholder="0" style="width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(56,139,253,.3);border-radius:8px;padding:10px;color:#e8f0fe;font-size:13px;font-family:var(--m);outline:none"></div>
     </div>
     <div style="display:flex;gap:10px">
@@ -3666,7 +3479,7 @@ function jupRenderSnapshots(){
     <div style="font-size:15px;font-weight:800;color:var(--purple);margin-bottom:16px">🟣 เพิ่ม BG ค่าแรง</div>
     <div style="display:grid;gap:10px;margin-bottom:16px">
       <div><div style="font-size:11px;color:var(--tx3);margin-bottom:4px">ชื่อผู้รับเหมา *</div><input id="bgl-name" placeholder="เช่น ทีมช่างก่ออิฐ" style="width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(206,147,216,.3);border-radius:8px;padding:10px;color:#e8f0fe;font-size:13px;font-family:var(--f);outline:none"></div>
-      <div><div style="font-size:11px;color:var(--tx3);margin-bottom:4px">หมวดงาน</div><select id="bgl-cat" style="width:100%;background:#0d1525;border:1px solid rgba(206,147,216,.3);border-radius:8px;padding:10px;color:#e8f0fe;font-size:13px;font-family:var(--f);outline:none"><option>S1 หลังคา</option><option>S3 ก่ออิฐนอก</option><option>S4 ก่ออิฐชั้น 1</option><option>S5 งานไฟฟ้า</option><option>S6 งานท่อน้ำดี</option><option>S7 ฉาบผนัง</option><option>อื่นๆ</option></select></div>
+      <div><div style="font-size:11px;color:var(--tx3);margin-bottom:4px">หมวดงาน</div><select id="bgl-cat" style="width:100%;background:#0d1525;border:1px solid rgba(206,147,216,.3);border-radius:8px;padding:10px;color:#e8f0fe;font-size:13px;font-family:var(--f);outline:none"><option>S1 หลังคา</option><option>S3 ก่ออิฐนอก</option><option>S4 ก่ออิฐชั้น 1</option><option>S5 งานไฟฟ้า</option><option>S5 ท่อน้ำดี ชั้น1-3</option><option>S7 ฉาบผนัง</option><option>อื่นๆ</option></select></div>
       <div><div style="font-size:11px;color:var(--tx3);margin-bottom:4px">ต้นทุน BG (฿) *</div><input id="bgl-cost" type="number" min="0" placeholder="0" style="width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(206,147,216,.3);border-radius:8px;padding:10px;color:#e8f0fe;font-size:13px;font-family:var(--m);outline:none"></div>
     </div>
     <div style="display:flex;gap:10px">
@@ -3719,7 +3532,7 @@ const ACCT_HASH = '30072530'; // plain compare for this module
 const ACCT_KEY = 'cp_acct_data';
 const CUSTOM_CATS_KEY = 'cp_custom_cats';
 function getAllCats(){
-  const base=['S1 หลังคา','S3 ก่ออิฐนอก','S4 ก่ออิฐชั้น 1','S5 งานไฟฟ้า','S6 งานท่อน้ำดี','S7 ฉาบผนัง','อื่นๆ'];
+  const base=['S1 หลังคา','S3 ก่ออิฐนอก','S4 ก่ออิฐชั้น 1','S5 งานไฟฟ้า','S5 ท่อน้ำดี 1-3','S7 ฉาบผนัง','อื่นๆ'];
   try{const c=JSON.parse(localStorage.getItem(CUSTOM_CATS_KEY)||'[]');return [...base,...c];}catch(e){return base;}
 }
 function saveCustomCat(label){
@@ -4133,7 +3946,7 @@ function jupAutoSaveSnapshot(manual=false){
   if(typeof getVals!=='function')return;
   try{
     const v=getVals();
-    const vs=[v.s1||0,v.out||0,v.s5||0,v.s6||0,v.s7||0,v.s8||0];
+    const vs=[(v.s1||0),(v.s7f1||0),(v.out||0),(v.s5||0),(v.s6||0),(v.s7||0),(v.s8||0)];
     const today=localDateIso();
     const now=new Date().toLocaleString('th-TH');
     let hist=[];
@@ -4197,12 +4010,13 @@ let _jup7Chart=null;
 
 // ── 7-day series definitions (mirrors SUMDEF + target lines) ──────────────
 const JUP7_SERIES=[
-  {label:'S1 ทาสีรองพื้น',col:'#00e676', tgt:100, idx:0, dash:false},
-  {label:'S3 ก่ออิฐนอก',col:'#00bcd4', tgt:100, idx:1, dash:false},
-  {label:'S5 ไฟฟ้า+กรีดท่อ',col:'#ce93d8', tgt:100, idx:2, dash:false},
-  {label:'S6 ท่อน้ำดี ชั้น1-3',col:'#388bfd', tgt:100, idx:3, dash:false},
-  {label:'S7 ฉาบผนัง',  col:'#ffd600', tgt:100, idx:4, dash:false},
-  {label:'S8 ท่อ ชั้น4-5',col:'#4fc3f7', tgt:50,  idx:5, dash:false},
+  {label:'S1 ทาสีรองพื้น',  col:'#00e676', tgt:20,  idx:0, dash:false},
+  {label:'S2 ฉาบ ชั้น1',    col:'#ff7043', tgt:100, idx:1, dash:false},
+  {label:'S3 ก่ออิฐนอก',   col:'#00bcd4', tgt:100, idx:2, dash:false},
+  {label:'S4 ไฟฟ้า+กรีดท่อ',col:'#ce93d8', tgt:100, idx:3, dash:false},
+  {label:'S5 ท่อน้ำดี 1-3', col:'#388bfd', tgt:100, idx:4, dash:false},
+  {label:'S6 ฉาบผนัง ชั้น2+4',col:'#ffd600',tgt:100, idx:5, dash:false},
+  {label:'S7 ท่อน้ำ ชั้น4-5',col:'#4fc3f7', tgt:50,  idx:6, dash:false},
 ];
 
 function renderJup7DayChart(){
@@ -4372,7 +4186,7 @@ function jup7ToggleLine(i){
 }
 
 // ── overall% สูตรเดียวกับ Dashboard โดนัท ─────────────────────────────────
-const JUP7_TGTS=[20,100,100,100,100,50];
+const JUP7_TGTS=[20,100,100,100,100,100,50];
 function jup7Overall(vs){
   // ใช้สูตรเดียวกับ Dashboard โดนัท: Σ(v/tgt)/n × 100
   if(!vs||!vs.length)return 0;
@@ -4437,8 +4251,8 @@ async function jupAnalyze7Days(){
   if(!resultEl)return;
   if(hist.length<2){resultEl.innerHTML='<div style="color:var(--orange)">ต้องการข้อมูลอย่างน้อย 2 วัน กรุณากรอกข้อมูลแล้วรอระบบบันทึกอัตโนมัติ</div>';return;}
   resultEl.innerHTML='<div style="display:flex;align-items:center;gap:10px;color:#8899aa"><div style="width:16px;height:16px;border:2px solid var(--gold);border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;flex-shrink:0"></div>Jupiter กำลังวิเคราะห์ 7 วัน...</div>';
-  const names=['S1 หลังคา','S3 ก่ออิฐนอก','S4 ก่ออิฐชั้น 1','S5 ไฟฟ้า','S6 ท่อน้ำดี','S7 ฉาบผนัง'];
-  const tgts=[20,100,100,100,100,50];
+  const names=['S1 หลังคา','S3 ก่ออิฐนอก','S4 ก่ออิฐชั้น 1','S5 ไฟฟ้า','S5 ท่อน้ำดี','S7 ฉาบผนัง'];
+  const tgts=[20,100,100,100,100,100,50];
   const histTxt=hist.map(h=>`${h.date}: ${h.vs.map((v,i)=>`${names[i]}=${v}%`).join(', ')}`).join('\n');
   const first=hist[0],last=hist[hist.length-1];
   const trends=names.map((n,i)=>{const d=last.vs[i]-first.vs[i];return`${n}: ${d>=0?'+':''}${d.toFixed(1)}%/รอบ`;}).join(', ');
@@ -4531,13 +4345,13 @@ function quickParseNlp(txt, mode){
     ['ก่ออิฐนอก','S3 ก่ออิฐนอก'],['อิฐนอก','S3 ก่ออิฐนอก'],
     ['ชั้น 1','S4 ก่ออิฐชั้น 1'],
     ['ไฟฟ้า','S5 งานไฟฟ้า'],['สายไฟ','S5 งานไฟฟ้า'],['เดินสาย','S5 งานไฟฟ้า'],
-    ['ท่อน้ำ','S6 งานท่อน้ำดี'],['ประปา','S6 งานท่อน้ำดี'],
+    ['ท่อน้ำ','S5 ท่อน้ำดี 1-3'],['ประปา','S5 ท่อน้ำดี 1-3'],
     ['ฉาบ','S7 ฉาบผนัง'],['ปูน','S7 ฉาบผนัง'],['ทาสี','S7 ฉาบผนัง'],
   ];
   var cat='อื่นๆ';
   for(var ci=0;ci<catMap.length;ci++){if(text.indexOf(catMap[ci][0])>=0){cat=catMap[ci][1];break;}}
   var sm=text.match(/S\s*([1-7])/i);
-  if(sm){var sm2={'1':'S1 หลังคา','3':'S3 ก่ออิฐนอก','4':'S4 ก่ออิฐชั้น 1','5':'S5 งานไฟฟ้า','6':'S6 งานท่อน้ำดี','7':'S7 ฉาบผนัง'};cat=sm2[sm[1]]||cat;}
+  if(sm){var sm2={'1':'S1 หลังคา','3':'S3 ก่ออิฐนอก','4':'S4 ก่ออิฐชั้น 1','5':'S5 งานไฟฟ้า','6':'S5 ท่อน้ำดี 1-3','7':'S7 ฉาบผนัง'};cat=sm2[sm[1]]||cat;}
   var today=localDateIso();
   var dm=text.match(/(\d{1,2})[\/\-\.](\d{1,2})(?:[\/\-\.](\d{2,4}))?/);
   if(dm){var dy=dm[3]?(dm[3].length===2?'20'+dm[3]:dm[3]):new Date().getFullYear();today=dy+'-'+dm[2].padStart(2,'0')+'-'+dm[1].padStart(2,'0');}
@@ -4590,7 +4404,7 @@ async function jupNlpParse() {
   if (st) st.textContent = '🪐 Jupiter กำลังอ่านประโยค...';
 
   const today = new Date().toLocaleDateString('th-TH', {day:'2-digit',month:'2-digit',year:'numeric'});
-  const cats = ['S1 หลังคา','S3 ก่ออิฐนอก','S4 ก่ออิฐชั้น 1','S5 งานไฟฟ้า','S6 งานท่อน้ำดี','S7 ฉาบผนัง','อื่นๆ'];
+  const cats = ['S1 หลังคา','S3 ก่ออิฐนอก','S4 ก่ออิฐชั้น 1','S5 งานไฟฟ้า','S5 ท่อน้ำดี 1-3','S7 ฉาบผนัง','อื่นๆ'];
 
   let sysPrompt, userPrompt;
   if (_jupNlpMode === 'purchase') {
@@ -4900,7 +4714,7 @@ function jup7SeedFromLatest(){
     if(!seedVs){
       try{
         const v=getVals();
-        seedVs=[v.s1,v.f25,v.out,v.s4,v.s5,v.s6,v.s7,v.s8||0].map(x=>parseFloat((+x||0).toFixed(2)));
+        seedVs=[v.s1,v.s7f1||0,v.out,v.s5,v.s6,v.s7,v.s8||0].map(x=>parseFloat((+x||0).toFixed(2)));
       }catch(e){return;}
     }
 
@@ -4981,21 +4795,21 @@ function jup7SeedFromLatest(){
 // ════════════════════════════════════════════════════════════════════
 var ADS_DEADLINE=null; // will be set on first use
 function getADSDeadline(){
-  if(!getADSDeadline()){
+  if(!ADS_DEADLINE){
     try{ ADS_DEADLINE=typeof getDeadlineForCalc==='function'?getDeadlineForCalc():new Date(2026,3,22); }
     catch(e){ ADS_DEADLINE=new Date(2026,3,22); }
   }
-  return getADSDeadline();
+  return ADS_DEADLINE;
 }
-var ADS_TGTS=[20,100,100,100,100,50];
-var ADS_NAMES=['S1 ทาสีรองพื้น','S3 ก่ออิฐนอก','S5 ไฟฟ้า+กรีดท่อ','S6 ท่อน้ำดี ชั้น1-3','S7 ฉาบผนัง','S8 ท่อน้ำ ชั้น4-5'];
-var ADS_COLS=['#00e676','#00bcd4','#ce93d8','#388bfd','#ffd600','#4fc3f7'];
+var ADS_TGTS=[20,100,100,100,100,100,50];
+var ADS_NAMES=['S1 ทาสีรองพื้น','S2 ฉาบ ชั้น1','S3 ก่ออิฐนอก','S5 ไฟฟ้า+กรีดท่อ','S5 ท่อน้ำดี ชั้น1-3','S7 ฉาบผนัง','S8 ท่อน้ำ ชั้น4-5'];
+var ADS_COLS=['#00e676','#ff7043','#00bcd4','#ce93d8','#388bfd','#ffd600','#4fc3f7'];
 
 function isAdminMode(){
   try{return !document.body.classList.contains('view-mode')&&sessionStorage.getItem('cp_edit_session')==='1';}catch(e){return false;}
 }
 function adsOverall(vs){return vs.reduce(function(a,v,i){return a+Math.min(1,v/ADS_TGTS[i]);},0)/vs.length*100;}
-function adsGetVs(){if(typeof getVals!=='function')return[0,0,0,0,0,0,0];var v=getVals();return[v.s1,v.out,v.s5,v.s6,v.s7,v.s8||0];}
+function adsGetVs(){if(typeof getVals!=='function')return[0,0,0,0,0,0];var v=getVals();return[v.s1,v.s7f1||0,v.out,v.s5,v.s6,v.s7,v.s8||0];}
 function adsFmtDate(d){if(!d||isNaN(d))return'—';return d.toLocaleDateString('th-TH',{year:'numeric',month:'short',day:'numeric'});}
 function adsGetRates(){
   try{
@@ -5029,7 +4843,7 @@ function adsRisk(pred,vs,i){
   if(pred[i].daysLeft>dLeft*0.6)return'medium';
   return'ok';
 }
-function adsAnalyze(){
+function adsAnalyze(){if(window._adsAnalyzing)return null;window._adsAnalyzing=true;try{
   var vs=adsGetVs(),overall=adsOverall(vs),today=new Date();
   var daysLeft=Math.ceil((getADSDeadline()-today)/86400000);
   var ri=adsGetRates(),rates=ri?ri.rates:null,pred=adsPredict(vs,rates);
@@ -5045,10 +4859,11 @@ function adsAnalyze(){
   var oFinDate=null;
   if(rates){var oR=vs.reduce(function(a,v,i){return a+Math.min(1,rates[i]/ADS_TGTS[i]*100);},0)/vs.length;var oG=100-overall;if(oR>0){oFinDate=new Date(today);oFinDate.setDate(today.getDate()+Math.ceil(oG/oR));}}
   return{vs:vs,overall:overall,daysLeft:daysLeft,tasks:tasks,criticals:criticals,highs:highs,delayed:delayed,rateInfo:ri,pred:pred,overallFinDate:oFinDate};
+  }finally{window._adsAnalyzing=false;}
 }
 
 // ── Bell alert ──────────────────────────────────────────────────────────
-function adsCheckAlerts(){
+function adsCheckAlerts(){if(window._adsChecking)return;window._adsChecking=true;setTimeout(()=>window._adsChecking=false,3000);
   if(!isAdminMode())return;
   try{
     var a=adsAnalyze();
@@ -5067,7 +4882,9 @@ function adsRiskBadge(r){
 
 // ── Render ADS panel ────────────────────────────────────────────────────
 function adsRenderPanel(){
-  var el=document.getElementById('ads-panel-content');if(!el)return;
+  if(window._renderingADS)return;window._renderingADS=true;
+  try{
+  var el=document.getElementById('ads-panel-content');if(!el){window._renderingADS=false;return;}
   if(!isAdminMode()){el.innerHTML='<div style="text-align:center;padding:40px;color:#6b7a8d">🔒 เฉพาะ Admin Mode</div>';return;}
   var a=adsAnalyze();
   var oCol=a.overall>=60?'var(--green)':a.overall>=30?'var(--orange)':'var(--red)';
@@ -5132,6 +4949,7 @@ function adsRenderPanel(){
   out+='</div>';
   out+=a.rateInfo?('<div style="font-size:10px;color:#445566;text-align:center;font-family:var(--m)">อัตราจาก '+a.rateInfo.oldest.date+' → '+a.rateInfo.newest.date+' ('+a.rateInfo.days.toFixed(1)+' วัน)</div>'):('<div style="font-size:10px;color:#445566;text-align:center;font-family:var(--m)">ต้องการ Snapshot ≥ 2 วัน</div>');
   el.innerHTML=out;
+  }finally{window._renderingADS=false;}
 }
 function openADS(){if(!isAdminMode()){showToast('เฉพาะ Admin Mode','err');return;}var o=document.getElementById('ads-overlay');if(o){o.style.display='block';adsRenderPanel();}}
 function closeADS(){var o=document.getElementById('ads-overlay');if(o)o.style.display='none';}
@@ -5231,7 +5049,7 @@ document.addEventListener('DOMContentLoaded',function(){
         clearTimeout(window._adsT);
         window._adsT=setTimeout(adsCheckAlerts,2500);
         var o=document.getElementById('ads-overlay');
-        if(o&&o.style.display!=='none'){clearTimeout(window._adsPT);window._adsPT=setTimeout(adsRenderPanel,400);}
+        if(o&&o.style.display!=='none'){clearTimeout(window._adsPT);if(!window._renderingADS){clearTimeout(window._adsPT);window._adsPT=setTimeout(adsRenderPanel,800);}}
       }
     };
     window.ra._adsPatch=true;
@@ -5380,3 +5198,261 @@ function saveNewCatModal(){
 </div>
 </body>
 </html>
+
+
+<div class="card" id="zone-s3">
+  <div class="SH">
+    <div class="SN" style="background:var(--cyan);color:#000">3</div>
+    <div class="ST">งานก่ออิฐภายนอก</div>
+    <div class="Stg">เป้า 100%</div>
+    <span style="font-size:10px;color:var(--tx3);background:var(--bg2);border:1px solid var(--bdr);padding:2px 7px;border-radius:4px">พื้นที่รวม 980 ตร.ม.</span>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:7px"><span style="font-size:11px;color:var(--tx2)">รวม:</span><span style="font-size:18px;font-weight:800;font-family:var(--m);color:var(--orange)" id="s3tp">—</span></div>
+  </div>
+  <div class="PBG" style="height:7px;margin-bottom:18px"><div class="PF o" id="s3bar" style="width:0%"></div></div>
+  <div class="s2-desktop"><div style="overflow-x:auto"><table style="width:100%;border-collapse:separate;border-spacing:0 5px"><thead><tr>
+    <th style="font-size:10px;color:var(--tx3);font-weight:600;padding:0 8px 6px;text-align:left;text-transform:uppercase">ชั้น</th>
+    <th style="font-size:10px;color:var(--tx3);font-weight:600;padding:0 8px 6px;text-align:center;text-transform:uppercase">น้ำหนัก</th>
+    <th style="font-size:10px;color:var(--tx3);font-weight:600;padding:0 8px 6px;text-align:center;text-transform:uppercase">ด้านหน้า (ตร.ม.)</th>
+    <th style="font-size:10px;color:var(--tx3);font-weight:600;padding:0 8px 6px;text-align:center;text-transform:uppercase">ด้านหลัง (ตร.ม.)</th>
+    <th style="font-size:10px;color:var(--tx3);font-weight:600;padding:0 8px 6px;text-align:center;text-transform:uppercase">ด้านซ้าย (ตร.ม.)</th>
+    <th style="font-size:10px;color:var(--tx3);font-weight:600;padding:0 8px 6px;text-align:center;text-transform:uppercase">ด้านขวา (ตร.ม.)</th>
+    <th style="font-size:10px;color:var(--tx3);font-weight:600;padding:0 8px 6px;text-align:center;text-transform:uppercase">ทำแล้ว (ตร.ม.)</th>
+    <th style="font-size:10px;color:var(--tx3);font-weight:600;padding:0 8px 6px;text-align:center;text-transform:uppercase">%คืบหน้า</th>
+  </tr></thead><tbody id="s3body"></tbody></table></div></div>
+  <div class="s2-mobile" id="s3cards"></div>
+  <div style="margin-top:16px;border-top:1px solid var(--bdr);padding-top:14px">
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <div style="font-size:12px;font-weight:700;color:var(--cyan)">📐 สรุปพื้นที่รวม</div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap">
+        <div style="display:flex;align-items:baseline;gap:4px"><span style="font-size:9px;color:var(--tx3)">ทำแล้ว</span><span style="font-size:16px;font-weight:800;font-family:var(--m);color:var(--cyan)" id="s3-done">—</span><span style="font-size:9px;color:var(--tx3)">ตร.ม.</span></div>
+        <div style="display:flex;align-items:baseline;gap:4px"><span style="font-size:9px;color:var(--tx3)">ทั้งหมด</span><span style="font-size:16px;font-weight:800;font-family:var(--m);color:var(--tx2)" id="s3-all">—</span><span style="font-size:9px;color:var(--tx3)">ตร.ม.</span></div>
+        <div style="display:flex;align-items:baseline;gap:4px"><span style="font-size:9px;color:var(--tx3)">เหลือ</span><span style="font-size:16px;font-weight:800;font-family:var(--m);color:var(--orange)" id="s3-rem">—</span><span style="font-size:9px;color:var(--tx3)">ตร.ม.</span></div>
+      </div>
+      <button id="s3-toggle-btn" onclick="toggleS3Detail()" style="margin-left:auto;background:rgba(0,212,255,.1);color:var(--cyan);border:1px solid rgba(0,212,255,.3);border-radius:7px;padding:5px 12px;font-size:11px;cursor:pointer;font-family:var(--f);font-weight:600;display:flex;align-items:center;gap:5px;transition:all .2s">
+        <span id="s3-ico">▼</span> รายละเอียดชั้น
+      </button>
+    </div>
+    <div id="s3-detail" class="s3-ext"><div id="s3-area-tbl" style="margin-top:12px"></div></div>
+  </div>
+</div>
+
+<div class="C2" id="zone-s5s6">
+<div class="card">
+  <div class="SH"><div class="SN" style="background:#9c27b0">4</div><div class="ST">งานไฟฟ้า กรีดผนัง+ฝังท่อ</div><div class="Stg" style="margin-left:auto">เป้า 100%</div></div>
+  <div class="C2" style="margin-bottom:10px">
+    <div class="MS"><span class="MSi">🔌</span><div><div class="MSl">ห้องทั้งหมด</div><div class="MSv">49 ห้อง</div></div></div>
+    <div class="MS"><span class="MSi">📊</span><div><div class="MSl">ความคืบหน้า</div><div class="MSv"><span id="s5p" style="color:var(--red);font-weight:800">0%</span></div></div></div>
+  </div>
+  <input type="hidden" id="s5" value="0">
+  <div id="s5-floors" style="display:grid;grid-template-columns:repeat(6,1fr);gap:5px;width:100%"></div>
+  <div style="margin-top:10px;padding:9px 12px;background:var(--bg2);border-radius:7px;border:1px solid var(--bdr)">
+    <div style="font-size:11px;color:var(--tx2)">ยังต้องทำ: <span style="color:var(--orange);font-weight:700;font-family:var(--m)" id="s5r">—</span></div>
+    <div style="font-size:11px;color:var(--tx2);margin-top:3px">ห้องที่ทำแล้ว: <span style="color:var(--tx);font-weight:700;font-family:var(--m)" id="s5rm">—</span></div>
+  </div>
+  <div id="s5b-bar" style="margin-top:8px"><div class="PBG"><div class="PF r" id="s5b" style="width:0%"></div></div></div>
+  <div style="margin-top:12px;background:var(--bg2);border:1px solid var(--bdr);border-radius:9px;padding:12px">
+    <div style="font-size:11px;font-weight:700;color:var(--purple);margin-bottom:8px">📈 กราฟความคืบหน้า vs เป้าหมาย</div>
+    <div style="position:relative;height:160px"><canvas id="s5LineChart"></canvas></div>
+  </div>
+</div>
+<div class="card">
+  <div class="SH"><div class="SN" style="background:#00838f">5</div><div class="ST">งานเดินท่อน้ำดี ชั้น 1-3</div><div class="Stg" style="margin-left:auto">เป้า 100%</div></div>
+  <div class="C2" style="margin-bottom:12px"><div class="MS"><span class="MSi">💧</span><div><div class="MSl">ห้องทั้งหมด</div><div class="MSv">26 ห้อง</div></div></div><div class="MS"><span class="MSi">⚖️</span><div><div class="MSl">น้ำหนักต่อห้อง</div><div class="MSv">3.85%</div></div></div></div>
+  <div class="PW"><div class="PM"><span class="PL">ชั้น 1–3</span><div class="IG"><input type="hidden" id="s6" value="0"><input class="PI" type="text" inputmode="decimal" pattern="[0-9.]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="s6r-inp" maxlength="4" value="0" oninput="updRooms('s6',this.value,26)" style="width:54px"><span class="Ps">ห้อง</span><span class="PP" id="s6p" style="color:var(--red);font-size:18px;font-weight:800">0%</span><span style="font-size:11px;color:var(--tx3);margin-left:3px">/100%</span></div></div><div class="PBG"><div class="PF r" id="s6b" style="width:0%"></div></div></div>
+  <div style="margin-top:10px;padding:9px 12px;background:var(--bg2);border-radius:7px;border:1px solid var(--bdr)"><div style="font-size:11px;color:var(--tx2)">ยังต้องทำ: <span style="color:var(--orange);font-weight:700;font-family:var(--m)" id="s6r">—</span></div><div style="font-size:11px;color:var(--tx2);margin-top:3px">ห้องที่ทำแล้ว: <span style="color:var(--tx);font-weight:700;font-family:var(--m)" id="s6rm">—</span></div></div>
+</div>
+</div>
+
+
+<div class="C2" id="zone-s8">
+<div class="card">
+  <div class="SH"><div class="SN" style="background:#0277bd">7</div><div class="ST">งานเดินท่อน้ำดี ชั้น 4-5</div><div class="Stg" style="margin-left:auto">เป้า 100%</div></div>
+  <div class="C2" style="margin-bottom:12px">
+    <div class="MS"><span class="MSi">🔵</span><div><div class="MSl">ห้องทั้งหมด</div><div class="MSv">22 ห้อง</div></div></div>
+    <div class="MS"><span class="MSi">⚖️</span><div><div class="MSl">น้ำหนักต่อห้อง</div><div class="MSv">4.55%</div></div></div>
+  </div>
+  <div class="PW"><div class="PM"><span class="PL">ชั้น 4-5</span><div class="IG">
+    <input type="hidden" id="s8" value="0">
+    <input class="PI" type="text" inputmode="decimal" pattern="[0-9.]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="s8r-inp" maxlength="4" value="0" oninput="updRooms('s8',this.value,22)" style="width:54px">
+    <span class="Ps">ห้อง</span>
+    <span class="PP" id="s8p" style="color:var(--red);font-size:18px;font-weight:800">0%</span>
+    <span style="font-size:11px;color:var(--tx3);margin-left:3px">/50%</span>
+  </div></div><div class="PBG"><div class="PF r" id="s8b" style="width:0%"></div></div></div>
+  <div style="margin-top:10px;padding:9px 12px;background:var(--bg2);border-radius:7px;border:1px solid var(--bdr)">
+    <div style="font-size:11px;color:var(--tx2)">ยังต้องทำ: <span style="color:var(--orange);font-weight:700;font-family:var(--m)" id="s8r">—</span></div>
+    <div style="font-size:11px;color:var(--tx2);margin-top:3px">ห้องที่ทำแล้ว: <span style="color:var(--tx);font-weight:700;font-family:var(--m)" id="s8rm">—</span></div>
+  </div>
+</div>
+<div></div>
+</div>
+
+
+<div class="card" id="zone-s7">
+  <div class="SH"><div class="SN" style="background:#f57c00">7</div><div class="ST">งานฉาบผนังภายใน (ชั้น 2 และ 4)</div><div class="Stg" style="margin-left:auto">เป้า <span id="s7-tgt-pct">100%</span></div><span style="font-size:10px;color:var(--tx3);background:var(--bg2);border:1px solid var(--bdr);padding:2px 7px;border-radius:4px">รวม 28 ช่อง</span></div>
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;padding:10px 14px;background:rgba(255,149,0,.07);border:1px solid rgba(255,149,0,.25);border-radius:8px">
+    <span style="font-size:22px">🎯</span>
+    <div><div style="font-size:11px;color:var(--tx3);margin-bottom:2px">จำนวนเป้าหมาย</div><div style="font-size:20px;font-weight:800;font-family:var(--m);color:var(--orange)">30 ช่อง <span id="s7-tgt-lbl" style="font-size:13px;font-weight:600;color:var(--tx3)">(ชั้น1=6, ชั้น2=12, ชั้น4=12)</span></div></div>
+  </div>
+  <div class="G2" style="gap:16px;align-items:stretch">
+    <div style="display:flex;flex-direction:column">
+      <div class="PW"><div class="PM"><span class="PL">เป้าหมาย (จำนวนห้อง)</span><div class="IG"><input type="hidden" id="s7" value="18.2"><input class="PI" type="text" inputmode="decimal" pattern="[0-9.]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="s7r-inp" maxlength="4" value="30" oninput="updS7Target(this.value)" style="width:54px"><span class="Ps">ห้อง</span><span class="PP" id="s7p" style="color:var(--orange);font-size:18px;font-weight:800">18.2%</span><span style="font-size:11px;color:var(--tx3);margin-left:3px" id="s7-tgt-bar">/100%</span></div></div><div class="PBG"><div class="PF o" id="s7b" style="width:18.2%"></div></div></div>
+      <div style="margin-top:9px;padding:9px 12px;background:var(--bg2);border-radius:7px;border:1px solid var(--bdr)"><div style="display:flex;justify-content:space-between"><span style="font-size:11px;color:var(--tx2)">ทำแล้ว: <span style="color:var(--green);font-weight:700;font-family:var(--m)" id="s7dr">4 ห้อง</span></span><span style="font-size:11px;color:var(--tx2)">ยังต้องทำ: <span style="color:var(--orange);font-weight:700;font-family:var(--m)" id="s7r">21.8%</span></span></div></div>
+      <div style="margin-top:6px;background:var(--bg2);border:1px solid var(--bdr);border-radius:9px;padding:12px 14px;flex:1;display:flex;flex-direction:column">
+        <div style="font-size:11px;font-weight:700;color:var(--orange);margin-bottom:8px;flex-shrink:0">📈 กราฟความคืบหน้า vs เป้าหมาย</div>
+        <div style="position:relative;flex:1"><canvas id="s7LineChart"></canvas></div>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:11px;color:var(--tx2);margin-bottom:9px">สถานะห้อง (แต่ละช่อง = 4.55%)</div>
+      <div id="prooms" style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;width:100%"></div>
+
+    </div>
+  </div>
+</div>
+
+<div class="SB" id="zone-summary">
+  <div class="SBt">สรุปภาพรวมโครงการ</div>
+  <div class="SBg" id="sbg"></div>
+  <div class="LU" id="lu"></div>
+</div>
+
+<div style="display:flex;justify-content:center;gap:12px;padding:16px 0 6px;flex-wrap:wrap">
+  <button onclick="showRealtimeGuide()" class="btn btn-b edit-only" style="padding:9px 20px;font-size:12px">🌐 คู่มือแชร์ Realtime</button>
+  <button onclick="openJupiter()" class="edit-only" style="background:linear-gradient(135deg,rgba(26,35,126,.6),rgba(255,214,0,.2));color:var(--gold);border:1px solid rgba(255,214,0,.5);border-radius:10px;padding:12px 28px;font-size:14px;cursor:pointer;font-family:var(--f);font-weight:700;display:inline-flex;align-items:center;gap:8px;transition:all .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">🪐 Jupiter AI ↗</button>
+
+  <button id="ai-insights-btn" onclick="openAIInsights()" class="edit-only" style="background:linear-gradient(135deg,rgba(76,175,80,.3),rgba(76,175,80,.1));color:#76ff03;border:1px solid rgba(118,255,3,.5);border-radius:10px;padding:12px 28px;font-size:14px;cursor:pointer;font-family:var(--f);font-weight:700;display:inline-flex;align-items:center;gap:8px;transition:all .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">🧠 AI Insights ↗</button>
+
+  <button onclick="openChecklistPage()" class="edit-only" style="background:linear-gradient(135deg,rgba(0,60,120,.6),rgba(56,139,253,.2));color:var(--blue);border:1px solid rgba(56,139,253,.5);border-radius:10px;padding:12px 28px;font-size:14px;cursor:pointer;font-family:var(--f);font-weight:700;display:inline-flex;align-items:center;gap:8px;transition:all .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">📋 Checklist ประสานงานหน้างาน ↗</button>
+
+  <button onclick="openAnalysisPage()" class="edit-only" style="background:linear-gradient(135deg,rgba(0,100,60,.6),rgba(0,230,118,.2));color:var(--green);border:1px solid rgba(0,230,118,.4);border-radius:10px;padding:12px 28px;font-size:14px;cursor:pointer;font-family:var(--f);font-weight:700;display:inline-flex;align-items:center;gap:8px;transition:all .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">📈 วิเคราะห์ — กราฟ & แผนรายวัน ↗</button>
+
+  <button onclick="openWorkforceAdmin()" class="edit-only" style="background:linear-gradient(135deg,rgba(0,188,212,.3),rgba(0,188,212,.1));color:var(--cyan);border:1px solid rgba(0,188,212,.5);border-radius:10px;padding:12px 28px;font-size:14px;cursor:pointer;font-family:var(--f);font-weight:700;display:inline-flex;align-items:center;gap:8px;transition:all .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">👷 กำลังพลในไซท์ ↗</button>
+
+  <button onclick="openADS()" class="edit-only" style="background:linear-gradient(135deg,rgba(255,68,68,.25),rgba(255,149,0,.15));color:var(--orange);border:1px solid rgba(255,149,0,.5);border-radius:10px;padding:12px 28px;font-size:14px;cursor:pointer;font-family:var(--f);font-weight:700;display:inline-flex;align-items:center;gap:8px;transition:all .2s;position:relative" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">🧠 AI Decision<span id="ads-bell" style="display:none;position:absolute;top:-6px;right:-6px;background:var(--red);color:#fff;border-radius:50%;width:18px;height:18px;font-size:10px;font-weight:800;align-items:center;justify-content:center">0</span></button>
+</div>
+
+<div id="checklist-overlay" class="overlay">
+  <button class="ov-close" onclick="document.getElementById('checklist-overlay').classList.remove('show')">✕ ปิด</button>
+  <div class="ov-inner" style="max-width:860px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:10px">
+      <div>
+        <div style="font-size:18px;font-weight:800">📋 Checklist การประสานงานหน้างาน</div>
+        <div style="font-size:11px;color:var(--tx2);margin-top:3px;font-family:var(--m)">ภายในและภายนอกองค์กร · ติ๊กรายการที่ดำเนินการแล้ว</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button onclick="resetChecklist()" class="btn btn-r" style="font-size:11px">🔄 รีเซ็ต</button>
+        <button onclick="exportChecklistPDF()" class="btn edit-only" style="background:rgba(220,38,38,.15);color:#ff4444;border:1px solid rgba(220,38,38,.4);font-size:11px">📄 Export PDF</button>
+        <button onclick="shareChecklistLine()" class="btn edit-only" style="background:rgba(0,185,0,.15);color:#00b900;border:1px solid rgba(0,185,0,.4);font-size:11px">💚 แชร์ไป Line</button>
+      </div>
+    </div>
+    <div style="display:none">
+      <span id="cl-done-count">0</span>
+      <span id="cl-total-count">0</span>
+      <div id="cl-progress-bar"></div>
+      <span id="cl-pct">0%</span>
+    </div>
+    <div style="margin-bottom:20px">
+      <div style="font-size:13px;font-weight:700;color:var(--tx);margin-bottom:8px">📝 รายงานความคืบหน้า</div>
+      <textarea id="cl-report-text" class="cl-report" maxlength="1000" placeholder="พิมพ์รายงานความคืบหน้าที่นี่... (ไม่เกิน 1,000 ตัวอักษร)" autocomplete="off" autocorrect="off" spellcheck="false" inputmode="text"></textarea>
+      <div style="display:flex;justify-content:space-between;margin-top:5px"><span style="font-size:10px;color:var(--tx3)" id="cl-report-count">0 / 1,000</span><span style="font-size:10px;color:var(--tx3)">รองรับคำสั่งเสียง 🎤</span></div>
+    </div>
+    <div id="checklist-body"></div>
+  </div>
+</div>
+
+<div id="lock-modal">
+  <div class="lm-card">
+    <div class="lm-acc"></div>
+    <div class="lm-body">
+      <div class="lm-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2a6cb8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><line x1="12" y1="15" x2="12" y2="17"/></svg></div>
+      <div class="lm-h">Restricted Access</div>
+      <div class="lm-dots" id="lm-dots">
+        <div class="lm-dot-inp" id="d0"></div><div class="lm-dot-inp" id="d1"></div><div class="lm-dot-inp" id="d2"></div>
+        <div class="lm-dot-inp" id="d3"></div><div class="lm-dot-inp" id="d4"></div><div class="lm-dot-inp" id="d5"></div>
+        <div class="lm-dot-inp" id="d6"></div><div class="lm-dot-inp" id="d7"></div>
+      </div>
+      <div style="display:none"><input id="lm-pw" type="password" maxlength="30" autocomplete="current-password" onkeydown="if(event.key==='Enter'){event.preventDefault();doUnlock();}"></div>
+      <div id="biometric-btn" style="display:none;margin-bottom:16px">
+        <button onclick="loginBiometric()" style="width:100%;padding:12px;background:linear-gradient(135deg,rgba(76,175,80,.3),rgba(76,175,80,.1));color:#76ff03;border:1px solid rgba(118,255,3,.5);border-radius:8px;font-family:var(--f);font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px">👆 ล็อกอินด้วย Face ID / Fingerprint</button>
+        <button onclick="registerBiometric()" style="width:100%;padding:8px;background:rgba(56,139,253,.12);color:var(--blue);border:1px solid rgba(56,139,253,.3);border-radius:8px;font-family:var(--f);font-size:11px;cursor:pointer">⚙️ ลงทะเบียน Face ID / Fingerprint</button>
+      </div>
+      <div class="lm-numgrid">
+        <button class="lm-num" ontouchstart="nmDown(this,'1');event.preventDefault()" ontouchend="nmUp(this)" ontouchcancel="nmUp(this)" onmousedown="nmDown(this,'1')" onmouseup="nmUp(this)" onmouseleave="nmUp(this)">1</button>
+        <button class="lm-num" ontouchstart="nmDown(this,'2');event.preventDefault()" ontouchend="nmUp(this)" ontouchcancel="nmUp(this)" onmousedown="nmDown(this,'2')" onmouseup="nmUp(this)" onmouseleave="nmUp(this)">2</button>
+        <button class="lm-num" ontouchstart="nmDown(this,'3');event.preventDefault()" ontouchend="nmUp(this)" ontouchcancel="nmUp(this)" onmousedown="nmDown(this,'3')" onmouseup="nmUp(this)" onmouseleave="nmUp(this)">3</button>
+        <button class="lm-num" ontouchstart="nmDown(this,'4');event.preventDefault()" ontouchend="nmUp(this)" ontouchcancel="nmUp(this)" onmousedown="nmDown(this,'4')" onmouseup="nmUp(this)" onmouseleave="nmUp(this)">4</button>
+        <button class="lm-num" ontouchstart="nmDown(this,'5');event.preventDefault()" ontouchend="nmUp(this)" ontouchcancel="nmUp(this)" onmousedown="nmDown(this,'5')" onmouseup="nmUp(this)" onmouseleave="nmUp(this)">5</button>
+        <button class="lm-num" ontouchstart="nmDown(this,'6');event.preventDefault()" ontouchend="nmUp(this)" ontouchcancel="nmUp(this)" onmousedown="nmDown(this,'6')" onmouseup="nmUp(this)" onmouseleave="nmUp(this)">6</button>
+        <button class="lm-num" ontouchstart="nmDown(this,'7');event.preventDefault()" ontouchend="nmUp(this)" ontouchcancel="nmUp(this)" onmousedown="nmDown(this,'7')" onmouseup="nmUp(this)" onmouseleave="nmUp(this)">7</button>
+        <button class="lm-num" ontouchstart="nmDown(this,'8');event.preventDefault()" ontouchend="nmUp(this)" ontouchcancel="nmUp(this)" onmousedown="nmDown(this,'8')" onmouseup="nmUp(this)" onmouseleave="nmUp(this)">8</button>
+        <button class="lm-num" ontouchstart="nmDown(this,'9');event.preventDefault()" ontouchend="nmUp(this)" ontouchcancel="nmUp(this)" onmousedown="nmDown(this,'9')" onmouseup="nmUp(this)" onmouseleave="nmUp(this)">9</button>
+        <button class="lm-num lm-num-s" ontouchstart="nmDown(this,null,'c');event.preventDefault()" ontouchend="nmUp(this)" ontouchcancel="nmUp(this)" onmousedown="nmDown(this,null,'c')" onmouseup="nmUp(this)" onmouseleave="nmUp(this)">ล้าง</button>
+        <button class="lm-num" ontouchstart="nmDown(this,'0');event.preventDefault()" ontouchend="nmUp(this)" ontouchcancel="nmUp(this)" onmousedown="nmDown(this,'0')" onmouseup="nmUp(this)" onmouseleave="nmUp(this)">0</button>
+        <button class="lm-num lm-num-s" ontouchstart="nmDown(this,null,'d');event.preventDefault()" ontouchend="nmUp(this)" ontouchcancel="nmUp(this)" onmousedown="nmDown(this,null,'d')" onmouseup="nmUp(this)" onmouseleave="nmUp(this)">&#x232B;</button>
+      </div>
+      <div class="lm-err" id="lm-err"></div>
+      <button class="lm-submit" onclick="doUnlock()">เข้าสู่ระบบ</button>
+      <button class="lm-ghost" onclick="closeLockModal()">ดูข้อมูลอย่างเดียว (Read Only)</button>
+      <div class="lm-foot"><div style="width:5px;height:5px;border-radius:50%;background:#0d1a28"></div>Construction Dashboard · Secured<div style="width:5px;height:5px;border-radius:50%;background:#0d1a28"></div></div>
+    </div>
+  </div>
+</div>
+
+<div id="pwc-modal">
+  <div class="pwc-card">
+    <div class="pwc-h">🔑 เปลี่ยนรหัสผ่าน</div>
+    <div class="pwc-s">รหัสผ่านใหม่จะบันทึกในเบราว์เซอร์นี้</div>
+    <div class="pwc-fld"><label class="pwc-lbl">รหัสผ่านปัจจุบัน</label><input class="pwc-inp" type="password" id="pwc-old" placeholder="รหัสผ่านเดิม" autocomplete="current-password"></div>
+    <div class="pwc-fld"><label class="pwc-lbl">รหัสผ่านใหม่ (4–20 ตัวอักษร)</label><input class="pwc-inp" type="password" id="pwc-new" placeholder="รหัสผ่านใหม่" maxlength="20" oninput="checkPwStrength(this.value)" autocomplete="new-password"><div class="pwc-str"><div class="pwc-str-b" id="pwc-bar" style="width:0%"></div></div><div class="pwc-hint" id="pwc-hint"></div></div>
+    <div class="pwc-fld"><label class="pwc-lbl">ยืนยันรหัสผ่านใหม่</label><input class="pwc-inp" type="password" id="pwc-confirm" placeholder="ยืนยันรหัสผ่าน" maxlength="20" autocomplete="new-password" onkeydown="if(event.key==='Enter')doChangePw()"></div>
+    <div class="pwc-err" id="pwc-err"></div>
+    <div class="pwc-btns"><button class="btn btn-b" style="flex:1" onclick="doChangePw()">✅ เปลี่ยนรหัสผ่าน</button><button class="btn btn-r" onclick="document.getElementById('pwc-modal').classList.remove('show')">ยกเลิก</button></div>
+  </div>
+</div>
+
+<div id="analysis-overlay" class="overlay">
+  <button class="ov-close" onclick="document.getElementById('analysis-overlay').classList.remove('show')">✕ ปิด</button>
+  <div class="ov-inner">
+    <div style="margin-bottom:20px"><div style="font-size:18px;font-weight:800">📈 วิเคราะห์ & แผนการทำงาน</div><div style="font-size:12px;color:var(--tx2);margin-top:4px">กราฟความคืบหน้า · บันทึกรายวัน · ความปลอดภัย</div></div>
+    <div class="TABS" id="an-tabs" style="margin-bottom:20px">
+      <button class="TAB ACT" onclick="switchAnalysisTab('overview',this)">📊 ภาพรวม</button>
+      <button class="TAB" onclick="switchAnalysisTab('trend',this)">📈 แนวโน้ม</button>
+      <button class="TAB" onclick="switchAnalysisTab('log',this)">📝 บันทึกรายวัน</button>
+      <button class="TAB" onclick="switchAnalysisTab('plan',this)">📅 แผนงาน</button>
+      <button class="TAB" onclick="switchAnalysisTab('safety',this)">🦺 ความปลอดภัย</button>
+    </div>
+    <div id="an-overview" class="DP SHW"><canvas id="overviewChart" height="320"></canvas></div>
+    <div id="an-trend" class="DP"><canvas id="trendChart" height="320"></canvas></div>
+    <div id="an-log" class="DP"></div>
+    <div id="an-plan" class="DP"></div>
+    <div id="an-safety" class="DP"></div>
+  </div>
+</div>
+
+<div id="api-key-modal" style="position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.8);backdrop-filter:blur(8px);padding:16px">
+  <div style="background:#08111e;border:1px solid rgba(56,139,253,.3);border-radius:16px;padding:28px;width:100%;max-width:420px;box-shadow:0 16px 48px rgba(0,0,0,.8)">
+    <div style="margin-bottom:20px">
+      <div style="font-size:18px;font-weight:800;color:#00d4ff;margin-bottom:6px">🔑 ตั้งค่า Claude API Key</div>
+      <div style="font-size:12px;color:var(--tx2);font-family:var(--m)">ใส่ API Key จาก Anthropic Console เพื่อใช้ Jupiter AI</div>
+    </div>
+    <div style="margin-bottom:16px">
+      <label style="display:block;font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;font-weight:600">Claude API Key</label>
+      <input id="api-key-input" type="password" placeholder="sk-ant-api03-..." style="width:100%;background:#040b14;border:1.5px solid #101e2e;border-radius:8px;padding:12px 14px;color:#e8f0fe;font-size:13px;font-family:monospace;outline:none;transition:border .2s;box-sizing:border-box;-webkit-user-select:text;user-select:text" onkeydown="if(event.key==='Enter'){doSaveAPIKey();}" onfocus="this.type='text'" onblur="this.type='password'">
+      <div style="font-size:10px;color:var(--tx3);margin-top:6px;font-family:var(--m)">✓ บันทึกในเบราว์เซอร์เท่านั้น (ไม่ส่งตรวจสอบ)</div>
+    </div>
+    <div id="api-key-err" style="font-size:11px;color:#ff6666;margin-bottom:12px;min-height:16px;font-family:var(--m)"></div>
+    <div style="display:flex;gap:10px">
+      <button onclick="doSaveAPIKey()" style="flex:1;padding:12px;background:linear-gradient(135deg,#1740b8,#1e90d4);color:#fff;border:none;border-radius:8px;font-family:var(--f);font-size:14px;font-weight:700;cursor:pointer;transition:filter .15s" onmouseover="this.style.filter='brightness(1.1)'" onmouseout="this.style.filter=''">✅ บันทึก API Key</button>
+      <button onclick="document.getElementById('api-key-modal').style.display='none'" style="padding:12px 16px;background:rgba(255,255,255,.04);color:var(--tx2);border:1px solid rgba(255,255,255,.1);border-radius:8px;font-family:var(--f);font-size:14px;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background='rgba(255,255,255,.04)'">ยกเลิก</button>
+    </div>
+    <div style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,.08);font-size:10px;color:var(--tx3);line-height:1.6">
+      <strong style="color:#00d4ff">ได้ API Key ยังไง?</strong><br>
+      1. ไปที่ <strong>https://console.anthropic.com</strong><br>
+      2. Sign Up / เข้าสู่ระบบ<br>
+      3. ไป API Keys → สร้าง New Key<br>
+      4. Copy Key ที่ขึ้นมา (เริ่มด้วย sk-ant-api03-)
+    </div>
+  </div>
+</div>
+
+</div>
