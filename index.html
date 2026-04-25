@@ -449,11 +449,11 @@ body.view-mode .edit-only{display:none!important}
     </div>
     <!-- Title block -->
     <div style="min-width:0;flex:1">
-      <div class="ht" style="font-size:22px;font-weight:900;line-height:1.1">System Intelligent Management on Network</div>
-      <div style="display:flex;align-items:center;gap:8px;margin-top:3px;flex-wrap:wrap">
-        <div class="hs" id="proj-name-display" style="font-size:12px">รายงานความคืบหน้างานก่อสร้าง · v2.5.1</div>
-        <span style="font-size:11px;font-weight:700;color:var(--cyan);background:rgba(0,212,255,.12);border:1px solid rgba(0,212,255,.35);border-radius:6px;padding:2px 9px">Phase 2</span>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:nowrap">
+        <div class="ht" style="font-size:18px;font-weight:900;white-space:nowrap">System Intelligent Management on Network</div>
+        <span style="font-size:11px;font-weight:700;color:var(--cyan);background:rgba(0,212,255,.12);border:1px solid rgba(0,212,255,.35);border-radius:6px;padding:2px 9px;white-space:nowrap;flex-shrink:0">Phase 2</span>
       </div>
+      <div class="hs" style="font-size:11px;margin-top:2px;white-space:nowrap">รายงานความคืบหน้างานก่อสร้าง · v2.5.1</div>
     </div>
   </div>
   <div class="hbtns">
@@ -783,6 +783,23 @@ function applyState(s){
   ['s1','s5','s6','s7','s8'].forEach(id=>setBar(id,id+'b',id+'p'));
   
   buildPlasterUI(true);updPlaster();buildDonuts();updS7Chart();updS5Chart();updS1Chart();ra();
+  // โหลด deadline จาก Firebase
+  if(typeof cloudGetNode==='function'){
+    cloudGetNode('project_settings').then(d=>{
+      if(!d)return;
+      if(d.deadline){
+        localStorage.setItem(DL_KEY,d.deadline);
+        const inp=document.getElementById('dl-date');
+        if(inp)inp.value=d.deadline;
+      }
+      if(d.delay_days!==undefined){
+        localStorage.setItem('cp_delay_days',d.delay_days);
+        const di=document.getElementById('dl-delay');
+        if(di)di.value=d.delay_days;
+      }
+      if(typeof updDeadline==='function')updDeadline();
+    }).catch(()=>{});
+  }
 }
 async function saveData(){
   if(!isFirebaseReady()){showFirebaseGuide();return;}
@@ -1492,6 +1509,14 @@ function getDeadlineDate(){
 }
 function saveDeadlineDate(dateStr){
   localStorage.setItem(DL_KEY, dateStr);
+  // Sync ขึ้น Firebase เพื่อให้ทุกเครื่องเห็นพร้อมกัน
+  if(typeof cloudPutNode==='function'){
+    cloudPutNode('project_settings',{
+      deadline: dateStr,
+      delay_days: localStorage.getItem('cp_delay_days')||'0',
+      updatedAt: new Date().toISOString()
+    }).catch(()=>{});
+  }
 }
 
 function updDeadline(){
@@ -1550,7 +1575,17 @@ function updDeadline(){
   }
 
   // บันทึก delay
-  if(delayVal >= 0) localStorage.setItem('cp_delay_days', delayVal);
+  if(delayVal >= 0){
+    localStorage.setItem('cp_delay_days', delayVal);
+    // Sync delay ขึ้น Firebase
+    if(typeof cloudPutNode==='function'){
+      cloudPutNode('project_settings',{
+        deadline: localStorage.getItem(DL_KEY)||'',
+        delay_days: String(delayVal),
+        updatedAt: new Date().toISOString()
+      }).catch(()=>{});
+    }
+  }
 }
 
 function toggleDeadlineWidget(){
