@@ -491,7 +491,7 @@ body.view-mode .edit-only{display:none!important}
     <div id="dl-days-badge" style="font-size:13px;font-weight:800;font-family:var(--m);padding:6px 18px;border-radius:20px;background:rgba(255,68,68,.15);border:1px solid rgba(255,68,68,.4);color:var(--red)">—</div>
   </div>
   <!-- Inputs Grid -->
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-bottom:14px">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
     <!-- วันกำหนดส่ง -->
     <div style="background:rgba(255,68,68,.05);border:1px solid rgba(255,68,68,.2);border-radius:12px;padding:16px">
       <div style="font-size:clamp(14px,2.5vw,18px);font-weight:800;color:rgba(255,100,100,.9);margin-bottom:10px">วันกำหนดส่งงาน</div>
@@ -2267,6 +2267,83 @@ header>div:first-child>div:first-child{flex-shrink:0}
   .hbtns{width:100%;justify-content:flex-start;gap:4px}
   .hbtns .btn,.hbtns a{font-size:9px!important;padding:4px 6px!important}
   .live-badge,.view-badge{font-size:8px!important;padding:3px 6px!important}
+}
+
+
+/* Deadline widget responsive */
+@media(max-width:480px){
+  #deadline-widget>div:nth-child(2){
+    grid-template-columns:1fr !important;
+  }
+  #deadline-widget .dl-fine-box{
+    grid-template-columns:1fr !important;
+  }
+}
+@media(min-width:481px) and (max-width:680px){
+  #deadline-widget>div:nth-child(2){
+    grid-template-columns:1fr 1fr !important;
+  }
+}
+
+
+/* iPad header fix */
+@media(min-width:481px) and (max-width:1024px){
+  header{
+    display:grid;
+    grid-template-columns:auto 1fr;
+    grid-template-rows:auto auto;
+    gap:8px;
+    padding:10px 14px;
+    align-items:start;
+  }
+  header>div:first-child{
+    grid-column:1;
+    grid-row:1;
+  }
+  .hbtns{
+    grid-column:2;
+    grid-row:1;
+    justify-content:flex-end;
+    flex-wrap:wrap;
+    gap:5px;
+  }
+  .hbtns .btn{
+    font-size:10px;
+    padding:4px 8px;
+  }
+  header>div:last-child{
+    grid-column:1 / -1;
+    grid-row:2;
+    border-top:1px solid rgba(255,255,255,.07);
+    padding-top:6px;
+  }
+  #simon-logo{height:40px !important}
+  .ht{font-size:14px !important}
+}
+
+/* iPhone portrait fix */
+@media(max-width:480px){
+  header{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    padding:10px 12px;
+  }
+  header>div:first-child{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    width:100%;
+  }
+  .hbtns{
+    width:100%;
+    flex-wrap:wrap;
+    gap:5px;
+  }
+  .live-badge, .view-badge{display:none}
+  .hbtns .btn{font-size:9px;padding:4px 7px}
+  #simon-logo{height:32px !important}
+  .ht{font-size:12px !important}
 }
 
 </style></head><body><div class="page">${pageHeader('Checklist (ต่อ)')}${p2cards}${rptHTML}${ftr}</div></body></html>`;
