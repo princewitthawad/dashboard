@@ -608,7 +608,7 @@ body.view-mode .edit-only{display:none!important}
 
 <div id="zone-s1">
 <div class="card">
-  <div class="SH"><div class="SN" style="background:#2e7d32">1</div><div class="ST">งานทาสีรองพื้น</div><div class="Stg" style="margin-left:auto">เป้า 20%</div></div>
+  <div class="SH"><div class="SN" style="background:#2e7d32">1</div><div class="ST">งานทาสีรองพื้น</div><div class="Stg" style="margin-left:auto">เป้า 20%</div><button onclick="if(confirm('รีเซ็ต S1 ทาสีรองพื้น เป็น 0% ?'))resetS1();" class="edit-only" style="margin-left:8px;background:rgba(255,68,68,.12);border:1px solid rgba(255,68,68,.3);color:var(--red);border-radius:6px;padding:3px 9px;cursor:pointer;font-size:10px">🔄 รีเซ็ต</button></div>
   <div class="C2" style="margin-bottom:10px">
     <div class="MS"><span class="MSi">🎨</span><div><div class="MSl">รวมทั้งหมด</div><div class="MSv">62 ช่อง</div></div></div>
     <div class="MS"><span class="MSi">📊</span><div><div class="MSl">ความคืบหน้า</div><div class="MSv"><span id="s1p" style="color:var(--red);font-weight:800">0%</span> / 20%</div></div></div>
@@ -1924,6 +1924,20 @@ const S1_GROUPS=[
 ];
 const S1_TOTAL=62;
 const S1_TGT=20;
+
+
+function resetS1(){
+  // รีเซ็ต S1 ทั้งหมดเป็น 0
+  for(let i=0;i<S1_TOTAL;i++){
+    const inp=document.getElementById('s1r'+i);
+    if(inp) inp.value=0;
+  }
+  const hid=document.getElementById('s1');
+  if(hid) hid.value='0';
+  updS1();
+  scheduleAutoSave();
+  showToast('รีเซ็ต S1 ทาสีรองพื้น เป็น 0% แล้ว','ok');
+}
 
 function buildS1UI(force=false){
   const c=document.getElementById('s1-grid');
