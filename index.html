@@ -766,7 +766,7 @@ function setSvStatus(st,msg,time=''){
 }
 
 function collectState(){
-  return{s1:gv('s1'),s1rooms:Array.from({length:62},(_,i)=>parseFloat(document.getElementById('s1r'+i)?.value||0)||0),s5:gv('s5'),s6:gv('s6'),s7:gv('s7'),s7rooms:Array.from({length:22},(_,i)=>parseFloat(document.getElementById('s7r'+i)?.value||0)||0),s7f1:gv('s7f1'),dl_deadline:localStorage.getItem(DL_KEY)||'',dl_delay:localStorage.getItem('cp_delay_days')||'0',f1rooms:Array.from({length:5},(_,i)=>parseFloat(document.getElementById('f1r'+i)?.value||0)||0),s7cor:parseFloat(document.getElementById('s7cor')?.value||0)||0,s5r:parseFloat(document.getElementById('s5r-inp')?.value||0),s5rooms:Array.from({length:49},(_,i)=>parseFloat(document.getElementById('s5r'+i)?.value||0)||0),s6r:parseFloat(document.getElementById('s6r-inp')?.value||0),s8:gv('s8'),s8r:parseFloat(document.getElementById('s8r-inp')?.value||0),s7r:parseFloat(document.getElementById('s7r-inp')?.value||0),
+  return{s1:gv('s1'),s1rooms:Array.from({length:62},(_,i)=>parseFloat(document.getElementById('s1r'+i)?.value||0)||0),s5:gv('s5'),s6:gv('s6'),s7:gv('s7'),s7rooms:Array.from({length:22},(_,i)=>parseFloat(document.getElementById('s7r'+i)?.value||0)||0),s7f1:gv('s7f1'),dl_deadline:localStorage.getItem(DL_KEY)||'',dl_delay:document.getElementById('dl-delay')?.value||localStorage.getItem('cp_delay_days')||'0',f1rooms:Array.from({length:5},(_,i)=>parseFloat(document.getElementById('f1r'+i)?.value||0)||0),s7cor:parseFloat(document.getElementById('s7cor')?.value||0)||0,s5r:parseFloat(document.getElementById('s5r-inp')?.value||0),s5rooms:Array.from({length:49},(_,i)=>parseFloat(document.getElementById('s5r'+i)?.value||0)||0),s6r:parseFloat(document.getElementById('s6r-inp')?.value||0),s8:gv('s8'),s8r:parseFloat(document.getElementById('s8r-inp')?.value||0),s7r:parseFloat(document.getElementById('s7r-inp')?.value||0),
     fd:FD.map(f=>f.pct),od:OD.map(o=>({fd:o.fd,bd:o.bd,sld:o.sld,srd:o.srd})),savedAt:new Date().toISOString()};
 }
 function applyState(s){
@@ -789,9 +789,10 @@ function applyState(s){
     localStorage.setItem(DL_KEY,s.dl_deadline);
     const di=document.getElementById('dl-date');if(di)di.value=s.dl_deadline;
   }
-  if(s.dl_delay!==undefined){
-    localStorage.setItem('cp_delay_days',s.dl_delay);
-    const dd=document.getElementById('dl-delay');if(dd)dd.value=s.dl_delay;
+  if(s.dl_delay!==undefined&&s.dl_delay!=='0'&&s.dl_delay!==0){
+    localStorage.setItem('cp_delay_days',String(s.dl_delay));
+    const dd=document.getElementById('dl-delay');
+    if(dd){dd.value=s.dl_delay;}
   }
   if(typeof updDeadline==='function')updDeadline();
   // Restore งานฉาบผนัง ชั้น 1 (S2)
@@ -1571,10 +1572,11 @@ function updDeadline(){
     if(fineBox) fineBox.style.display='none';
   }
 
-  // บันทึก delay
-  if(delayVal >= 0){
+  // บันทึก delay — เฉพาะเมื่อ user กรอกจริง (input ไม่ว่าง)
+  const delayRaw = delayInp?.value;
+  if(delayRaw !== null && delayRaw !== undefined && delayRaw !== ''){
     localStorage.setItem('cp_delay_days', String(delayVal));
-    scheduleAutoSave(); // บันทึกผ่าน saveData()
+    scheduleAutoSave();
   }
 }
 
