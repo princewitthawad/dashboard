@@ -766,12 +766,13 @@ function setSvStatus(st,msg,time=''){
 }
 
 function collectState(){
-  return{s1:gv('s1'),s1rooms:Array.from({length:62},(_,i)=>parseFloat(document.getElementById('s1r'+i)?.value||0)||0),s5:gv('s5'),s6:gv('s6'),s7:gv('s7'),s7rooms:Array.from({length:22},(_,i)=>parseFloat(document.getElementById('s7r'+i)?.value||0)||0),f1rooms:Array.from({length:5},(_,i)=>parseFloat(document.getElementById('f1r'+i)?.value||0)||0),s7cor:parseFloat(document.getElementById('s7cor')?.value||0)||0,s5r:parseFloat(document.getElementById('s5r-inp')?.value||0),s5rooms:Array.from({length:49},(_,i)=>parseFloat(document.getElementById('s5r'+i)?.value||0)||0),s6r:parseFloat(document.getElementById('s6r-inp')?.value||0),s8:gv('s8'),s8r:parseFloat(document.getElementById('s8r-inp')?.value||0),s7r:parseFloat(document.getElementById('s7r-inp')?.value||0),
+  return{s1:gv('s1'),s1rooms:Array.from({length:62},(_,i)=>parseFloat(document.getElementById('s1r'+i)?.value||0)||0),s5:gv('s5'),s6:gv('s6'),s7:gv('s7'),s7rooms:Array.from({length:22},(_,i)=>parseFloat(document.getElementById('s7r'+i)?.value||0)||0),s7f1:gv('s7f1'),dl_deadline:localStorage.getItem(DL_KEY)||'',dl_delay:localStorage.getItem('cp_delay_days')||'0',f1rooms:Array.from({length:5},(_,i)=>parseFloat(document.getElementById('f1r'+i)?.value||0)||0),s7cor:parseFloat(document.getElementById('s7cor')?.value||0)||0,s5r:parseFloat(document.getElementById('s5r-inp')?.value||0),s5rooms:Array.from({length:49},(_,i)=>parseFloat(document.getElementById('s5r'+i)?.value||0)||0),s6r:parseFloat(document.getElementById('s6r-inp')?.value||0),s8:gv('s8'),s8r:parseFloat(document.getElementById('s8r-inp')?.value||0),s7r:parseFloat(document.getElementById('s7r-inp')?.value||0),
     fd:FD.map(f=>f.pct),od:OD.map(o=>({fd:o.fd,bd:o.bd,sld:o.sld,srd:o.srd})),savedAt:new Date().toISOString()};
 }
 function applyState(s){
   if(!s)return;
   const sv=(id,v)=>{const e=document.getElementById(id);if(e)e.value=v;};
+  sv('s7f1',s.s7f1||0);
   sv('s8',s.s8||0);{const e=document.getElementById('s8r-inp');if(e)e.value=s.s8r!==undefined?s.s8r:Math.round(gv('s8')/100*22);}sv('s1',s.s1);if(s.s1rooms&&Array.isArray(s.s1rooms)){s.s1rooms.forEach((v,i)=>{const e=document.getElementById('s1r'+i);if(e)e.value=v;});updS1();}sv('s5',s.s5);sv('s6',s.s6);sv('s7',s.s7);
   // restore room-based visible inputs
   if(s.s5rooms&&Array.isArray(s.s5rooms)){s.s5rooms.forEach((v,i)=>{const e=document.getElementById('s5r'+i);if(e)e.value=v;});updS5();}else if(s.s5r!==undefined){/* legacy */}
@@ -783,24 +784,23 @@ function applyState(s){
   buildS3();
   ['s1','s5','s6','s7','s8'].forEach(id=>setBar(id,id+'b',id+'p'));
   
-  buildPlasterUI(true);updPlaster();buildDonuts();updS7Chart();updS5Chart();updS1Chart();ra();
-  // โหลด deadline จาก Firebase
-  if(typeof cloudGetNode==='function'){
-    cloudGetNode('project_settings').then(d=>{
-      if(!d)return;
-      if(d.deadline){
-        localStorage.setItem(DL_KEY,d.deadline);
-        const inp=document.getElementById('dl-date');
-        if(inp)inp.value=d.deadline;
-      }
-      if(d.delay_days!==undefined){
-        localStorage.setItem('cp_delay_days',d.delay_days);
-        const di=document.getElementById('dl-delay');
-        if(di)di.value=d.delay_days;
-      }
-      if(typeof updDeadline==='function')updDeadline();
-    }).catch(()=>{});
+  // Restore deadline & delay
+  if(s.dl_deadline){
+    localStorage.setItem(DL_KEY,s.dl_deadline);
+    const di=document.getElementById('dl-date');if(di)di.value=s.dl_deadline;
   }
+  if(s.dl_delay!==undefined){
+    localStorage.setItem('cp_delay_days',s.dl_delay);
+    const dd=document.getElementById('dl-delay');if(dd)dd.value=s.dl_delay;
+  }
+  if(typeof updDeadline==='function')updDeadline();
+  // Restore งานฉาบผนัง ชั้น 1 (S2)
+  if(s.f1rooms&&Array.isArray(s.f1rooms)){
+    s.f1rooms.forEach((v,i)=>{const e=document.getElementById('f1r'+i);if(e)e.value=v;});
+  }
+  buildF1UI(true);updF1();
+  buildPlasterUI(true);updPlaster();buildDonuts();updS7Chart();updS5Chart();updS1Chart();ra();
+
 }
 async function saveData(){
   if(!isFirebaseReady()){showFirebaseGuide();return;}
@@ -1513,14 +1513,7 @@ function getDeadlineDate(){
 }
 function saveDeadlineDate(dateStr){
   localStorage.setItem(DL_KEY, dateStr);
-  // Sync ขึ้น Firebase เพื่อให้ทุกเครื่องเห็นพร้อมกัน
-  if(typeof cloudPutNode==='function'){
-    cloudPutNode('project_settings',{
-      deadline: dateStr,
-      delay_days: localStorage.getItem('cp_delay_days')||'0',
-      updatedAt: new Date().toISOString()
-    }).catch(()=>{});
-  }
+  scheduleAutoSave(); // บันทึกผ่าน saveData() เหมือนข้อมูลอื่น
 }
 
 function updDeadline(){
@@ -1580,15 +1573,8 @@ function updDeadline(){
 
   // บันทึก delay
   if(delayVal >= 0){
-    localStorage.setItem('cp_delay_days', delayVal);
-    // Sync delay ขึ้น Firebase
-    if(typeof cloudPutNode==='function'){
-      cloudPutNode('project_settings',{
-        deadline: localStorage.getItem(DL_KEY)||'',
-        delay_days: String(delayVal),
-        updatedAt: new Date().toISOString()
-      }).catch(()=>{});
-    }
+    localStorage.setItem('cp_delay_days', String(delayVal));
+    scheduleAutoSave(); // บันทึกผ่าน saveData()
   }
 }
 
