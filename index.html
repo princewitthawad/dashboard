@@ -766,7 +766,7 @@ function setSvStatus(st,msg,time=''){
 }
 
 function collectState(){
-  return{s1:gv('s1'),s1rooms:Array.from({length:62},(_,i)=>parseFloat(document.getElementById('s1r'+i)?.value||0)||0),s5:gv('s5'),s6:gv('s6'),s7:gv('s7'),s7rooms:Array.from({length:FLOORS.reduce((a,f)=>a+f.slots,0)},(_,i)=>parseFloat(document.getElementById('s7r'+i)?.value||0)||0),f1rooms:Array.from({length:6},(_,i)=>parseFloat(document.getElementById('f1r'+i)?.value||0)||0),s7cor:parseFloat(document.getElementById('s7cor')?.value||0)||0,s5r:parseFloat(document.getElementById('s5r-inp')?.value||0),s5rooms:Array.from({length:49},(_,i)=>parseFloat(document.getElementById('s5r'+i)?.value||0)||0),s6r:parseFloat(document.getElementById('s6r-inp')?.value||0),s8:gv('s8'),s8r:parseFloat(document.getElementById('s8r-inp')?.value||0),s7r:parseFloat(document.getElementById('s7r-inp')?.value||0),
+  return{s1:gv('s1'),s1rooms:Array.from({length:62},(_,i)=>parseFloat(document.getElementById('s1r'+i)?.value||0)||0),s5:gv('s5'),s6:gv('s6'),s7:gv('s7'),s7rooms:Array.from({length:22},(_,i)=>parseFloat(document.getElementById('s7r'+i)?.value||0)||0),f1rooms:Array.from({length:5},(_,i)=>parseFloat(document.getElementById('f1r'+i)?.value||0)||0),s7cor:parseFloat(document.getElementById('s7cor')?.value||0)||0,s5r:parseFloat(document.getElementById('s5r-inp')?.value||0),s5rooms:Array.from({length:49},(_,i)=>parseFloat(document.getElementById('s5r'+i)?.value||0)||0),s6r:parseFloat(document.getElementById('s6r-inp')?.value||0),s8:gv('s8'),s8r:parseFloat(document.getElementById('s8r-inp')?.value||0),s7r:parseFloat(document.getElementById('s7r-inp')?.value||0),
     fd:FD.map(f=>f.pct),od:OD.map(o=>({fd:o.fd,bd:o.bd,sld:o.sld,srd:o.srd})),savedAt:new Date().toISOString()};
 }
 function applyState(s){
@@ -1150,12 +1150,12 @@ function toggleS3Line(i){if(!_s3Chart)return;const meta=_s3Chart.getDatasetMeta(
 
 // S6 ฉาบผนัง ชั้น 2+4
 const FLOORS=[
-  {name:'ชั้น 2',slots:12,labels:['ห้อง201','ห้อง202','ห้อง203','ห้อง204','ห้อง205','ห้อง206','ห้อง207','ห้อง208','ห้อง209','ห้อง210','ห้อง211','โถงบันได']},
-  {name:'ชั้น 4',slots:12,labels:['ห้อง401','ห้อง402','ห้อง403','ห้อง404','ห้อง405','ห้อง406','ห้อง407','ห้อง408','ห้อง409','ห้อง410','ห้อง411','โถงบันได']},
+  {name:'ชั้น 2',slots:11,labels:['ห้อง201','ห้อง202','ห้อง203','ห้อง204','ห้อง205','ห้อง206','ห้อง207','ห้อง208','ห้อง209','ห้อง210','ห้อง211'],roomCount:11},
+  {name:'ชั้น 4',slots:11,labels:['ห้อง401','ห้อง402','ห้อง403','ห้อง404','ห้อง405','ห้อง406','ห้อง407','ห้อง408','ห้อง409','ห้อง410','ห้อง411'],roomCount:11},
 ];
 // S2: ฉาบผนัง ชั้น 1 (แยกออกมา)
 const FLOORS_F1=[
-  {name:'ชั้น 1',slots:6, labels:['ห้อง101','ห้อง102','ห้อง103','ร้านค้า','ห้องซักอบ','โถงบันได']},
+  {name:'ชั้น 1',slots:5, labels:['ห้อง101','ห้อง102','ห้อง103','ร้านค้า','ห้องซักอบ'],roomCount:5},
 ];
 function buildPlasterUI(force=false){
   if(window._buildingPlaster)return;window._buildingPlaster=true;
@@ -1176,10 +1176,9 @@ function buildPlasterUI(force=false){
       const val=parseFloat(document.getElementById('s7r'+i)?.value||0)||0;
       const dn=val>=100;
       const lbl=fl.labels[si]||('ช่อง'+(i+1));
-      const isStair=lbl.startsWith('โถง');
-      const bc=dn?'rgba(0,230,118,.5)':'var(--bdrh)';
-      out+=`<div class="PB ${dn?'dn':'pd'}" style="width:100%;padding:6px 4px;${isStair?'border:1px dashed rgba(255,214,0,.4);':''}">`;
-      out+=`<div style="font-size:8px;font-weight:700;color:${isStair?'var(--gold)':'var(--tx2)'};margin-bottom:3px;text-align:center;line-height:1.2">${lbl}</div>`;
+        const bc=dn?'rgba(0,230,118,.5)':'var(--bdrh)';
+      out+=`<div class="PB ${dn?'dn':'pd'}" style="width:100%;padding:6px 4px;">`;
+      out+=`<div style="font-size:8px;font-weight:700;color:var(--tx2);margin-bottom:3px;text-align:center;line-height:1.2">${lbl}</div>`;
       out+=`<input class="PI" type="text" inputmode="decimal" pattern="[0-9.]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="s7r${i}" value="${val}" oninput="updPlaster();scheduleAutoSave()" style="width:100%;font-size:13px;font-weight:700;text-align:center;padding:3px 2px;background:transparent;border:1px solid ${bc};-webkit-user-select:text;user-select:text;min-height:34px;box-sizing:border-box">`;
       out+=`<div style="font-size:7px;color:var(--tx3);margin-top:2px;text-align:center">${(val*WTP_R/100).toFixed(1)}%</div>`;
       out+=`</div>`;
@@ -1206,7 +1205,11 @@ function updPlaster(){
   let total=0,doneCount=0;
   for(let i=0;i<target;i++){
     const val=parseFloat(document.getElementById('s7r'+i)?.value||0)||0;
-    total+=val*WTP_R/100;
+    // ตรวจว่าเป็นโถงบันได
+    let _lbl='';let _ri=0;let _done=false;
+    FLOORS.forEach(fl=>{fl.labels.forEach((lb,si)=>{if(_ri===i){_lbl=lb;_done=true;}_ri++;});});
+    const isStairCell=_lbl.startsWith('โถง');
+    if(!isStairCell) total+=val*WTP_R/100;
     if(val>=100)doneCount++;
     const inp=document.getElementById('s7r'+i);
     if(inp){
@@ -1825,32 +1828,36 @@ function buildF1UI(force=false){
   const c=document.getElementById('prooms-f1');
   if(!c)return;
   if(!force&&c.querySelector('#f1r0'))return;
-  const WTP=100/6;
-  let out='';
   const fl=FLOORS_F1[0];
+  const roomCount=fl.roomCount||fl.slots;
+  const WTP=100/roomCount;
+  const isViewMode=document.body.classList.contains('view-mode');
+  let out='';
   fl.labels.forEach((lbl,si)=>{
     const i=si;
+
     const val=parseFloat(document.getElementById('f1r'+i)?.value||0)||0;
     const dn=val>=100;
-    const isStair=lbl.startsWith('โถง');
     const bc=dn?'rgba(0,230,118,.5)':'var(--bdrh)';
-    out+=`<div class="PB ${dn?'dn':'pd'}" style="width:100%;padding:5px 3px;${isStair?'border:1px dashed rgba(255,214,0,.4);':''}">`;
-    out+=`<div style="font-size:8px;font-weight:700;color:${isStair?'var(--gold)':'var(--tx2)'};margin-bottom:3px;text-align:center;line-height:1.2">${lbl}</div>`;
+    out+=`<div class="PB ${dn?'dn':'pd'}" style="width:100%;padding:5px 3px;">`;
+    out+=`<div style="font-size:8px;font-weight:700;color:var(--tx2);margin-bottom:3px;text-align:center;line-height:1.2">${lbl}</div>`;
     out+=`<input class="PI" type="text" inputmode="decimal" pattern="[0-9.]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="f1r${i}" value="${val}" oninput="updF1();scheduleAutoSave()" style="width:100%;font-size:12px;font-weight:700;text-align:center;padding:3px 2px;background:transparent;border:1px solid ${bc};-webkit-user-select:text;user-select:text;min-height:32px;box-sizing:border-box">`;
-    out+=`<div style="font-size:7px;color:var(--tx3);margin-top:2px;text-align:center">${(val*WTP/100).toFixed(1)}%</div>`;
+    out+=`<div style="font-size:7px;color:var(--tx3);margin-top:2px;text-align:center">${(val*WTP/100).toFixed(2)}%</div>`;
     out+=`</div>`;
   });
   c.innerHTML=out;
 }
 function updF1(){
-  const WTP=100/6;
+  const fl=FLOORS_F1[0];
+  const roomCount=fl.roomCount||fl.slots; // ไม่นับโถงบันได
+  const WTP=100/roomCount;
   let total=0;
-  for(let i=0;i<6;i++){
+  fl.labels.forEach((lbl,i)=>{
     const val=parseFloat(document.getElementById('f1r'+i)?.value||0)||0;
     total+=Math.min(100,val)*WTP/100;
     const inp=document.getElementById('f1r'+i);
     if(inp){const dn=val>=100;const box=inp.closest('.PB');if(box)box.className='PB '+(dn?'dn':'pd');inp.style.borderColor=dn?'rgba(0,230,118,.5)':'var(--bdrh)';}
-  }
+  });
   total=Math.min(100,total);
   const hid=document.getElementById('s7f1');if(hid)hid.value=total.toFixed(4);
   setBar('s7f1','s7f1b','s7f1p');
@@ -5551,7 +5558,7 @@ function saveNewCatModal(){
 
 
 <div class="card" id="zone-s7">
-  <div class="SH"><div class="SN" style="background:#f57c00">7</div><div class="ST">งานฉาบผนังภายใน (ชั้น 2 และ 4)</div><div class="Stg" style="margin-left:auto">เป้า <span id="s7-tgt-pct">100%</span></div><span style="font-size:10px;color:var(--tx3);background:var(--bg2);border:1px solid var(--bdr);padding:2px 7px;border-radius:4px">รวม 28 ช่อง</span></div>
+  <div class="SH"><div class="SN" style="background:#f57c00">6</div><div class="ST">งานฉาบผนังภายใน (ชั้น 2 และ 4)</div><div class="Stg" style="margin-left:auto">เป้า <span id="s7-tgt-pct">100%</span></div><span style="font-size:10px;color:var(--tx3);background:var(--bg2);border:1px solid var(--bdr);padding:2px 7px;border-radius:4px">รวม 28 ช่อง</span></div>
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;padding:10px 14px;background:rgba(255,149,0,.07);border:1px solid rgba(255,149,0,.25);border-radius:8px">
     <span style="font-size:22px">🎯</span>
     <div><div style="font-size:11px;color:var(--tx3);margin-bottom:2px">จำนวนเป้าหมาย</div><div style="font-size:20px;font-weight:800;font-family:var(--m);color:var(--orange)">30 ช่อง <span id="s7-tgt-lbl" style="font-size:13px;font-weight:600;color:var(--tx3)">(ชั้น1=6, ชั้น2=12, ชั้น4=12)</span></div></div>
@@ -5587,7 +5594,7 @@ function saveNewCatModal(){
 
   <button onclick="openChecklistPage()" class="edit-only" style="background:linear-gradient(135deg,rgba(0,60,120,.6),rgba(56,139,253,.2));color:var(--blue);border:1px solid rgba(56,139,253,.5);border-radius:10px;padding:12px 28px;font-size:14px;cursor:pointer;font-family:var(--f);font-weight:700;display:inline-flex;align-items:center;gap:8px;transition:all .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">📋 Checklist ประสานงานหน้างาน ↗</button>
 
-  <button onclick="openAnalysisPage()" class="edit-only" style="background:linear-gradient(135deg,rgba(0,100,60,.6),rgba(0,230,118,.2));color:var(--green);border:1px solid rgba(0,230,118,.4);border-radius:10px;padding:12px 28px;font-size:14px;cursor:pointer;font-family:var(--f);font-weight:700;display:inline-flex;align-items:center;gap:8px;transition:all .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">📈 วิเคราะห์ — กราฟ & แผนรายวัน ↗</button>
+  
 
   <button onclick="openWorkforceAdmin()" class="edit-only" style="background:linear-gradient(135deg,rgba(0,188,212,.3),rgba(0,188,212,.1));color:var(--cyan);border:1px solid rgba(0,188,212,.5);border-radius:10px;padding:12px 28px;font-size:14px;cursor:pointer;font-family:var(--f);font-weight:700;display:inline-flex;align-items:center;gap:8px;transition:all .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">👷 กำลังพลในไซท์ ↗</button>
 
@@ -5673,7 +5680,7 @@ function saveNewCatModal(){
   </div>
 </div>
 
-<div id="analysis-overlay" class="overlay">
+<div id="analysis-overlay" style="display:none!important" class="overlay">
   <button class="ov-close" onclick="document.getElementById('analysis-overlay').classList.remove('show')">✕ ปิด</button>
   <div class="ov-inner">
     <div style="margin-bottom:20px"><div style="font-size:18px;font-weight:800">📈 วิเคราะห์ & แผนการทำงาน</div><div style="font-size:12px;color:var(--tx2);margin-top:4px">กราฟความคืบหน้า · บันทึกรายวัน · ความปลอดภัย</div></div>
