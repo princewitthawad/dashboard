@@ -1196,6 +1196,7 @@ function pk(key){return PROJECT_ID+'_'+key;}
 })();
 let _fbUrl=localStorage.getItem(pk('cp_fb_url'))||'';
 let _saveTimer=null,_lastSavedAt='';
+let _fbPermDenied=false; // หยุด retry เมื่อ 401
 function fbPath(){
   const base=_fbUrl.replace(/\/+$/,'');
   const secret=localStorage.getItem(pk('cp_fb_secret')||'');
@@ -1282,9 +1283,14 @@ async function saveData(){
     setSvStatus('saved','☁️ บันทึกสำเร็จ ✓',new Date().toLocaleDateString('th-TH',{year:'numeric',month:'short',day:'numeric'}));
     showToast('บันทึก Cloud สำเร็จ 💾','ok');
   }catch(e){
-    let m=e.message;if(m.includes('Failed to fetch')||m.includes('NetworkError'))m='เชื่อมต่อ Firebase ไม่ได้ (ตรวจ URL)';
-    if(m.includes('401'))m='Firebase: Permission denied — ตั้ง Database Rules เป็น read/write: true หรือเพิ่ม Database Secret';
-    if(m.includes('403'))m='Firebase: ไม่มีสิทธิ์ — ตรวจสอบ Database Rules';
+    let m=e.message;
+    if(m.includes('Failed to fetch')||m.includes('NetworkError'))m='เชื่อมต่อ Firebase ไม่ได้ (ตรวจ URL)';
+    if(m.includes('401')||m.includes('403')){
+      _fbPermDenied=true;
+      setSvStatus('saved','💾 บันทึกในเครื่อง (Firebase: ตั้ง Rules ก่อน)');
+      showToast('⚠️ Firebase: กรุณาตั้ง Database Rules → .read/.write: true','err',8000);
+      return;
+    }
     setSvStatus('unsaved','บันทึกล้มเหลว');showToast('❌ '+m,'err',6000);
   }
 }
@@ -1316,7 +1322,39 @@ function clearData(){
   ['r41','r42','r43','r44','r45'].forEach(id=>setBar(id,id+'b',id+'p'));
   buildPlasterUI(true);updPlaster();buildDonuts();ra();scheduleAutoSave();showToast('ล้างข้อมูลแล้ว','info');
 }
-function showFirebaseGuide(){
+
+function openFbSetup(){
+  const modal=document.getElementById('fb-setup-modal');
+  if(!modal)return;
+  const inp=document.getElementById('fb-setup-url');
+  if(inp)inp.value=_fbUrl||'';
+  _fbPermDenied=false; // reset flag เมื่อ user พยายาม setup ใหม่
+  modal.style.display='flex';
+}
+function saveFbSetup(){
+  const url=(document.getElementById('fb-setup-url')?.value||'').trim();
+  if(!url){showToast('กรุณาใส่ URL','err');return;}
+  if(!url.startsWith('https://')){showToast('URL ต้องขึ้นต้นด้วย https://','err');return;}
+  _fbUrl=url;_fbPermDenied=false;
+  try{localStorage.setItem(pk('cp_fb_url'),_fbUrl);}catch(e){}
+  document.getElementById('fb-setup-modal').style.display='none';
+  showToast('บันทึก Firebase URL แล้ว ✓ — กด 💾 ลองบันทึกอีกครั้ง','ok',5000);
+}
+async function testFbConnection(){
+  const url=(document.getElementById('fb-setup-url')?.value||'').trim();
+  const res_el=document.getElementById('fb-test-result');
+  if(!url){if(res_el)res_el.textContent='⚠️ ใส่ URL ก่อน';return;}
+  if(res_el)res_el.innerHTML='<span style="color:var(--tx3)">กำลังทดสอบ...</span>';
+  try{
+    const r=await fetch(url.replace(/\/+$/,'')+'/ping.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:'"test"'});
+    if(r.ok){if(res_el)res_el.innerHTML='<span style="color:var(--green)">✅ เชื่อมต่อสำเร็จ! กด "บันทึก URL"</span>';}
+    else if(r.status===401||r.status===403){if(res_el)res_el.innerHTML='<span style="color:var(--orange)">⚠️ URL ถูกต้อง แต่ต้องแก้ Rules ก่อน (ดูขั้นตอนข้างบน)</span>';}
+    else{if(res_el)res_el.innerHTML='<span style="color:var(--red)">❌ HTTP '+r.status+'</span>';}
+  }catch(e){if(res_el)res_el.innerHTML='<span style="color:var(--red)">❌ เชื่อมต่อไม่ได้: ตรวจ URL หรือ Internet</span>';}
+}
+
+function showFirebaseGuide(){openFbSetup();}
+function _oldShowFirebaseGuide_unused(){
   const cur=_fbUrl;
   const msg='📡 ตั้งค่า Firebase Realtime Database\n\n'+
     '1. ไปที่ firebase.google.com → สร้าง/เข้า Project\n'+
@@ -1340,15 +1378,25 @@ function showRealtimeGuide(){alert('📡 คู่มือแชร์ Realtime
 let _autoRefTimer=null;
 function startAutoRefresh(){
   clearInterval(_autoRefTimer);
+  // Realtime: view-mode refresh 5s, edit-mode 15s
+  const interval=document.body.classList.contains('view-mode')?5000:15000;
   _autoRefTimer=setInterval(async()=>{
-    if(!isFirebaseReady())return;
-    try{const res=await fetch(fbPath());if(!res.ok)return;const s=await res.json();if(!s)return;
-      if(s.savedAt&&s.savedAt!==_lastSavedAt){_lastSavedAt=s.savedAt;applyState(s);setSvStatus('saved','🔄 รีเฟรชอัตโนมัติ',new Date(s.savedAt).toLocaleDateString('th-TH',{year:'numeric',month:'short',day:'numeric'}));}
+    if(!isFirebaseReady()||_fbPermDenied)return;
+    try{
+      const res=await fetch(fbPath());if(!res.ok)return;
+      const s=await res.json();if(!s)return;
+      if(s.savedAt&&s.savedAt!==_lastSavedAt){
+        const isView=document.body.classList.contains('view-mode');
+        _lastSavedAt=s.savedAt;
+        applyState(s);
+        setSvStatus('saved','🔄 ซิงค์ข้อมูลใหม่',new Date(s.savedAt).toLocaleDateString('th-TH',{year:'numeric',month:'short',day:'numeric'}));
+        if(isView)showToast('🔄 ข้อมูลอัพเดทจาก Admin','info',3000);
+        else showToast('🔄 ซิงค์ข้อมูลจากเครื่องอื่น','info',2500);
+      }
     }catch(e){}
-    // Also pull ACCT + snapshots from cloud every cycle
     if(typeof refreshACCTFromCloud==='function')refreshACCTFromCloud();
     if(typeof refreshSnapshotsFromCloud==='function')refreshSnapshotsFromCloud();
-  },15000);
+  },interval);
 }
 
 function gv(id){return parseFloat(document.getElementById(id)?.value)||0;}
@@ -2353,6 +2401,45 @@ function exportChecklistPDF(){
   <div class="page">${hdr}${p1}${ftr}</div>
   <div class="page"><div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid #1565c0"><div style="font-size:15px;font-weight:800">📋 Checklist (ต่อ)</div><div style="font-size:11px;color:#9ca3af">${today}</div></div>${p2}${rptHTML}${ftr}</div>
   \u003cscript\u003ewindow.onload=()=>{window.print();}\u003c/script\u003e
+
+<!-- Firebase Setup Modal -->
+<div id="fb-setup-modal" style="display:none;position:fixed;inset:0;z-index:99998;align-items:center;justify-content:center;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);padding:16px">
+  <div style="background:#08111e;border:1px solid rgba(56,139,253,.4);border-radius:16px;padding:24px;width:100%;max-width:460px;box-shadow:0 16px 48px rgba(0,0,0,.8);max-height:90vh;overflow-y:auto">
+    <div style="font-size:18px;font-weight:800;color:#00d4ff;margin-bottom:4px">☁️ ตั้งค่า Firebase Cloud Sync</div>
+    <div style="font-size:11px;color:var(--tx3);margin-bottom:16px">บันทึกข้อมูลไว้ใน Cloud — เปิดได้ทุกอุปกรณ์</div>
+
+    <div style="background:rgba(255,149,0,.08);border:1px solid rgba(255,149,0,.3);border-radius:8px;padding:12px;margin-bottom:16px;font-size:11px;color:var(--tx2);line-height:1.8">
+      <div style="font-weight:700;color:var(--orange);margin-bottom:6px">⚠️ แก้ Permission denied:</div>
+      <div>1. ไป <strong style="color:#00d4ff">Firebase Console</strong> → Project → Realtime Database</div>
+      <div>2. คลิก Tab <strong style="color:var(--gold)">Rules</strong></div>
+      <div>3. แก้เป็น:</div>
+      <div style="background:rgba(0,0,0,.4);border-radius:6px;padding:8px;margin:6px 0;font-family:monospace;font-size:11px;color:#76ff03">
+        {<br>&nbsp;&nbsp;"rules": {<br>&nbsp;&nbsp;&nbsp;&nbsp;".read": true,<br>&nbsp;&nbsp;&nbsp;&nbsp;".write": true<br>&nbsp;&nbsp;}<br>}
+      </div>
+      <div>4. กด <strong style="color:var(--green)">Publish</strong></div>
+    </div>
+
+    <div style="margin-bottom:14px">
+      <label style="font-size:11px;color:var(--tx3);display:block;margin-bottom:5px">🔗 Firebase Database URL</label>
+      <input id="fb-setup-url" type="text" placeholder="https://your-project-default-rtdb.firebaseio.com"
+        style="width:100%;background:var(--bg2);border:1px solid rgba(56,139,253,.3);border-radius:7px;color:var(--tx);padding:9px 12px;font-size:12px;font-family:monospace;box-sizing:border-box">
+      <div style="font-size:10px;color:var(--tx3);margin-top:4px">Firebase Console → Project Settings → General → Realtime Database URL</div>
+    </div>
+
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button onclick="saveFbSetup()" style="flex:1;padding:10px;background:linear-gradient(135deg,#1740b8,#1e90d4);color:#fff;border:none;border-radius:8px;font-family:var(--f);font-size:13px;font-weight:700;cursor:pointer;min-width:120px">
+        ✅ บันทึก URL
+      </button>
+      <button onclick="testFbConnection()" style="flex:1;padding:10px;background:rgba(0,230,118,.15);border:1px solid rgba(0,230,118,.4);color:var(--green);border-radius:8px;font-family:var(--f);font-size:13px;font-weight:700;cursor:pointer;min-width:120px">
+        🔌 ทดสอบ
+      </button>
+      <button onclick="document.getElementById('fb-setup-modal').style.display='none'" style="padding:10px 16px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--tx2);border-radius:8px;font-family:var(--f);font-size:13px;cursor:pointer">
+        ปิด
+      </button>
+    </div>
+    <div id="fb-test-result" style="margin-top:10px;font-size:11px;min-height:16px"></div>
+  </div>
+</div>
 </body></html>`);
   win.document.close();
 }
@@ -4537,8 +4624,8 @@ function scheduleAutoSave(){
   setSvStatus('unsaved','● มีการเปลี่ยนแปลง...');
   // บันทึก localStorage ทันที
   try{const st=collectState();localStorage.setItem(pk('cp_backup'),JSON.stringify(st));}catch(e){}
-  // บันทึก Firebase (debounce 5s)
-  _saveTimer=setTimeout(saveData,5000);
+  // บันทึก Firebase (debounce 5s) — ข้ามถ้า permission denied
+  if(!_fbPermDenied)_saveTimer=setTimeout(saveData,5000);
   // Jupiter auto-snapshot
   clearTimeout(window._jupAutoSaveTimer);
   window._jupAutoSaveTimer=setTimeout(()=>{try{jupAutoSaveSnapshot();}catch(e){}},3000);
