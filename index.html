@@ -10,8 +10,8 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#080d14">
 <meta name="description" content="Construction Progress Dashboard v2.6.0">
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='100' fill='%23080d14'/%3E%3Crect x='40' y='40' width='432' height='432' rx='80' fill='%230d1a2e'/%3E%3Ctext x='256' y='200' text-anchor='middle' font-family='Arial' font-weight='bold' font-size='80' fill='%23388bfd'%3ECP%3C/text%3E%3Ctext x='256' y='290' text-anchor='middle' font-family='Arial' font-size='40' fill='%2300e676'%3EDashboard%3C/text%3E%3Ctext x='256' y='360' text-anchor='middle' font-family='Arial' font-size='28' fill='%236b7a8d'%3Ev2.5.1%3C/text%3E%3Crect x='80' y='390' width='352' height='4' rx='2' fill='%23388bfd' opacity='.5'/%3E%3C/svg%3E">
-<link rel="manifest" href="data:application/json,%7B%22name%22%3A%22Construction%20Progress%20Dashboard%22%2C%22short_name%22%3A%22CP%20Dashboard%22%2C%22description%22%3A%22Construction%20Progress%20Dashboard%20v2.5.1%22%2C%22start_url%22%3A%22.%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23080d14%22%2C%22theme_color%22%3A%22%23080d14%22%2C%22orientation%22%3A%22any%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%2520xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%2520viewBox%3D%270%2520256%2520512%27%253E%253C%2Fsvg%253E%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='100' fill='%23080d14'/%3E%3Crect x='40' y='40' width='432' height='432' rx='80' fill='%230d1a2e'/%3E%3Ctext x='256' y='200' text-anchor='middle' font-family='Arial' font-weight='bold' font-size='80' fill='%23388bfd'%3ECP%3C/text%3E%3Ctext x='256' y='290' text-anchor='middle' font-family='Arial' font-size='40' fill='%2300e676'%3EDashboard%3C/text%3E%3Ctext x='256' y='360' text-anchor='middle' font-family='Arial' font-size='28' fill='%236b7a8d'%3Ev2.6.0%3C/text%3E%3Crect x='80' y='390' width='352' height='4' rx='2' fill='%23388bfd' opacity='.5'/%3E%3C/svg%3E">
+<link rel="manifest" href="data:application/json,%7B%22name%22%3A%22Construction%20Progress%20Dashboard%22%2C%22short_name%22%3A%22CP%20Dashboard%22%2C%22description%22%3A%22Construction%20Progress%20Dashboard%20v2.6.0%22%2C%22start_url%22%3A%22.%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23080d14%22%2C%22theme_color%22%3A%22%23080d14%22%2C%22orientation%22%3A%22any%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%2520xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%2520viewBox%3D%270%2520256%2520512%27%253E%253C%2Fsvg%253E%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -621,7 +621,7 @@ header{
     </div>
     <div>
       <div class="ht">Construction Progress Dashboard <span style="font-size:13px;font-weight:600;color:var(--cyan);background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.3);border-radius:6px;padding:2px 8px;vertical-align:middle">Phase 3</span></div>
-      <div class="hs">รายงานความคืบหน้างานก่อสร้าง · v2.5.1</div>
+      <div class="hs">รายงานความคืบหน้างานก่อสร้าง · v2.6.0</div>
     </div>
   </div>
   <div class="hbtns">
@@ -1196,7 +1196,11 @@ function pk(key){return PROJECT_ID+'_'+key;}
 })();
 let _fbUrl=localStorage.getItem(pk('cp_fb_url'))||'';
 let _saveTimer=null,_lastSavedAt='';
-function fbPath(){return _fbUrl.replace(/\/+$/,'')+'/construction_progress.json';}
+function fbPath(){
+  const base=_fbUrl.replace(/\/+$/,'');
+  const secret=localStorage.getItem(pk('cp_fb_secret')||'');
+  return base+'/construction_progress.json'+(secret?'?auth='+secret:'');
+}
 function fbNodePath(node){return _fbUrl.replace(/\/+$/,'')+'/'+node+'.json';}
 async function cloudPutNode(node,payload){
   if(!isFirebaseReady())return false;
@@ -1278,7 +1282,9 @@ async function saveData(){
     setSvStatus('saved','☁️ บันทึกสำเร็จ ✓',new Date().toLocaleDateString('th-TH',{year:'numeric',month:'short',day:'numeric'}));
     showToast('บันทึก Cloud สำเร็จ 💾','ok');
   }catch(e){
-    let m=e.message;if(m.includes('Failed to fetch')||m.includes('NetworkError'))m='เชื่อมต่อ Firebase ไม่ได้';
+    let m=e.message;if(m.includes('Failed to fetch')||m.includes('NetworkError'))m='เชื่อมต่อ Firebase ไม่ได้ (ตรวจ URL)';
+    if(m.includes('401'))m='Firebase: Permission denied — ตั้ง Database Rules เป็น read/write: true หรือเพิ่ม Database Secret';
+    if(m.includes('403'))m='Firebase: ไม่มีสิทธิ์ — ตรวจสอบ Database Rules';
     setSvStatus('unsaved','บันทึกล้มเหลว');showToast('❌ '+m,'err',6000);
   }
 }
@@ -1312,11 +1318,22 @@ function clearData(){
 }
 function showFirebaseGuide(){
   const cur=_fbUrl;
-  const url=prompt('วาง Firebase Realtime Database URL ของคุณ\n(ตัวอย่าง: https://your-project.firebaseio.com)\n\nURL ปัจจุบัน: '+(cur||'(ยังไม่ได้ตั้งค่า)'),cur);
+  const msg='📡 ตั้งค่า Firebase Realtime Database\n\n'+
+    '1. ไปที่ firebase.google.com → สร้าง/เข้า Project\n'+
+    '2. Realtime Database → Create Database\n'+
+    '3. Copy URL (เช่น https://project-default-rtdb.firebaseio.com)\n\n'+
+    '⚠️ ถ้าเจอ Permission denied (401/403):\n'+
+    '   Rules → แก้เป็น { "rules": { ".read": true, ".write": true } }\n\n'+
+    'URL ปัจจุบัน: '+(cur||'(ยังไม่ได้ตั้งค่า)');
+  const url=prompt(msg,cur);
   if(url===null)return;
-  if(url&&url.startsWith('https://')){_fbUrl=url.trim();localStorage.setItem(pk('cp_fb_url'),_fbUrl);showToast('ตั้งค่า Firebase สำเร็จ! กด 📂 โหลดข้อมูล','ok',5000);}
-  else if(url===''){_fbUrl='';localStorage.removeItem(pk('cp_fb_url'));showToast('ลบ Firebase URL แล้ว','info');}
-  else{showToast('URL ไม่ถูกต้อง ต้องขึ้นต้นด้วย https://','err');}
+  if(url&&url.startsWith('https://')){
+    _fbUrl=url.trim();
+    try{localStorage.setItem(pk('cp_fb_url'),_fbUrl);}catch(e){}
+    showToast('ตั้งค่า Firebase สำเร็จ! กด 💾 บันทึกได้เลย','ok',5000);
+  } else if(url!==null&&url!=='') {
+    showToast('URL ต้องขึ้นต้นด้วย https://','err');
+  }
 }
 function showRealtimeGuide(){alert('📡 คู่มือแชร์ Realtime\n\n1. ไปที่ firebase.google.com → สร้าง Project ฟรี\n2. Realtime Database → สร้าง Database → โหมด Test\n3. คัดลอก URL (https://...firebaseio.com)\n4. กดปุ่ม ⚙️ Cloud → วาง URL\n5. กด 💾 บันทึก เพื่ออัพโหลดข้อมูล\n\n🔒 ทุกเครื่องที่ใส่ URL เดียวกัน\nจะแชร์ข้อมูลกัน Realtime!');}
 
@@ -4049,6 +4066,8 @@ function jupRenderSnapshots(){
 </div>
 
 <script>
+if(typeof pk==='undefined'){var pk=function(k){return k;};}
+
 // ======================== ACCT MODULE ========================
 const ACCT_HASH = '30072530'; // plain compare for this module
 const ACCT_KEY = 'cp_acct_data';
@@ -5253,14 +5272,18 @@ function jup7SeedFromLatest(){
 </script>
 
 <script>
+if(typeof pk==='undefined'){var pk=function(k){return k;};}
+if(typeof getDeadlineForCalc==='undefined'){var getDeadlineForCalc=function(){return null;};}
+
 // ════════════════════════════════════════════════════════════════════
 // 🧠 AI DECISION SYSTEM — Admin Only
 //    สูตร: Σ(v/tgt)/n×100  เหมือน Dashboard โดนัท
 // ════════════════════════════════════════════════════════════════════
-var ADS_DEADLINE=getDeadlineForCalc();
+// ADS_DEADLINE — lazy load ใน adsAnalyze()
+var ADS_DEADLINE=null;
 var ADS_TGTS=[100,100,100,100,100,100,100,20];
-var ADS_NAMES=['S1 ทาสีรองพื้น','S3 ก่ออิฐนอก','S5 ไฟฟ้า+กรีดท่อ','S6 ท่อน้ำดี ชั้น1-3','S7 ฉาบผนัง','S8 ท่อน้ำ ชั้น4-5'];
-var ADS_COLS=['#00e676','#00bcd4','#ce93d8','#388bfd','#ffd600','#4fc3f7'];
+var ADS_NAMES=['S1 ฉาบผนัง','S2 กรีดผนัง','S3 ตู้เมนไฟ','S4 ท่อน้ำดี','S5 สุขภัณฑ์','S6 ฝ้าเพดาน','S7 ประตู','S8 ทาสีรองพื้น','S8 ท่อน้ำ ชั้น4-5'];
+var ADS_COLS=['#ff7043','#ce93d8','#ffca28','#388bfd','#26c6da','#a5d6a7','#ef9a9a','#00e676'];
 
 function isAdminMode(){
   try{return !document.body.classList.contains('view-mode')&&sessionStorage.getItem(pk('cp_edit_session'))==='1';}catch(e){return false;}
@@ -5301,6 +5324,7 @@ function adsRisk(pred,vs,i){
   return'ok';
 }
 function adsAnalyze(){
+  try{ADS_DEADLINE=typeof getDeadlineForCalc==="function"?getDeadlineForCalc():null;}catch(e){}
   var vs=adsGetVs(),overall=adsOverall(vs),today=new Date();
   var daysLeft=Math.ceil((ADS_DEADLINE-today)/86400000);
   var ri=adsGetRates(),rates=ri?ri.rates:null,pred=adsPredict(vs,rates);
