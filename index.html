@@ -639,7 +639,7 @@ header{
     <button class="btn edit-only" onclick="openExportJpegModal()" style="background:rgba(0,229,255,.15);color:#00e5ff;border:1px solid rgba(0,229,255,.5)">🖼️ Export JPEG</button>
     <button class="btn edit-only" onclick="downloadCurrentState()" style="background:rgba(179,136,255,.15);color:#b388ff;border:1px solid rgba(179,136,255,.5)">💾 บันทึกไฟล์</button>
     <button class="btn edit-only" onclick="exportDataJSON()" style="background:rgba(255,149,0,.15);color:#ff9500;border:1px solid rgba(255,149,0,.5)">📤 Export JSON</button>
-    <button class="btn btn-b view-only" onclick="showFirebaseGuide()">☁️ ลงทะเบียน</button>
+    <button class="btn btn-b" onclick="showFirebaseGuide()">☁️ ลงทะเบียน</button>
     <button class="btn btn-gold edit-only" onclick="showPwChange()">🔑 รหัสผ่าน</button>
     <a id="lockin-link" href="#" onclick="event.preventDefault();showLockModal()" style="font-size:11px;font-weight:700;color:#b5f54a;text-decoration:none;padding:5px 12px;border-radius:6px;border:1px solid rgba(181,245,74,.35);background:rgba(181,245,74,.08);transition:all .2s" onmouseover="this.style.background='rgba(181,245,74,.18)'" onmouseout="this.style.background='rgba(181,245,74,.08)'">🔓 Login</a>
     <button id="logout-btn" class="btn" onclick="doLogout()" style="background:rgba(255,68,68,.12);color:#ff6666;border:1px solid rgba(255,68,68,.3);font-size:11px">🔒 Logout</button>
@@ -1436,7 +1436,7 @@ function resetCloudBadData(){
   ra();
   setTimeout(()=>{saveData();showToast('รีเซ็ตและบันทึกค่าใหม่แล้ว ✓','ok',4000);},200);
 }
-function showFirebaseGuide(){openFbSetup();}
+function showFirebaseGuide(){var cur=_fbUrl||'';var url=prompt('Firebase Database URL:\n(https://project-rtdb.firebaseio.com)\n\nRules: {".read":true,".write":true}\n\nURL ปัจจุบัน: '+(cur||'ยังไม่ตั้งค่า'),cur);if(url===null)return;if(url&&url.trim().startsWith('https://')){_fbUrl=url.trim();_fbPermDenied=false;try{localStorage.setItem(pk('cp_fb_url'),_fbUrl);}catch(e){}showToast('✅ บันทึก Firebase URL แล้ว กด บันทึก','ok',5000);}else if(url.trim()!=''){showToast('URL ต้องขึ้นต้นด้วย https://','err');}}
 function _oldShowFirebaseGuide_unused(){
   const cur=_fbUrl;
   const msg='📡 ตั้งค่า Firebase Realtime Database\n\n'+
@@ -2524,6 +2524,7 @@ function exportChecklistPDF(){
   <div class="page">${hdr}${p1}${ftr}</div>
   <div class="page"><div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid #1565c0"><div style="font-size:15px;font-weight:800">📋 Checklist (ต่อ)</div><div style="font-size:11px;color:#9ca3af">${today}</div></div>${p2}${rptHTML}${ftr}</div>
   \u003cscript\u003ewindow.onload=()=>{window.print();}\u003c/script\u003e
+
 
 <!-- Firebase Setup Modal -->
 <div id="fb-setup-modal" style="display:none;position:fixed;inset:0;z-index:99998;align-items:center;justify-content:center;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);padding:16px">
@@ -5884,7 +5885,7 @@ function saveNewCatModal(){
     <button class="btn edit-only" onclick="openExportJpegModal()" style="background:rgba(0,229,255,.15);color:#00e5ff;border:1px solid rgba(0,229,255,.5)">🖼️ Export JPEG</button>
     <button class="btn edit-only" onclick="downloadCurrentState()" style="background:rgba(179,136,255,.15);color:#b388ff;border:1px solid rgba(179,136,255,.5)">💾 บันทึกไฟล์</button>
     <button class="btn edit-only" onclick="exportDataJSON()" style="background:rgba(255,149,0,.15);color:#ff9500;border:1px solid rgba(255,149,0,.5)">📤 Export JSON</button>
-    <button class="btn btn-b view-only" onclick="showFirebaseGuide()">☁️ ลงทะเบียน</button>
+    <button class="btn btn-b" onclick="showFirebaseGuide()">☁️ ลงทะเบียน</button>
     <button class="btn btn-gold edit-only" onclick="showPwChange()">🔑 รหัสผ่าน</button>
     <a id="lockin-link" href="#" onclick="event.preventDefault();showLockModal()" style="font-size:11px;font-weight:700;color:#b5f54a;text-decoration:none;padding:5px 12px;border-radius:6px;border:1px solid rgba(181,245,74,.35);background:rgba(181,245,74,.08);transition:all .2s" onmouseover="this.style.background='rgba(181,245,74,.18)'" onmouseout="this.style.background='rgba(181,245,74,.08)'">🔓 Login</a>
     <button id="logout-btn" class="btn edit-only" onclick="doLogout()" style="display:none;background:rgba(255,68,68,.12);color:#ff6666;border:1px solid rgba(255,68,68,.3);font-size:11px">🔒 Logout</button>
