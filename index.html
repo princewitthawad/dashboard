@@ -236,7 +236,7 @@ button:not(.btn):not(.lm-num):not(.ov-close):active{transform:scale(.96)}
 .mcrd-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px}
 .s3-ext{overflow:hidden;max-height:0;opacity:0;transition:max-height .6s ease,opacity .4s ease}
 .s3-ext.open{max-height:900px;opacity:1}
-body.view-mode input,body.view-mode .DCI,body.view-mode .PI{pointer-events:none!important;opacity:.45!important;cursor:not-allowed!important}
+body.view-mode input:not(.admin-input),body.view-mode .DCI,body.view-mode .PI{pointer-events:none!important;opacity:.45!important;cursor:not-allowed!important}
 body.view-mode .edit-only{display:none!important}
 body.view-mode #logout-btn{display:none!important}
 body:not(.view-mode) #logout-btn{display:inline-flex!important}
@@ -732,7 +732,7 @@ header{
 </div>
 
 
-<div class="kg" id="zone-kpi">
+<div class="kg" id="zone-kpi" style="display:none">
   <div class="kc G"><div class="ki">✅</div><div class="kl">งานเสร็จสมบูรณ์</div><div class="kv" id="kp-d">—</div><div class="ks">จาก 8 รายการ</div></div>
   <div class="kc O"><div class="ki">⚡</div><div class="kl">กำลังดำเนินการ</div><div class="kv" id="kp-p">—</div><div class="ks">ติดตามอย่างใกล้ชิด</div></div>
   <div class="kc B"><div class="ki">📊</div><div class="kl">ความคืบหน้ารวม</div><div class="kv" id="kp-o">—</div><div class="ks">เฉลี่ยทุกหัวข้อ</div></div>
@@ -763,26 +763,7 @@ header{
 
 <div class="DS" id="zone-donut">
 
-  <!-- ── โดนัท ภาพรวมทั้งโครงการ ── -->
-  <div style="display:flex;align-items:center;justify-content:center;gap:clamp(16px,3vw,40px);flex-wrap:wrap;padding:10px 0 20px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:20px">
-    <div style="text-align:center">
-      <div style="font-size:11px;font-weight:700;color:var(--tx3);margin-bottom:8px;letter-spacing:.5px">ภาพรวมทั้งโครงการ</div>
-      <div style="position:relative;width:clamp(130px,18vw,170px);margin:0 auto">
-        <svg viewBox="0 0 200 200" style="width:100%;transform:rotate(-90deg)">
-          <circle cx="100" cy="100" r="80" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="20"/>
-          <circle id="overall-donut-ring" cx="100" cy="100" r="80" fill="none"
-            stroke="#00d4ff" stroke-width="20" stroke-linecap="round"
-            stroke-dasharray="0 502.655" style="transition:stroke-dasharray .8s ease"/>
-        </svg>
-        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
-          <div id="overall-donut-pct" style="font-size:clamp(22px,4vw,32px);font-weight:900;font-family:var(--m);color:#00d4ff">0%</div>
-          <div style="font-size:9px;color:var(--tx3);margin-top:2px">S1–S8 รวม</div>
-        </div>
-      </div>
-    </div>
-    <div id="overall-donut-stats" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;min-width:150px;align-self:center"></div>
-  </div>
-
+<div style="display:flex;align-items:center;justify-content:center;gap:32px;flex-wrap:wrap;padding:10px 0 20px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:20px"><div style="text-align:center"><div style="font-size:11px;font-weight:700;color:var(--tx3);margin-bottom:8px">ภาพรวมทั้งโครงการ</div><div style="position:relative;width:clamp(130px,18vw,170px);margin:0 auto"><svg viewBox="0 0 200 200" style="width:100%;transform:rotate(-90deg)"><circle cx="100" cy="100" r="80" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="20"/><circle id="overall-donut-ring" cx="100" cy="100" r="80" fill="none" stroke="#00d4ff" stroke-width="20" stroke-linecap="round" stroke-dasharray="0 502.655" style="transition:stroke-dasharray .8s ease"/></svg><div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center"><div id="overall-donut-pct" style="font-size:clamp(22px,4vw,32px);font-weight:900;font-family:var(--m);color:#00d4ff">0%</div><div style="font-size:9px;color:var(--tx3);margin-top:2px">S1-S8 รวม</div></div></div></div><div id="overall-donut-stats" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;min-width:150px;align-self:center"></div></div>
   <!-- ── โดนัท S1–S8 แยกรายงาน ── -->
   <div style="font-size:11px;font-weight:700;color:var(--tx3);margin-bottom:10px">แยกตามหมวดงาน</div>
   <div class="DP SHW" id="tab-all">
@@ -799,7 +780,7 @@ header{
   </div>
   <div class="G2" style="gap:16px;align-items:stretch">
     <div style="display:flex;flex-direction:column">
-      <div class="PW"><div class="PM"><span class="PL">เป้าหมาย (จำนวนห้อง)</span><div class="IG"><input type="hidden" id="s7" value="18.2"><input class="PI" type="text" inputmode="decimal" pattern="[0-9.]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="s7r-inp" maxlength="2" value="49" oninput="updS7Target(this.value)" max="49" min="0" placeholder="0-49" style="width:54px"><span class="Ps">ห้อง</span><span class="PP" id="s7p" style="color:var(--orange);font-size:18px;font-weight:800">18.2%</span><span style="font-size:11px;color:var(--tx3);margin-left:3px" id="s7-tgt-bar">/100%</span></div></div><div class="PBG"><div class="PF o" id="s7b" style="width:18.2%"></div></div></div>
+      <div class="PW"><div class="PM"><span class="PL">เป้าหมาย (จำนวนห้อง)</span><div class="IG"><input type="hidden" id="s7" value="18.2"><input class="PI" type="text" inputmode="decimal" pattern="[0-9.]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="s7r-inp" class="PI admin-input" maxlength="2" value="49" oninput="updS7Target(this.value)" max="49" min="0" placeholder="0-49" style="width:54px"><span class="Ps">ห้อง</span><span class="PP" id="s7p" style="color:var(--orange);font-size:18px;font-weight:800">18.2%</span><span style="font-size:11px;color:var(--tx3);margin-left:3px" id="s7-tgt-bar">/100%</span></div></div><div class="PBG"><div class="PF o" id="s7b" style="width:18.2%"></div></div></div>
       <div style="margin-top:9px;padding:9px 12px;background:var(--bg2);border-radius:7px;border:1px solid var(--bdr)"><div style="display:flex;justify-content:space-between"><span style="font-size:11px;color:var(--tx2)">ทำแล้ว: <span style="color:var(--green);font-weight:700;font-family:var(--m)" id="s7dr">4 ห้อง</span></span><span style="font-size:11px;color:var(--tx2)">ยังต้องทำ: <span style="color:var(--orange);font-weight:700;font-family:var(--m)" id="s7r">21.8%</span></span></div></div>
       <div style="margin-top:6px;background:var(--bg2);border:1px solid var(--bdr);border-radius:9px;padding:12px 14px;flex:1;display:flex;flex-direction:column">
         <div style="font-size:11px;font-weight:700;color:var(--orange);margin-bottom:8px;flex-shrink:0">📈 กราฟความคืบหน้า vs เป้าหมาย</div>
@@ -853,7 +834,12 @@ header{
 <div class="card">
   <div class="SH"><div class="SN" style="background:#388bfd">4a</div><div class="ST">งานเดินท่อน้ำดี ชั้น 1-3 (26 ห้อง)</div><div class="Stg" style="margin-left:auto">เป้า 100%</div></div>
   <div class="C2" style="margin-bottom:12px"><div class="MS"><span class="MSi">💧</span><div><div class="MSl">ห้องทั้งหมด</div><div class="MSv">26 ห้อง</div></div></div><div class="MS"><span class="MSi">⚖️</span><div><div class="MSl">น้ำหนักต่อห้อง</div><div class="MSv">3.85%</div></div></div></div>
-  <div class="PW"><div class="PM"><span class="PL">ชั้น 1–3</span><div class="IG"><input type="hidden" id="s6" value="0"><input class="PI" type="text" inputmode="decimal" pattern="[0-9.]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="s6r-inp" maxlength="4" value="0" oninput="updRooms('s6',this.value,26)" style="width:54px"><span class="Ps">ห้อง</span><span class="PP" id="s6p" style="color:var(--red);font-size:18px;font-weight:800">0%</span><span style="font-size:11px;color:var(--tx3);margin-left:3px">/100%</span></div></div><div class="PBG"><div class="PF r" id="s6b" style="width:0%"></div></div></div>
+  <input type="hidden" id="s6" value="0">
+  <div class="PW"><div class="PM"><span class="PL">ชั้น 1–3</span><div class="IG">
+    <span class="PP" id="s6p" style="color:var(--red);font-size:18px;font-weight:800">0%</span>
+    <span style="font-size:11px;color:var(--tx3);margin-left:3px">/100%</span>
+  </div></div><div class="PBG"><div class="PF r" id="s6b" style="width:0%"></div></div></div>
+  <div id="pipe-a-grid" style="margin-top:10px"></div>
   <div style="margin-top:10px;padding:9px 12px;background:var(--bg2);border-radius:7px;border:1px solid var(--bdr)"><div style="font-size:11px;color:var(--tx2)">ยังต้องทำ: <span style="color:var(--orange);font-weight:700;font-family:var(--m)" id="s6r">—</span></div><div style="font-size:11px;color:var(--tx2);margin-top:3px">ห้องที่ทำแล้ว: <span style="color:var(--tx);font-weight:700;font-family:var(--m)" id="s6rm">—</span></div></div>
 
   <div style="margin-top:12px;background:var(--bg2);border:1px solid var(--bdr);border-radius:9px;padding:12px">
@@ -867,13 +853,12 @@ header{
     <div class="MS"><span class="MSi">🔵</span><div><div class="MSl">ห้องทั้งหมด</div><div class="MSv">22 ห้อง</div></div></div>
     <div class="MS"><span class="MSi">⚖️</span><div><div class="MSl">น้ำหนักต่อห้อง</div><div class="MSv">4.55%</div></div></div>
   </div>
+  <input type="hidden" id="s8" value="0">
   <div class="PW"><div class="PM"><span class="PL">ชั้น 4-5</span><div class="IG">
-    <input type="hidden" id="s8" value="0">
-    <input class="PI" type="text" inputmode="decimal" pattern="[0-9.]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="s8r-inp" maxlength="4" value="0" oninput="updRooms('s8',this.value,22)" style="width:54px">
-    <span class="Ps">ห้อง</span>
     <span class="PP" id="s8p" style="color:var(--red);font-size:18px;font-weight:800">0%</span>
     <span style="font-size:11px;color:var(--tx3);margin-left:3px">/100%</span>
   </div></div><div class="PBG"><div class="PF r" id="s8b" style="width:0%"></div></div></div>
+  <div id="pipe-b-grid" style="margin-top:10px"></div>
   <div style="margin-top:10px;padding:9px 12px;background:var(--bg2);border-radius:7px;border:1px solid var(--bdr)">
     <div style="font-size:11px;color:var(--tx2)">ยังต้องทำ: <span style="color:var(--orange);font-weight:700;font-family:var(--m)" id="s8r">—</span></div>
     <div style="font-size:11px;color:var(--tx2);margin-top:3px">ห้องที่ทำแล้ว: <span style="color:var(--tx);font-weight:700;font-family:var(--m)" id="s8rm">—</span></div>
@@ -1275,6 +1260,8 @@ function collectState(){
     // S5 สุขภัณฑ์ (48 ห้อง)
     sSani:gv('sSani'),
     saniRooms:Array.from({length:48},(_,i)=>_v('sn'+i)),
+    pipeARooms:Array.from({length:26},(_,i)=>_v('pipe-a-gridr'+i)),
+    pipeBRooms:Array.from({length:22},(_,i)=>_v('pipe-b-gridr'+i)),
     // S6 ฝ้าเพดาน (48×3)
     sCeil:gv('sCeil'),
     ceilRooms:Array.from({length:3},(_,ti)=>Array.from({length:48},(_,ri)=>_v('cl'+ti+'_'+ri))),
@@ -1317,6 +1304,8 @@ function applyState(s){
   if(s.elecWay)s.elecWay.forEach((v,i)=>{const e=document.getElementById('ew'+i);if(e)e.value=v;});
   if(s.elecBox)s.elecBox.forEach((v,i)=>{const e=document.getElementById('eb'+i);if(e)e.value=v;});
   if(s.saniRooms)s.saniRooms.forEach((v,i)=>{const e=document.getElementById('sn'+i);if(e)e.value=v;});
+  if(s.pipeARooms)s.pipeARooms.forEach((v,i)=>{const e=document.getElementById('pipe-a-gridr'+i);if(e)e.value=v;});
+  if(s.pipeBRooms)s.pipeBRooms.forEach((v,i)=>{const e=document.getElementById('pipe-b-gridr'+i);if(e)e.value=v;});
   if(s.ceilRooms)s.ceilRooms.forEach((row,ti)=>{if(row)row.forEach((v,ri)=>{const e=document.getElementById('cl'+ti+'_'+ri);if(e)e.value=v;});});
   if(s.doorRooms)s.doorRooms.forEach((row,ti)=>{if(row)row.forEach((v,ri)=>{const e=document.getElementById('dr'+ti+'_'+ri);if(e)e.value=v;});});
   if(s.doorShop)s.doorShop.forEach((v,i)=>{const e=document.getElementById('ds'+i);if(e)e.value=v;});
@@ -1522,7 +1511,23 @@ function getVals(){
     _s5Sum=parseFloat(Math.min(100,_s5Sum).toFixed(2));
   } else {_s5Sum=gv('s5');}
   const s5=_s5Sum;
-  const s6=gv('s6');
+  // S4a ท่อน้ำดี ชั้น1-3: คำนวณจาก pipe-a-grid
+  let _s6=0;
+  if(typeof PIPE_A_ROOMS!=='undefined'){
+    let _s6sum=0;
+    PIPE_A_ROOMS.forEach((_,i)=>{_s6sum+=Math.min(100,parseFloat(document.getElementById('pipe-a-gridr'+i)?.value||0)||0);});
+    _s6=parseFloat((_s6sum/PIPE_A_ROOMS.length).toFixed(2));
+    const _h6=document.getElementById('s6');if(_h6)_h6.value=_s6;
+  }else{_s6=gv('s6');}
+  const s6=_s6;
+  // S4b ท่อน้ำดี ชั้น4-5: คำนวณจาก pipe-b-grid
+  let _s8val=0;
+  if(typeof PIPE_B_ROOMS!=='undefined'){
+    let _s8sum=0;
+    PIPE_B_ROOMS.forEach((_,i)=>{_s8sum+=Math.min(100,parseFloat(document.getElementById('pipe-b-gridr'+i)?.value||0)||0);});
+    _s8val=parseFloat((_s8sum/PIPE_B_ROOMS.length).toFixed(2));
+    const _h8=document.getElementById('s8');if(_h8)_h8.value=_s8val;
+  }else{_s8val=gv('s8');}
   // คำนวณ sSani จาก grid จริงเสมอ (ป้องกัน stale hidden value)
   let _saniSum=0;
   if(typeof SANI_ROOMS!=='undefined'){
@@ -1550,7 +1555,7 @@ function getVals(){
     ELEC_ROOMS.forEach((_,ri)=>{_b+=Math.min(100,parseFloat(document.getElementById('eb'+ri)?.value||0)||0);});
     _elecSum=parseFloat((_w/ELEC_FLOORS.length*0.5+_b/ELEC_ROOMS.length*0.5).toFixed(2));
   } else {_elecSum=gv('sElec');}
-  return{s1,out,s5,s6,s7,sPlaster,sDoor:_doorSum,sCeil:_ceilSum,sSani:_saniSum,sElec:_elecSum,s8};
+  return{s1,out,s5,s6,s7,sPlaster,sDoor:_doorSum,sCeil:_ceilSum,sSani:_saniSum,sElec:_elecSum,s8:_s8val};
 }
 function buildS2(force){
   const tb=document.getElementById('s2body'),mc=document.getElementById('s2cards');
@@ -1878,7 +1883,7 @@ function donutHTML(pct,tgt,col,lbl,sub,showInput,inputId){
 
 function getOverall(){
   const vals=getVals();
-  const vs=[vals.sPlaster||0,vals.s5||0,vals.sElec||0,vals.s6||0,vals.sSani||0,vals.sCeil||0,vals.sDoor||0,vals.s1||0];
+  const vs=[vals.sPlaster||0,vals.s5||0,vals.sElec||0,(((vals.s6||0)+(vals.s8||0))/2),vals.sSani||0,vals.sCeil||0,vals.sDoor||0,vals.s1||0];
   const totalTgt=SUMDEF.reduce((a,d)=>a+d.tgt,0);
   const achieved=vs.reduce((a,v,i)=>a+Math.min(v,SUMDEF[i].tgt),0);
   return{overall:parseFloat((achieved/totalTgt*100).toFixed(2)),vs,achieved,totalTgt};
@@ -1907,14 +1912,52 @@ function updOverallDonut(){
     <div style="font-size:9px;color:var(--tx3)">${r.l}</div>
   </div>`).join('');
 }
+
+// ════ S4 ท่อน้ำดี — grid builders ════
+function buildPipeUI(gridId, rooms, floors, hidId, pctId, barId, statRId, statMId, force=false){
+  const c=document.getElementById(gridId);if(!c)return;
+  if(!force&&c.querySelector('.PB'))return;
+  let out='';let idx=0;
+  floors.forEach(fl=>{
+    out+=`<div style="grid-column:1/-1;font-size:10px;font-weight:800;color:var(--blue);padding:4px 0 2px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:2px">${fl.name}</div>`;
+    for(let s=0;s<fl.slots;s++){
+      const rm=rooms[idx]||('ห้อง'+(idx+1));
+      const v=parseFloat(document.getElementById(gridId+'r'+idx)?.value||0)||0;
+      const dn=v>=100;
+      out+=`<div class="PB ${dn?'dn':'pd'}" style="padding:5px 3px">`;
+      out+=`<div style="font-size:8px;font-weight:700;color:var(--blue);margin-bottom:3px;text-align:center">${rm}</div>`;
+      out+=`<input class="PI" type="text" inputmode="decimal" pattern="[0-9.]*" autocomplete="off" id="${gridId}r${idx}" value="${v}" oninput="updPipe('${gridId}','${hidId}','${pctId}','${barId}','${statRId}','${statMId}',${rooms.length});ra();scheduleAutoSave()" style="width:100%;font-size:13px;font-weight:700;text-align:center;padding:3px 2px;background:transparent;border:1px solid ${dn?'rgba(0,230,118,.5)':'var(--bdrh)'};min-height:34px;box-sizing:border-box">`;
+      out+=`<div style="font-size:7px;color:var(--tx3);margin-top:2px;text-align:center">${v.toFixed(0)}%</div>`;
+      out+='</div>';
+      idx++;
+    }
+  });
+  c.innerHTML=out;
+}
+function updPipe(gridId,hidId,pctId,barId,statRId,statMId,total){
+  let sum=0,done=0;
+  for(let i=0;i<total;i++){
+    const val=Math.min(100,parseFloat(document.getElementById(gridId+'r'+i)?.value||0)||0);
+    sum+=val;if(val>=100)done++;
+  }
+  const v=parseFloat((sum/total).toFixed(2));
+  const hid=document.getElementById(hidId);if(hid)hid.value=v;
+  const p=document.getElementById(pctId);if(p){p.textContent=v.toFixed(2)+'%';p.style.color=v>=100?'var(--green)':v>=50?'var(--orange)':'var(--red)';}
+  const b=document.getElementById(barId);if(b){b.style.width=v+'%';b.className='PF '+(v>=100?'g':v>=50?'b':v>=30?'o':'r');}
+  const r=document.getElementById(statRId);if(r)r.textContent=(total-done)>0?(total-done)+' ห้อง':'เสร็จสมบูรณ์';
+  const m=document.getElementById(statMId);if(m)m.textContent=done+'/'+total+' ห้อง (='+v.toFixed(2)+'%)';
+}
+function buildPipeAUI(force=false){buildPipeUI('pipe-a-grid',PIPE_A_ROOMS,PIPE_A_FLOORS,'s6','s6p','s6b','s6r','s6rm',force);}
+function buildPipeBUI(force=false){buildPipeUI('pipe-b-grid',PIPE_B_ROOMS,PIPE_B_FLOORS,'s8','s8p','s8b','s8r','s8rm',force);}
 function buildDonuts(){
   const ga=document.getElementById('g-all');if(!ga)return;
   ga.innerHTML='';
   const vals=getVals();
-  const vs=[vals.sPlaster||0,vals.s5||0,vals.sElec||0,vals.s6||0,vals.sSani||0,vals.sCeil||0,vals.sDoor||0,vals.s1||0];
+  const vs=[vals.sPlaster||0,vals.s5||0,vals.sElec||0,(((vals.s6||0)+(vals.s8||0))/2),vals.sSani||0,vals.sCeil||0,vals.sDoor||0,vals.s1||0];
   const CIRC=2*Math.PI*46;
   SUMDEF.forEach((d,i)=>{
     const v=Math.round((vs[i]||0)*100)/100;
+    if(v<=0)return; // ซ่อนโดนัทที่เป็น 0%
     const ratio=v/d.tgt;
     const col=gcol(ratio);
     const dash=(CIRC*Math.min(1,v/100)).toFixed(2);
@@ -1938,21 +1981,27 @@ function buildDonuts(){
 }
 function updateDonuts(){
   const vals=getVals();
-  const vs=[vals.sPlaster||0,vals.s5||0,vals.sElec||0,vals.s6||0,vals.sSani||0,vals.sCeil||0,vals.sDoor||0,vals.s1||0];
+  const vs=[vals.sPlaster||0,vals.s5||0,vals.sElec||0,(((vals.s6||0)+(vals.s8||0))/2),vals.sSani||0,vals.sCeil||0,vals.sDoor||0,vals.s1||0];
+  // ถ้าค่าเปลี่ยนจาก 0 → มีค่า หรือ มีค่า → 0 ให้ rebuild
+  const hasZero=vs.some((v,i)=>{
+    const cur=parseFloat(document.querySelector('#g-all .DC:nth-child('+(i+1)+') .DC-pct')?.textContent||'0');
+    return (v<=0&&cur>0)||(v>0&&cur<=0);
+  });
+  if(hasZero){buildDonuts();return;}
   const CIRC=2*Math.PI*46;
-  const ga=document.getElementById('g-all');
-  if(ga){
-    ga.querySelectorAll('.DC').forEach((dc,i)=>{
-      if(i>=vs.length)return;
-      const v=Math.round((vs[i]||0)*100)/100;
-      const d=SUMDEF[i]; const col=gcol(v/d.tgt);
-      const dash=(CIRC*Math.min(1,v/100)).toFixed(2);
-      const ring=dc.querySelector('.DC-ring');
-      if(ring){ring.setAttribute('stroke-dasharray',dash+' '+CIRC.toFixed(3));ring.setAttribute('stroke',d.col);}
-      const pctEl=dc.querySelector('.DC-pct');
-      if(pctEl){pctEl.textContent=v.toFixed(1)+'%';pctEl.style.color=col;}
-    });
-  }
+  const ga=document.getElementById('g-all');if(!ga)return;
+  let di=0;
+  vs.forEach((v,i)=>{
+    if(v<=0)return;
+    const dc=ga.querySelectorAll('.DC')[di++];if(!dc)return;
+    const vr=Math.round(v*100)/100;
+    const d=SUMDEF[i];const col=gcol(vr/d.tgt);
+    const dash=(CIRC*Math.min(1,vr/100)).toFixed(2);
+    const ring=dc.querySelector('.DC-ring');
+    if(ring){ring.setAttribute('stroke-dasharray',dash+' '+CIRC.toFixed(3));ring.setAttribute('stroke',d.col);}
+    const pctEl=dc.querySelector('.DC-pct');
+    if(pctEl){pctEl.textContent=vr.toFixed(1)+'%';pctEl.style.color=col;}
+  });
   updOverallDonut();
 }
 
@@ -1963,7 +2012,7 @@ function showTab(id,btn){
 
 function updSummary(){
   const vals=getVals();
-  const vs=[vals.sPlaster||0,vals.s5||0,vals.sElec||0,vals.s6||0,vals.sSani||0,vals.sCeil||0,vals.sDoor||0,vals.s1||0];
+  const vs=[vals.sPlaster||0,vals.s5||0,vals.sElec||0,(((vals.s6||0)+(vals.s8||0))/2),vals.sSani||0,vals.sCeil||0,vals.sDoor||0,vals.s1||0];
   // sbg = hidden, lu = hidden — ไม่แสดง legend ที่อาจมีค่าเก่า
   // แสดงเฉพาะ overall bar ใน kpi section
   const overall=vs.reduce((a,v,i)=>a+Math.min(v,SUMDEF[i].tgt),0)/SUMDEF.reduce((a,d)=>a+d.tgt,0)*100;
@@ -1973,12 +2022,18 @@ function updSummary(){
 function updRooms(key,v,total){
   const raw=parseFloat(v);
   if(isNaN(raw)&&v!=='')return;
-  if(v.endsWith('.')&&v.split('.').length===2)return; // allow typing decimal
+  if(v.endsWith('.')&&v.split('.').length===2)return;
   const rooms=v===''?0:Math.min(total,Math.max(0,raw));
   const pct=parseFloat((rooms/total*100).toFixed(4));
   const hid=document.getElementById(key);if(hid)hid.value=pct;
   setBar(key,key+'b',key+'p');
   if(key==='s7'){updPlaster2(rooms,total);updS7Chart();}
+  // อัพเดท stats ยังต้องทำ / ห้องที่ทำแล้ว
+  const remaining=total-rooms;
+  const rEl=document.getElementById(key+'r');
+  const mEl=document.getElementById(key+'rm');
+  if(rEl)rEl.textContent=remaining>0?remaining+' ห้อง':'เสร็จสมบูรณ์';
+  if(mEl)mEl.textContent=rooms+'/'+total+' ห้อง (='+pct.toFixed(2)+'%)';
   ra();scheduleAutoSave();
 }
 function updS5S6(){
@@ -2799,7 +2854,14 @@ const ELEC_ROOMS=[
 ]; // 48 ห้อง (ไม่รวมโถงบันได)
 
 // ════ S5 สุขภัณฑ์ ════
-const SANI_ROOMS=ELEC_ROOMS; // 48 ห้องเดียวกัน
+const SANI_ROOMS=ELEC_ROOMS;
+
+// ════ S4 ท่อน้ำดี — ห้อง arrays ════
+const PIPE_A_ROOMS=['101','102','103','ร้านค้า','ห้องซักอบ','201','202','203','204','205','206','207','208','209','210','211','301','302','303','304','305','306','307','308','309','310']; // 26 ห้อง ชั้น1-3
+const PIPE_B_ROOMS=['401','402','403','404','405','406','407','408','409','410','411','501','502','503','504','505','506','507','508','509','510','511']; // 22 ห้อง ชั้น4-5
+const PIPE_A_FLOORS=[{name:'ชั้น 1',slots:5},{name:'ชั้น 2',slots:11},{name:'ชั้น 3',slots:10}];
+const PIPE_B_FLOORS=[{name:'ชั้น 4',slots:11},{name:'ชั้น 5',slots:11}];
+ // 48 ห้องเดียวกัน
 
 // ════ S6 ฝ้าเพดานห้องน้ำ ════
 const CEIL_TASKS=['ขึ้นโครงฝ้าซีไลน์','ติดตั้งยิปซั่ม+ขัด+ฉาบ','ทาสีฝ้าเพดาน'];
@@ -3020,7 +3082,7 @@ function init(){
   buildS2(true);buildS3();
   ['s1','s4t','s5','s6','s7'].forEach(id=>setBar(id,id+'b',id+'p'));
   ['r41','r42','r43','r44','r45'].forEach(id=>setBar(id,id+'b',id+'p'));
-  buildS5UI();updS5();buildS1UI();updS1();buildPlasterUI();updPlaster();buildElecUI();updElec();buildSaniUI();updSani();buildCeilUI();updCeil();buildDoorUI();updDoor();
+  buildS5UI();updS5();buildS1UI();updS1();buildPlasterUI();updPlaster();buildPipeAUI();buildPipeBUI();buildElecUI();updElec();buildSaniUI();updSani();buildCeilUI();updCeil();buildDoorUI();updDoor();
   setTimeout(()=>{
     buildPieChart();buildDonuts();buildS7Chart();buildS5Chart();buildS1Chart();ra();initDeadlineWidget();
     if(isFirebaseReady()){
@@ -6008,25 +6070,10 @@ function saveNewCatModal(){
 </div>
 
 <div class="DS" id="zone-donut" style="display:flex;align-items:center;justify-content:center;padding:20px 0">
-  <div style="text-align:center">
-    <div style="font-size:13px;font-weight:800;color:var(--tx2);margin-bottom:12px">ยอดรวมความคืบหน้าทั้งโครงการ</div>
-    <div style="position:relative;width:200px;margin:0 auto">
-      <svg id="overall-donut-svg" viewBox="0 0 200 200" style="width:200px;height:200px;transform:rotate(-90deg)">
-        <circle cx="100" cy="100" r="80" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="18"/>
-        <circle id="overall-donut-ring" cx="100" cy="100" r="80" fill="none"
-          stroke="#00d4ff" stroke-width="18" stroke-linecap="round"
-          stroke-dasharray="0 502.655" style="transition:stroke-dasharray .8s ease"/>
-      </svg>
-      <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
-        <div id="overall-donut-pct" style="font-size:36px;font-weight:900;font-family:var(--m);color:#00d4ff">0%</div>
-        <div style="font-size:11px;color:var(--tx3);margin-top:2px">ภาพรวม S1–S8</div>
-      </div>
-    </div>
-    <div id="overall-donut-legend" style="display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-top:14px;max-width:360px"></div>
-  </div>
+  
 </div>
 
-<div class="card" id="zone-s7">
+<div id="zone-s7-dup" style="display:none">
   <div class="SH"><div class="SN" style="background:#ff7043">1</div><div class="ST">งานฉาบผนัง (ชั้น 1-5)</div><div class="Stg" style="margin-left:auto">เป้า <span id="s7-tgt-pct">100%</span></div><span style="font-size:10px;color:var(--tx3);background:var(--bg2);border:1px solid var(--bdr);padding:2px 7px;border-radius:4px">รวม <span id="s7-total-lbl">49</span> ช่อง</span></div>
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;padding:10px 14px;background:rgba(255,149,0,.07);border:1px solid rgba(255,149,0,.25);border-radius:8px">
     <span style="font-size:22px">🎯</span>
@@ -6049,7 +6096,7 @@ function saveNewCatModal(){
   </div>
 </div>
 
-<div class="card-wrap" id="zone-s5s6">
+<div id="zone-s5s6-dup" style="display:none">
 <div class="card">
   <div class="SH"><div class="SN" style="background:#ce93d8">2</div><div class="ST">งานกรีดผนัง+ฝังท่อ</div><div class="Stg" style="margin-left:auto">เป้า 100%</div></div>
   <div class="C2" style="margin-bottom:10px">
@@ -6131,7 +6178,7 @@ function saveNewCatModal(){
   </div>
   <div id="sani-grid" style="margin-top:10px"></div>
 </div>
-<div class="card" id="zone-sceil">
+<div id="zone-sceil-dup" style="display:none">
   <div class="SH"><div class="SN" style="background:#a5d6a7">6</div><div class="ST">งานฝ้าเพดานห้องน้ำ</div><div class="Stg" style="margin-left:auto">เป้า 100%</div></div>
   <input type="hidden" id="sCeil" value="0">
   <div class="C2" style="margin-bottom:10px">
@@ -6152,7 +6199,7 @@ function saveNewCatModal(){
 </div>
 </div>
 
-<div class="card" id="zone-sdoor">
+<div id="zone-sdoor-dup" style="display:none">
   <div class="SH"><div class="SN" style="background:#ef9a9a">7</div><div class="ST">งานประตู/หน้าต่าง</div><div class="Stg" style="margin-left:auto">เป้า 100%</div></div>
   <input type="hidden" id="sDoor" value="0">
   <div class="C2" style="margin-bottom:10px">
@@ -6177,7 +6224,7 @@ function saveNewCatModal(){
   <div id="door-grid"></div>
 </div>
 
-<div id="zone-s1">
+<div id="zone-s1-dup" style="display:none">
 <div class="card">
   <div class="SH"><div class="SN" style="background:#00e676">8</div><div class="ST">งานทาสีรองพื้น</div><div class="Stg" style="margin-left:auto">เป้า 20%</div></div>
   <div class="C2" style="margin-bottom:10px">
