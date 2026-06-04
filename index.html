@@ -238,6 +238,8 @@ button:not(.btn):not(.lm-num):not(.ov-close):active{transform:scale(.96)}
 .s3-ext.open{max-height:900px;opacity:1}
 body.view-mode input,body.view-mode .DCI,body.view-mode .PI{pointer-events:none!important;opacity:.45!important;cursor:not-allowed!important}
 body.view-mode .edit-only{display:none!important}
+body.view-mode #logout-btn{display:none!important}
+body:not(.view-mode) #logout-btn{display:inline-flex!important}
 #toast{position:fixed;bottom:24px;right:24px;background:#111b28;border:1px solid;border-radius:10px;padding:10px 18px;font-size:13px;font-weight:600;z-index:9999;display:none;align-items:center;gap:8px;box-shadow:var(--shadow);animation:slideup .3s ease}
 @keyframes slideup{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
 #toast.ok{border-color:rgba(0,230,118,.5);color:var(--green)}
@@ -406,6 +408,12 @@ body.view-mode .edit-only{display:none!important}
   .overlay, #lock-modal, #pwc-modal, #jpeg-modal { display: none !important; }
   canvas { max-width: 100%; height: auto !important; }
 }
+
+/* Login/Logout visibility */
+body.view-mode #lockin-link { display: inline !important; }
+body:not(.view-mode) #lockin-link { display: none !important; }
+body.view-mode #logout-btn { display: none !important; }
+body:not(.view-mode) #logout-btn { display: inline-flex !important; }
 </style>
 <style>
 /* ══════════════════════════════════════════════
@@ -634,7 +642,7 @@ header{
     <button class="btn btn-b view-only" onclick="showFirebaseGuide()">☁️ ลงทะเบียน</button>
     <button class="btn btn-gold edit-only" onclick="showPwChange()">🔑 รหัสผ่าน</button>
     <a id="lockin-link" href="#" onclick="event.preventDefault();showLockModal()" style="font-size:11px;font-weight:700;color:#b5f54a;text-decoration:none;padding:5px 12px;border-radius:6px;border:1px solid rgba(181,245,74,.35);background:rgba(181,245,74,.08);transition:all .2s" onmouseover="this.style.background='rgba(181,245,74,.18)'" onmouseout="this.style.background='rgba(181,245,74,.08)'">🔓 Login</a>
-    <button id="logout-btn" class="btn edit-only" onclick="doLogout()" style="display:none;background:rgba(255,68,68,.12);color:#ff6666;border:1px solid rgba(255,68,68,.3);font-size:11px">🔒 Logout</button>
+    <button id="logout-btn" class="btn" onclick="doLogout()" style="background:rgba(255,68,68,.12);color:#ff6666;border:1px solid rgba(255,68,68,.3);font-size:11px">🔒 Logout</button>
     <button id="lock-btn" class="btn btn-o edit-only" onclick="applyViewMode()" style="display:none">🔒 ล็อก</button>
     <button class="btn edit-only" onclick="openACCT()" style="background:rgba(0,212,255,.15);color:var(--cyan);border:1px solid rgba(0,212,255,.4);font-size:11px">💰 ACCT</button>
   </div>
@@ -2000,8 +2008,8 @@ function showLockModal(){
   checkBiometricSupport();
 }
 function closeLockModal(){document.getElementById('lock-modal').classList.remove('show');_numBuf='';_syncDots();}
-function applyViewMode(){document.body.classList.add('view-mode');_isLocked=true;const link=document.getElementById('lockin-link'),logout=document.getElementById('logout-btn');if(link)link.style.display='';if(logout)logout.style.display='none';}
-function applyEditMode(){document.body.classList.remove('view-mode');_isLocked=false;sessionStorage.setItem(SESSION_KEY,'1');const link=document.getElementById('lockin-link'),logout=document.getElementById('logout-btn');if(link)link.style.display='none';if(logout)logout.style.display='';setTimeout(()=>showUrgentPopup(),300);}
+function applyViewMode(){document.body.classList.add('view-mode');_isLocked=true;document.querySelectorAll('#lockin-link').forEach(e=>e.style.display='');document.querySelectorAll('#logout-btn').forEach(e=>e.style.display='none');}
+function applyEditMode(){document.body.classList.remove('view-mode');_isLocked=false;sessionStorage.setItem(SESSION_KEY,'1');document.querySelectorAll('#lockin-link').forEach(e=>e.style.display='none');document.querySelectorAll('#logout-btn').forEach(e=>e.style.display='');setTimeout(()=>showUrgentPopup(),300);}
 function showGreeting(){const d=document.createElement('div');d.style.cssText='position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;pointer-events:none';d.innerHTML=`<div style="background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:36px 72px;backdrop-filter:blur(20px);box-shadow:0 12px 60px rgba(0,0,0,.5);animation:greetIn .35s cubic-bezier(.34,1.56,.64,1) both"><span style="font-size:42px;font-weight:800;color:#e8f0fe;font-family:'Sarabun',sans-serif;letter-spacing:1px">สวัสดี ค่ะ</span></div>`;document.body.appendChild(d);setTimeout(()=>{d.firstElementChild.style.cssText+=';animation:greetOut .3s ease forwards';setTimeout(()=>d.remove(),300);},3000);}
 function doLogout(){sessionStorage.removeItem(SESSION_KEY);applyViewMode();showToast('ออกจากระบบแล้ว 🔒','ok');}
 // ── Biometric Login (Fingerprint / Face ID) ──
