@@ -897,7 +897,7 @@ header{
   <div class="SH"><div class="SN" style="background:#ef9a9a">7</div><div class="ST">งานประตู/หน้าต่าง</div><div class="Stg" style="margin-left:auto">เป้า 100%</div></div>
   <input type="hidden" id="sDoor" value="0">
   <div class="C2" style="margin-bottom:10px">
-    <div class="MS"><span class="MSi">🚪</span><div><div class="MSl">48ห้อง×4ประเภท + ร้านค้า</div><div class="MSv">193 ชุด</div></div></div>
+    <div class="MS"><span class="MSi">🚪</span><div><div class="MSl">48ห้อง×4ประเภท + ร้านค้า</div><div class="MSv">195 ชุด</div></div></div>
     <div class="MS"><span class="MSi">✅</span><div><div class="MSl">3 ขั้นตอน/ชุด</div><div class="MSv">ผ่าน=100% ไม่ผ่าน=50%</div></div></div>
   </div>
   <div class="PW"><div class="PM"><span class="PL">ความคืบหน้า</span><div class="IG">
@@ -1399,8 +1399,8 @@ function startAutoRefresh(){
   },interval);
 }
 
-function gv(id){return parseFloat(document.getElementById(id)?.value)||0;}
-function ceilTo2(v){return(Math.ceil(v*100)/100).toFixed(2);}
+function gv(id){const v=parseFloat(document.getElementById(id)?.value);return isNaN(v)?0:v;}
+function ceilTo2(v){if(isNaN(v)||v==null)return'0.00';return(Math.ceil(v*100)/100).toFixed(2);}
 function gcol(ratio){return ratio>=.9?'var(--green)':ratio>=.5?'var(--blue)':ratio>=.3?'var(--orange)':'var(--red)';}
 function gclass(ratio){return ratio>=.9?'g':ratio>=.5?'b':ratio>=.3?'o':'r';}
 
@@ -2252,7 +2252,7 @@ function updS1(){
       inp.style.borderColor=dn?'rgba(0,230,118,.5)':'var(--bdrh)';
     }
   }
-  total=Math.min(100,total);
+  total=isNaN(total)?0:Math.min(100,total);
   const hid=document.getElementById('s1');if(hid)hid.value=total.toFixed(4);
   setBar('s1','s1b','s1p');
   const s1r=document.getElementById('s1r'),s1rm=document.getElementById('s1rm');
@@ -2773,15 +2773,22 @@ function buildElecUI(force=false){
   c.innerHTML=out;
 }
 function updElec(){
-  let waySum=0;ELEC_FLOORS.forEach((_,fi)=>{waySum+=Math.min(100,parseFloat(document.getElementById('ew'+fi)?.value||0)||0);});
-  let boxSum=0;ELEC_ROOMS.forEach((_,ri)=>{boxSum+=Math.min(100,parseFloat(document.getElementById('eb'+ri)?.value||0)||0);});
+  let waySum=0,wayDone=0;
+  ELEC_FLOORS.forEach((_,fi)=>{const val=Math.min(100,parseFloat(document.getElementById('ew'+fi)?.value||0)||0);waySum+=val;if(val>=100)wayDone++;});
+  let boxSum=0,boxDone=0;
+  ELEC_ROOMS.forEach((_,ri)=>{const val=Math.min(100,parseFloat(document.getElementById('eb'+ri)?.value||0)||0);boxSum+=val;if(val>=100)boxDone++;});
   const wayPct=waySum/ELEC_FLOORS.length;
   const boxPct=boxSum/ELEC_ROOMS.length;
-  const total=(wayPct*0.5+boxPct*0.5);
-  const v=parseFloat(total.toFixed(2));
+  const v=parseFloat((wayPct*0.5+boxPct*0.5).toFixed(2));
+  const totalItems=ELEC_FLOORS.length+ELEC_ROOMS.length; // 5+48=53
+  const totalDone=wayDone+boxDone;
   const s=document.getElementById('sElec');if(s)s.value=v;
   const p=document.getElementById('sElecp');if(p){p.textContent=v.toFixed(2)+'%';p.style.color=v>=100?'var(--green)':v>=50?'var(--orange)':'var(--red)';}
   const b=document.getElementById('sElecb');if(b){b.style.width=v+'%';b.className='PF '+(v>=100?'g':v>=50?'b':v>=30?'o':'r');}
+  const r=document.getElementById('sElecr');if(r)r.textContent=(totalItems-totalDone)>0?(totalItems-totalDone)+' ชุด':'เสร็จสมบูรณ์';
+  const m=document.getElementById('sElecm');if(m)m.textContent=totalDone+' ชุด (วายเวย์ '+wayDone+'/5, คอนซูเมอร์ '+boxDone+'/48)';
+  // อัพเดท label น้ำหนักต่อชุด
+  const wp=document.getElementById('sElec-wt');if(wp)wp.textContent='วายเวย์ 50%·คอนซูเมอร์ 50%';
 }
 
 // ════ S5 สุขภัณฑ์ ════
@@ -2801,14 +2808,16 @@ function buildSaniUI(force=false){
   c.innerHTML=out;
 }
 function updSani(){
-  let sum=0;SANI_ROOMS.forEach((_,ri)=>{sum+=Math.min(100,parseFloat(document.getElementById('sn'+ri)?.value||0)||0);});
+  let sum=0,done=0;
+  SANI_ROOMS.forEach((_,ri)=>{const val=Math.min(100,parseFloat(document.getElementById('sn'+ri)?.value||0)||0);sum+=val;if(val>=100)done++;});
   const v=parseFloat((sum/SANI_ROOMS.length).toFixed(2));
   const s=document.getElementById('sSani');if(s)s.value=v;
   const p=document.getElementById('sSanip');if(p){p.textContent=v.toFixed(2)+'%';p.style.color=v>=100?'var(--green)':v>=50?'var(--orange)':'var(--red)';}
+  const p2=document.getElementById('sSanip2');if(p2){p2.textContent=v.toFixed(2)+'%';p2.style.color=v>=100?'var(--green)':v>=50?'var(--orange)':'var(--red)';}
   const b=document.getElementById('sSanib');if(b){b.style.width=v+'%';b.className='PF '+(v>=100?'g':v>=50?'b':v>=30?'o':'r');}
+  const r=document.getElementById('sSanir');if(r)r.textContent=(SANI_ROOMS.length-done)>0?(SANI_ROOMS.length-done)+' ห้อง':'เสร็จสมบูรณ์';
+  const m=document.getElementById('sSanim');if(m)m.textContent=done+'/'+SANI_ROOMS.length+' ห้อง';
 }
-
-// ════ S6 ฝ้าเพดานห้องน้ำ ════
 function buildCeilUI(force=false){
   const c=document.getElementById('ceil-grid');if(!c)return;
   if(!force&&c.querySelector('.PB'))return;
@@ -2830,15 +2839,15 @@ function buildCeilUI(force=false){
   c.innerHTML=out;
 }
 function updCeil(){
-  let total=0;
-  CEIL_TASKS.forEach((_,ti)=>{CEIL_ROOMS.forEach((_,ri)=>{total+=Math.min(100,parseFloat(document.getElementById('cl'+ti+'_'+ri)?.value||0)||0);});});
-  const v=parseFloat((total/(CEIL_TASKS.length*CEIL_ROOMS.length)).toFixed(2));
+  let total=0,done=0;
+  CEIL_TASKS.forEach((_,ti)=>{CEIL_ROOMS.forEach((_,ri)=>{const val=Math.min(100,parseFloat(document.getElementById('cl'+ti+'_'+ri)?.value||0)||0);total+=val;if(val>=100)done++;});});
+  const items=CEIL_TASKS.length*CEIL_ROOMS.length;
+  const v=parseFloat((total/items).toFixed(2));
   const s=document.getElementById('sCeil');if(s)s.value=v;
   const p=document.getElementById('sCeilp');if(p){p.textContent=v.toFixed(2)+'%';p.style.color=v>=100?'var(--green)':v>=50?'var(--orange)':'var(--red)';}
+  const p2=document.getElementById('sCeilp2');if(p2){p2.textContent=v.toFixed(2)+'%';p2.style.color=v>=100?'var(--green)':v>=50?'var(--orange)':'var(--red)';}
   const b=document.getElementById('sCeilb');if(b){b.style.width=v+'%';b.className='PF '+(v>=100?'g':v>=50?'b':v>=30?'o':'r');}
 }
-
-// ════ S7 ประตู/หน้าต่าง ════
 function buildDoorUI(force=false){
   const c=document.getElementById('door-grid');if(!c)return;
   if(!force&&c.querySelector('.PB'))return;
@@ -2872,15 +2881,17 @@ function buildDoorUI(force=false){
   c.innerHTML=out;
 }
 function updDoor(){
-  let sum=0;const TOTAL=195; // 48×4=192 ห้อง + ร้านค้า 3 ประเภท
-  DOOR_TYPES_48.forEach((_,ti)=>{DOOR_ROOMS_48.forEach((_,ri)=>{sum+=Math.min(100,parseFloat(document.getElementById('dr'+ti+'_'+ri)?.value||0)||0);});});
-  DOOR_SHOP_TYPES.forEach((_,ti)=>{sum+=Math.min(100,parseFloat(document.getElementById('ds'+ti)?.value||0)||0);});
-  const v=parseFloat((sum/TOTAL).toFixed(2));
+  if(typeof DOOR_TYPES_48==='undefined'||typeof DOOR_ROOMS_48==='undefined')return;
+  let sum=0,done=0;const TOTAL=195;
+  (DOOR_TYPES_48||[]).forEach((_,ti)=>{(DOOR_ROOMS_48||[]).forEach((_,ri)=>{const val=Math.min(100,parseFloat(document.getElementById('dr'+ti+'_'+ri)?.value||0)||0);sum+=val;if(val>=100)done++;});});
+  (DOOR_SHOP_TYPES||[]).forEach((_,ti)=>{const val=Math.min(100,parseFloat(document.getElementById('ds'+ti)?.value||0)||0);sum+=val;if(val>=100)done++;});
+  const v=isNaN(sum)?0:parseFloat((sum/TOTAL).toFixed(2));
   const s=document.getElementById('sDoor');if(s)s.value=v;
   const p=document.getElementById('sDoorp');if(p){p.textContent=v.toFixed(2)+'%';p.style.color=v>=100?'var(--green)':v>=50?'var(--orange)':'var(--red)';}
   const b=document.getElementById('sDoorb');if(b){b.style.width=v+'%';b.className='PF '+(v>=100?'g':v>=50?'b':v>=30?'o':'r');}
+  const r=document.getElementById('sDoorr');if(r)r.textContent=(TOTAL-done)>0?(TOTAL-done)+' ชุด':'เสร็จสมบูรณ์';
+  const m=document.getElementById('sDoorm');if(m)m.textContent=done+'/'+TOTAL+' ชุด';
 }
-
 function init(){
   buildS2(true);buildS3();
   ['s1','s4t','s5','s6','s7'].forEach(id=>setBar(id,id+'b',id+'p'));
