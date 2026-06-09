@@ -219,7 +219,23 @@ button:not(.btn):not(.lm-num):not(.ov-close):active{transform:scale(.96)}
 .SB{background:rgba(8,13,20,.05);border:1px solid rgba(56,139,253,.25);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);box-shadow:0 4px 24px rgba(0,0,0,.15),inset 0 1px 0 rgba(255,255,255,.12),inset 0 -1px 0 rgba(255,255,255,.04);border-radius:var(--r);padding:20px 22px;margin-top:20px;position:relative;overflow:hidden}
 
 
-.card{}
+.card{display:flex;flex-direction:column;gap:12px}
+/* ── ระยะห่างภายใน card — ทุก S ใช้ gap แทน margin-top/bottom ── */
+.card > .SH{margin-bottom:0}
+.card > .C2{margin-bottom:0}
+.card > .PW{margin-bottom:0}
+.card > .PBG{margin-bottom:0}
+.card > .G2{margin-bottom:0}
+.card > [id$="-grid"]{margin-top:0}
+.card > #prooms{margin-top:0}
+.card > #s1-grid{margin-top:0}
+.card > .s-chart-box{margin-top:0}
+/* reset inline margin-top/bottom ที่ element ลูกตรงของ .card มี */
+.card > *{margin-top:0!important;margin-bottom:0!important}
+/* G2 ภายใน card — ให้ gap สม่ำเสมอ */
+.card .G2{gap:clamp(10px,2vw,16px)}
+/* MS boxes spacing */
+.card .C2.mb0{margin-bottom:0}
 .kc{animation:fadein .4s ease both}
 
 .SB::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(56,139,253,.05),transparent 60%);pointer-events:none}
@@ -803,15 +819,15 @@ header{
 
 <div class="card" id="zone-s7">
   <div class="SH"><div class="SN" style="background:#ff7043">1</div><div class="ST">งานฉาบผนัง (ชั้น 1-5)</div><div class="Stg" style="margin-left:auto">เป้า <span id="s7-tgt-pct">100%</span></div><span style="font-size:10px;color:var(--tx3);background:var(--bg2);border:1px solid var(--bdr);padding:2px 7px;border-radius:4px">รวม <span id="s7-total-lbl">49</span> ช่อง</span></div>
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;padding:10px 14px;background:rgba(255,149,0,.07);border:1px solid rgba(255,149,0,.25);border-radius:8px">
+  <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(255,149,0,.07);border:1px solid rgba(255,149,0,.25);border-radius:8px">
     <span style="font-size:22px">🎯</span>
     <div><div style="font-size:11px;color:var(--tx3);margin-bottom:2px">จำนวนเป้าหมาย</div><div style="font-size:20px;font-weight:800;font-family:var(--m);color:var(--orange)">49 ช่อง <span id="s7-tgt-lbl" style="font-size:13px;font-weight:600;color:var(--tx3)">(ชั้น1=5, ชั้น2=11, ชั้น3=11, ชั้น4=11, ชั้น5=11)</span></div></div>
   </div>
-  <div class="G2" style="gap:16px;align-items:stretch">
-    <div style="display:flex;flex-direction:column">
+  <div class="G2" style="align-items:stretch">
+    <div style="display:flex;flex-direction:column;gap:10px">
       <div class="PW"><div class="PM"><span class="PL">เป้าหมาย (จำนวนห้อง)</span><div class="IG"><input type="hidden" id="s7" value="18.2"><input class="PI" type="text" inputmode="decimal" pattern="[0-9.]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="s7r-inp" maxlength="2" value="49" oninput="updS7Target(this.value)" max="49" min="0" placeholder="0-49" style="width:54px"><span class="Ps">ห้อง</span><span class="PP" id="s7p" style="color:var(--orange);font-size:18px;font-weight:800">18.2%</span><span style="font-size:11px;color:var(--tx3);margin-left:3px" id="s7-tgt-bar">/100%</span></div></div><div class="PBG"><div class="PF o" id="s7b" style="width:18.2%"></div></div></div>
-      <div style="margin-top:9px;padding:9px 12px;background:var(--bg2);border-radius:7px;border:1px solid var(--bdr)"><div style="display:flex;justify-content:space-between"><span style="font-size:11px;color:var(--tx2)">ทำแล้ว: <span style="color:var(--green);font-weight:700;font-family:var(--m)" id="s7dr">4 ห้อง</span></span><span style="font-size:11px;color:var(--tx2)">ยังต้องทำ: <span style="color:var(--orange);font-weight:700;font-family:var(--m)" id="s7r">21.8%</span></span></div></div>
-      <div style="margin-top:6px;background:var(--bg2);border:1px solid var(--bdr);border-radius:9px;padding:12px 14px;flex:1;display:flex;flex-direction:column">
+      <div style="padding:9px 12px;background:var(--bg2);border-radius:7px;border:1px solid var(--bdr)"><div style="display:flex;justify-content:space-between"><span style="font-size:11px;color:var(--tx2)">ทำแล้ว: <span style="color:var(--green);font-weight:700;font-family:var(--m)" id="s7dr">4 ห้อง</span></span><span style="font-size:11px;color:var(--tx2)">ยังต้องทำ: <span style="color:var(--orange);font-weight:700;font-family:var(--m)" id="s7r">21.8%</span></span></div></div>
+      <div style="background:var(--bg2);border:1px solid var(--bdr);border-radius:9px;padding:12px 14px;flex:1;display:flex;flex-direction:column">
         <div style="font-size:11px;font-weight:700;color:var(--orange);margin-bottom:8px;flex-shrink:0">📈 กราฟความคืบหน้า vs เป้าหมาย</div>
         <div style="position:relative;flex:1"><canvas id="s7LineChart"></canvas></div>
       </div>
@@ -827,18 +843,18 @@ header{
 <div class="card-wrap" id="zone-s5s6">
 <div class="card">
   <div class="SH"><div class="SN" style="background:#ce93d8">2</div><div class="ST">งานกรีดผนัง+ฝังท่อ</div><div class="Stg" style="margin-left:auto">เป้า 100%</div></div>
-  <div class="C2" style="margin-bottom:10px">
+  <div class="C2">
     <div class="MS"><span class="MSi">🔌</span><div><div class="MSl">ห้องทั้งหมด</div><div class="MSv">49 ห้อง (5 ชั้น)</div></div></div>
     <div class="MS"><span class="MSi">📊</span><div><div class="MSl">ความคืบหน้า</div><div class="MSv"><span id="s5p" style="color:var(--red);font-weight:800">0%</span></div></div></div>
   </div>
   <input type="hidden" id="s5" value="0">
   <div id="s5-floors" style="display:grid;grid-template-columns:repeat(6,1fr);gap:5px;width:100%"></div>
-  <div style="margin-top:10px;padding:9px 12px;background:var(--bg2);border-radius:7px;border:1px solid var(--bdr)">
+  <div style="padding:9px 12px;background:var(--bg2);border-radius:7px;border:1px solid var(--bdr)">
     <div style="font-size:11px;color:var(--tx2)">ยังต้องทำ: <span style="color:var(--orange);font-weight:700;font-family:var(--m)" id="s5r">—</span></div>
     <div style="font-size:11px;color:var(--tx2);margin-top:3px">ห้องที่ทำแล้ว: <span style="color:var(--tx);font-weight:700;font-family:var(--m)" id="s5rm">—</span></div>
   </div>
-  <div id="s5b-bar" style="margin-top:8px"><div class="PBG"><div class="PF r" id="s5b" style="width:0%"></div></div></div>
-  <div style="margin-top:12px;background:var(--bg2);border:1px solid var(--bdr);border-radius:9px;padding:12px">
+  <div id="s5b-bar"><div class="PBG"><div class="PF r" id="s5b" style="width:0%"></div></div></div>
+  <div style="background:var(--bg2);border:1px solid var(--bdr);border-radius:9px;padding:12px">
     <div style="font-size:11px;font-weight:700;color:var(--purple);margin-bottom:8px">📈 กราฟความคืบหน้า vs เป้าหมาย</div>
     <div style="position:relative;height:160px"><canvas id="s5LineChart"></canvas></div>
   </div>
@@ -846,7 +862,7 @@ header{
 <div class="card" id="zone-selec">
   <div class="SH"><div class="SN" style="background:#ffca28">3</div><div class="ST">งานติดตั้งตู้เมนไฟ</div><div class="Stg" style="margin-left:auto">เป้า 100%</div></div>
   <input type="hidden" id="sElec" value="0">
-  <div class="C2" style="margin-bottom:10px">
+  <div class="C2">
     <div class="MS"><span class="MSi">⚡</span><div><div class="MSl">วายเวย์</div><div class="MSv">5 ชั้น</div></div></div>
     <div class="MS"><span class="MSi">🔌</span><div><div class="MSl">คอนซูเมอร์</div><div class="MSv">48 ห้อง</div></div></div>
   </div>
@@ -854,7 +870,7 @@ header{
     <span class="PP" id="sElecp" style="color:var(--red);font-size:18px;font-weight:800">0%</span>
     <span style="font-size:11px;color:var(--tx3);margin-left:3px">/100%</span>
   </div></div><div class="PBG"><div class="PF r" id="sElecb" style="width:0%"></div></div></div>
-  <div style="margin-top:10px;padding:9px 12px;background:var(--bg2);border-radius:7px;border:1px solid var(--bdr)">
+  <div style="padding:9px 12px;background:var(--bg2);border-radius:7px;border:1px solid var(--bdr)">
     <div style="font-size:11px;color:var(--tx2)">ยังต้องทำ: <span style="color:var(--orange);font-weight:700;font-family:var(--m)" id="sElecr">—</span></div>
     <div style="font-size:11px;color:var(--tx2);margin-top:3px">ทำแล้ว: <span style="color:var(--tx);font-weight:700;font-family:var(--m)" id="sElecm">—</span></div>
   </div>
@@ -862,19 +878,19 @@ header{
 </div>
 <div class="card">
   <div class="SH"><div class="SN" style="background:#388bfd">4a</div><div class="ST">งานเดินท่อน้ำดี ชั้น 1-3 (26 ห้อง)</div><div class="Stg" style="margin-left:auto">เป้า 100%</div></div>
-  <div class="C2" style="margin-bottom:12px"><div class="MS"><span class="MSi">💧</span><div><div class="MSl">ห้องทั้งหมด</div><div class="MSv">26 ห้อง</div></div></div><div class="MS"><span class="MSi">⚖️</span><div><div class="MSl">น้ำหนักต่อห้อง</div><div class="MSv">3.85%</div></div></div></div>
+  <div class="C2"><div class="MS"><span class="MSi">💧</span><div><div class="MSl">ห้องทั้งหมด</div><div class="MSv">26 ห้อง</div></div></div><div class="MS"><span class="MSi">⚖️</span><div><div class="MSl">น้ำหนักต่อห้อง</div><div class="MSv">3.85%</div></div></div></div>
   <div class="PW"><div class="PM"><span class="PL">ชั้น 1–3</span><div class="IG"><input type="hidden" id="s6" value="0"><input class="PI" type="text" inputmode="decimal" pattern="[0-9.]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="s6r-inp" maxlength="4" value="0" oninput="updRooms('s6',this.value,26)" style="width:54px"><span class="Ps">ห้อง</span><span class="PP" id="s6p" style="color:var(--red);font-size:18px;font-weight:800">0%</span><span style="font-size:11px;color:var(--tx3);margin-left:3px">/100%</span></div></div><div class="PBG"><div class="PF r" id="s6b" style="width:0%"></div></div></div>
-  <div style="margin-top:10px;padding:9px 12px;background:var(--bg2);border-radius:7px;border:1px solid var(--bdr)"><div style="font-size:11px;color:var(--tx2)">ยังต้องทำ: <span style="color:var(--orange);font-weight:700;font-family:var(--m)" id="s6r">—</span></div><div style="font-size:11px;color:var(--tx2);margin-top:3px">ห้องที่ทำแล้ว: <span style="color:var(--tx);font-weight:700;font-family:var(--m)" id="s6rm">—</span></div></div>
+  <div style="padding:9px 12px;background:var(--bg2);border-radius:7px;border:1px solid var(--bdr)"><div style="font-size:11px;color:var(--tx2)">ยังต้องทำ: <span style="color:var(--orange);font-weight:700;font-family:var(--m)" id="s6r">—</span></div><div style="font-size:11px;color:var(--tx2);margin-top:3px">ห้องที่ทำแล้ว: <span style="color:var(--tx);font-weight:700;font-family:var(--m)" id="s6rm">—</span></div></div>
 
-  <div id="pipe-a-grid" style="margin-top:10px;display:grid;grid-template-columns:repeat(auto-fill,minmax(clamp(50px,9vw,76px),1fr));gap:3px"></div>
-  <div style="margin-top:12px;background:var(--bg2);border:1px solid var(--bdr);border-radius:9px;padding:12px">
+  <div id="pipe-a-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(clamp(50px,9vw,76px),1fr));gap:3px"></div>
+  <div style="background:var(--bg2);border:1px solid var(--bdr);border-radius:9px;padding:12px">
     <div style="font-size:11px;font-weight:700;color:var(--blue);margin-bottom:8px">📈 กราฟความคืบหน้า vs เป้าหมาย</div>
     <div style="position:relative;height:160px"><canvas id="s6LineChart"></canvas></div>
   </div>
 </div>
 <div class="card">
   <div class="SH"><div class="SN" style="background:#1565c0">4b</div><div class="ST">งานเดินท่อน้ำดี ชั้น 4-5 (22 ห้อง)</div><div class="Stg" style="margin-left:auto">เป้า 100%</div></div>
-  <div class="C2" style="margin-bottom:12px">
+  <div class="C2">
     <div class="MS"><span class="MSi">🔵</span><div><div class="MSl">ห้องทั้งหมด</div><div class="MSv">22 ห้อง</div></div></div>
     <div class="MS"><span class="MSi">⚖️</span><div><div class="MSl">น้ำหนักต่อห้อง</div><div class="MSv">4.55%</div></div></div>
   </div>
@@ -885,17 +901,17 @@ header{
     <span class="PP" id="s8p" style="color:var(--red);font-size:18px;font-weight:800">0%</span>
     <span style="font-size:11px;color:var(--tx3);margin-left:3px">/100%</span>
   </div></div><div class="PBG"><div class="PF r" id="s8b" style="width:0%"></div></div></div>
-  <div style="margin-top:10px;padding:9px 12px;background:var(--bg2);border-radius:7px;border:1px solid var(--bdr)">
+  <div style="padding:9px 12px;background:var(--bg2);border-radius:7px;border:1px solid var(--bdr)">
     <div style="font-size:11px;color:var(--tx2)">ยังต้องทำ: <span style="color:var(--orange);font-weight:700;font-family:var(--m)" id="s8r">—</span></div>
     <div style="font-size:11px;color:var(--tx2);margin-top:3px">ห้องที่ทำแล้ว: <span style="color:var(--tx);font-weight:700;font-family:var(--m)" id="s8rm">—</span></div>
   </div>
-  <div id="pipe-b-grid" style="margin-top:10px;display:grid;grid-template-columns:repeat(auto-fill,minmax(clamp(50px,9vw,76px),1fr));gap:3px"></div>
-  <div style="margin-top:12px;background:var(--bg2);border:1px solid var(--bdr);border-radius:9px;padding:12px"><div style="font-size:11px;font-weight:700;color:var(--blue);margin-bottom:8px">📈 กราฟความคืบหน้า vs เป้าหมาย</div><div style="position:relative;height:160px"><canvas id="s8LineChart"></canvas></div></div>
+  <div id="pipe-b-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(clamp(50px,9vw,76px),1fr));gap:3px"></div>
+  <div style="background:var(--bg2);border:1px solid var(--bdr);border-radius:9px;padding:12px"><div style="font-size:11px;font-weight:700;color:var(--blue);margin-bottom:8px">📈 กราฟความคืบหน้า vs เป้าหมาย</div><div style="position:relative;height:160px"><canvas id="s8LineChart"></canvas></div></div>
 </div>
 <div class="card" id="zone-ssani-inner">
   <div class="SH"><div class="SN" style="background:#26c6da">5</div><div class="ST">งานติดตั้งสุขภัณฑ์</div><div class="Stg" style="margin-left:auto">เป้า 100%</div></div>
   <input type="hidden" id="sSani" value="0">
-  <div class="C2" style="margin-bottom:10px">
+  <div class="C2">
     <div class="MS"><span class="MSi">🚿</span><div><div class="MSl">ห้องทั้งหมด</div><div class="MSv">48 ห้อง</div></div></div>
     <div class="MS"><span class="MSi">📊</span><div><div class="MSl">ความคืบหน้า</div><div class="MSv"><span id="sSanip" style="color:var(--red);font-weight:800">0%</span> / 100%</div></div></div>
   </div>
@@ -903,17 +919,17 @@ header{
     <span class="PP" id="sSanip2" style="color:var(--red);font-size:18px;font-weight:800">0%</span>
     <span style="font-size:11px;color:var(--tx3);margin-left:3px">/100%</span>
   </div></div><div class="PBG"><div class="PF r" id="sSanib" style="width:0%"></div></div></div>
-  <div style="margin-top:10px;padding:9px 12px;background:var(--bg2);border-radius:7px;border:1px solid var(--bdr)">
+  <div style="padding:9px 12px;background:var(--bg2);border-radius:7px;border:1px solid var(--bdr)">
     <div style="font-size:11px;color:var(--tx2)">ยังต้องทำ: <span style="color:var(--orange);font-weight:700;font-family:var(--m)" id="sSanir">—</span></div>
     <div style="font-size:11px;color:var(--tx2);margin-top:3px">ทำแล้ว: <span style="color:var(--tx);font-weight:700;font-family:var(--m)" id="sSanim">—</span></div>
   </div>
-  <div id="sani-grid" style="margin-top:10px"></div>
-  <div style="margin-top:12px;background:var(--bg2);border:1px solid var(--bdr);border-radius:9px;padding:12px"><div style="font-size:11px;font-weight:700;color:var(--blue);margin-bottom:8px">📈 กราฟความคืบหน้า vs เป้าหมาย</div><div style="position:relative;height:160px"><canvas id="sSaniChart"></canvas></div></div>
+  <div id="sani-grid"></div>
+  <div style="background:var(--bg2);border:1px solid var(--bdr);border-radius:9px;padding:12px"><div style="font-size:11px;font-weight:700;color:var(--blue);margin-bottom:8px">📈 กราฟความคืบหน้า vs เป้าหมาย</div><div style="position:relative;height:160px"><canvas id="sSaniChart"></canvas></div></div>
 </div>
 <div class="card" id="zone-sceil">
   <div class="SH"><div class="SN" style="background:#a5d6a7">6</div><div class="ST">งานฝ้าเพดานห้องน้ำ</div><div class="Stg" style="margin-left:auto">เป้า 100%</div></div>
   <input type="hidden" id="sCeil" value="0">
-  <div class="C2" style="margin-bottom:10px">
+  <div class="C2">
     <div class="MS"><span class="MSi">🏗️</span><div><div class="MSl">48 ห้อง × 3 งาน</div><div class="MSv">144 รายการ</div></div></div>
     <div class="MS"><span class="MSi">📊</span><div><div class="MSl">ความคืบหน้า</div><div class="MSv"><span id="sCeilp" style="color:var(--red);font-weight:800">0%</span> / 100%</div></div></div>
   </div>
@@ -921,13 +937,13 @@ header{
     <span class="PP" id="sCeilp2" style="color:var(--red);font-size:18px;font-weight:800">0%</span>
     <span style="font-size:11px;color:var(--tx3);margin-left:3px">/100%</span>
   </div></div><div class="PBG"><div class="PF r" id="sCeilb" style="width:0%"></div></div></div>
-  <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;font-size:10px">
+  <div style="display:flex;flex-wrap:wrap;gap:6px;font-size:10px">
     <span style="background:rgba(56,139,253,.15);border:1px solid rgba(56,139,253,.3);border-radius:4px;padding:2px 8px;color:var(--blue)">① ขึ้นโครงฝ้าซีไลน์</span>
     <span style="background:rgba(0,230,118,.15);border:1px solid rgba(0,230,118,.3);border-radius:4px;padding:2px 8px;color:var(--green)">② ยิปซั่ม+ขัด+ฉาบ</span>
     <span style="background:rgba(255,214,0,.15);border:1px solid rgba(255,214,0,.3);border-radius:4px;padding:2px 8px;color:var(--gold)">③ ทาสีฝ้า</span>
   </div>
-  <div id="ceil-grid" style="margin-top:4px"></div>
-  <div style="margin-top:12px;background:var(--bg2);border:1px solid var(--bdr);border-radius:9px;padding:12px"><div style="font-size:11px;font-weight:700;color:var(--blue);margin-bottom:8px">📈 กราฟความคืบหน้า vs เป้าหมาย</div><div style="position:relative;height:160px"><canvas id="sCeilChart"></canvas></div></div>
+  <div id="ceil-grid"></div>
+  <div style="background:var(--bg2);border:1px solid var(--bdr);border-radius:9px;padding:12px"><div style="font-size:11px;font-weight:700;color:var(--blue);margin-bottom:8px">📈 กราฟความคืบหน้า vs เป้าหมาย</div><div style="position:relative;height:160px"><canvas id="sCeilChart"></canvas></div></div>
 </div>
 </div>
 </div>
@@ -935,7 +951,7 @@ header{
 <div class="card" id="zone-sdoor">
   <div class="SH"><div class="SN" style="background:#ef9a9a">7</div><div class="ST">งานประตู/หน้าต่าง</div><div class="Stg" style="margin-left:auto">เป้า 100%</div></div>
   <input type="hidden" id="sDoor" value="0">
-  <div class="C2" style="margin-bottom:10px">
+  <div class="C2">
     <div class="MS"><span class="MSi">🚪</span><div><div class="MSl">48ห้อง×4ประเภท + ร้านค้า</div><div class="MSv">195 ชุด</div></div></div>
     <div class="MS"><span class="MSi">✅</span><div><div class="MSl">3 ขั้นตอน/ชุด</div><div class="MSv">ผ่าน=100% ไม่ผ่าน=50%</div></div></div>
   </div>
@@ -943,11 +959,11 @@ header{
     <span class="PP" id="sDoorp" style="color:var(--red);font-size:18px;font-weight:800">0%</span>
     <span style="font-size:11px;color:var(--tx3);margin-left:3px">/100%</span>
   </div></div><div class="PBG"><div class="PF r" id="sDoorb" style="width:0%"></div></div></div>
-  <div style="margin-top:8px;padding:9px 12px;background:var(--bg2);border-radius:7px;border:1px solid var(--bdr)">
+  <div style="padding:9px 12px;background:var(--bg2);border-radius:7px;border:1px solid var(--bdr)">
     <div style="font-size:11px;color:var(--tx2)">ยังต้องทำ: <span style="color:var(--orange);font-weight:700;font-family:var(--m)" id="sDoorr">—</span></div>
     <div style="font-size:11px;color:var(--tx2);margin-top:3px">ทำแล้ว: <span style="color:var(--tx);font-weight:700;font-family:var(--m)" id="sDoorm">—</span></div>
   </div>
-  <div style="display:flex;flex-wrap:wrap;gap:5px;margin:10px 0 8px;font-size:10px">
+  <div style="display:flex;flex-wrap:wrap;gap:5px;font-size:10px">
     <span style="background:rgba(206,147,216,.15);border:1px solid rgba(206,147,216,.3);border-radius:4px;padding:2px 7px;color:#ce93d8">① ประตูระเบียง</span>
     <span style="background:rgba(56,139,253,.15);border:1px solid rgba(56,139,253,.3);border-radius:4px;padding:2px 7px;color:var(--blue)">② หน้าต่างห้องน้ำ</span>
     <span style="background:rgba(0,230,118,.15);border:1px solid rgba(0,230,118,.3);border-radius:4px;padding:2px 7px;color:var(--green)">③ ประตูทางเข้า</span>
@@ -955,25 +971,25 @@ header{
     <span style="background:rgba(255,68,68,.15);border:1px solid rgba(255,68,68,.3);border-radius:4px;padding:2px 7px;color:var(--red)">🏪 ร้านค้า</span>
   </div>
   <div id="door-grid"></div>
-  <div style="margin-top:12px;background:var(--bg2);border:1px solid var(--bdr);border-radius:9px;padding:12px"><div style="font-size:11px;font-weight:700;color:var(--blue);margin-bottom:8px">📈 กราฟความคืบหน้า vs เป้าหมาย</div><div style="position:relative;height:160px"><canvas id="sDoorChart"></canvas></div></div>
+  <div style="background:var(--bg2);border:1px solid var(--bdr);border-radius:9px;padding:12px"><div style="font-size:11px;font-weight:700;color:var(--blue);margin-bottom:8px">📈 กราฟความคืบหน้า vs เป้าหมาย</div><div style="position:relative;height:160px"><canvas id="sDoorChart"></canvas></div></div>
 </div>
 
 <div id="zone-s1">
 <div class="card">
   <div class="SH"><div class="SN" style="background:#00e676">8</div><div class="ST">งานทาสีรองพื้น</div><div class="Stg" style="margin-left:auto">เป้า 20%</div></div>
-  <div class="C2" style="margin-bottom:10px">
+  <div class="C2">
     <div class="MS"><span class="MSi">🎨</span><div><div class="MSl">รวมทั้งหมด</div><div class="MSv">62 ช่อง</div></div></div>
     <div class="MS"><span class="MSi">📊</span><div><div class="MSl">ความคืบหน้า</div><div class="MSv"><span id="s1p" style="color:var(--red);font-weight:800">0%</span> / 20%</div></div></div>
   </div>
   <input type="hidden" id="s1" value="0">
-  <div class="PBG" style="margin-bottom:10px"><div class="PF r" id="s1b" style="width:0%"></div></div>
+  <div class="PBG"><div class="PF r" id="s1b" style="width:0%"></div></div>
   <!-- S1 floor grid -->
   <div id="s1-grid" style="display:grid;grid-template-columns:repeat(6,1fr);gap:5px;width:100%"></div>
-  <div style="margin-top:10px;padding:9px 12px;background:var(--bg2);border-radius:7px;border:1px solid var(--bdr)">
+  <div style="padding:9px 12px;background:var(--bg2);border-radius:7px;border:1px solid var(--bdr)">
     <div style="font-size:11px;color:var(--tx2)">ยังต้องทำ: <span style="color:var(--orange);font-weight:700;font-family:var(--m)" id="s1r">—</span></div>
     <div style="font-size:11px;color:var(--tx2);margin-top:3px">ทำแล้ว: <span style="color:var(--tx);font-weight:700;font-family:var(--m)" id="s1rm">—</span></div>
   </div>
-  <div style="margin-top:12px;background:var(--bg2);border:1px solid var(--bdr);border-radius:9px;padding:12px">
+  <div style="background:var(--bg2);border:1px solid var(--bdr);border-radius:9px;padding:12px">
     <div style="font-size:11px;font-weight:700;color:var(--green);margin-bottom:8px">📈 กราฟความคืบหน้า vs เป้าหมาย</div>
     <div style="position:relative;height:160px"><canvas id="s1LineChart"></canvas></div>
   </div>
